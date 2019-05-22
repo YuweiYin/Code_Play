@@ -38,7 +38,7 @@ class Solution:
         root = sequence[len(sequence) - 1]
         flag = True
         for i in range(len(sequence) - 1):
-            # falg 为真表示正在分割左子树序列
+            # flag 为真表示正在分割左子树序列
             if flag:
                 # 把比根节点小的值存入 left_seq
                 if sequence[i] < root:
@@ -47,7 +47,7 @@ class Solution:
                 else:
                     right_seq.append(sequence[i])
                     flag = False
-            # falg 为假表示正在分割右子树序列
+            # flag 为假表示正在分割右子树序列
             else:
                 # 如果在右子树序列里面存在比根小的值，则序列不符合 BST
                 if sequence[i] < root:
