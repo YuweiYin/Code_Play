@@ -43,6 +43,19 @@ class Solution:
             else:
                 return s.find(s_temp[0])
 
+        # # 方法二：遍历一遍，构造字典，键为字符，值为字符出现次数
+        # dic = dict()
+        # for char in s:
+        #     if char in dic:
+        #         dic[char] += 1
+        #     else:
+        #         dic[char] = 1
+
+        # # 遍历一遍，如果某字符总出现次数为 1，则返回该字符在 s 里的下标
+        # for i in range(len(s)):
+        #     if dic[s[i]] == 1:
+        #         return i
+
         return -1
 
 
