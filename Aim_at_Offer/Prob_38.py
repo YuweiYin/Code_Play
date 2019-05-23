@@ -33,6 +33,10 @@ class Solution:
         if pRoot is None:
             return 0
 
+        # 方法一
+        # return 1 + max(self.TreeDepth(pRoot.left), self.TreeDepth(pRoot.right))
+
+        # 方法二：前序遍历
         if pRoot.left is None and pRoot.right is None:
             return 1
 
