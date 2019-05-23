@@ -19,11 +19,11 @@ import getopt
 class Solution:
     def FirstNotRepeatingChar(self, s):
         # write code here
-        s_len = len(s)
-        if s is None or s_len <= 0:
+        if s is None or len(s) <= 0:
             return -1
 
         # s 仅有一个字符，直接返回之
+        s_len = len(s)
         if s_len == 1:
             return s[0]
 
