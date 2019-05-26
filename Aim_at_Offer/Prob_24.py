@@ -71,7 +71,7 @@ class Solution:
         if root.val <= expectNumber and root.right is not None:
             self.FindPath(root.right, expectNumber - root.val)
 
-        # 若都不符合，则回溯退到父节点，弹出子节点
+        # 若都不符合，则回溯退到父节点，弹出子节点（避免重复出现）
         self.path_list_current.pop()
         return self.path_list_all
 
