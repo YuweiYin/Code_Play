@@ -25,23 +25,23 @@
 #pragma comment(linker, "/STACK:1024000000,1024000000")
 
 // 引入头文件
-#include<iostream>
-#include<cstdio>
-#include<cstring>
-#include<cmath>
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
 
-#include<math.h>
-#include<time.h>
+#include <math.h>
+#include <time.h>
 
-#include<algorithm>
-#include<string>
-#include<vector>
-#include<list>
-#include<stack>
-#include<queue>
-#include<map>
-#include<set>
-#include<bitset>
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <list>
+#include <stack>
+#include <queue>
+#include <map>
+#include <set>
+#include <bitset>
 
 // 使用 std 标准命名空间
 using namespace std;
