@@ -15,7 +15,7 @@ const double EPS = 1e-10;
 
 class Solution {
 public:
-    // 计算 double 型正平方根
+    // 计算 double 型数的正平方根
     double mySqrtDouble(double x) {
         if (x < 0) {
             return -1;
@@ -47,11 +47,12 @@ public:
                 res = (last + x / last) / 2;
                 max_loop --;
             }
+            
             return res;
         }
     }
     
-    // 获得正平方根的整数部分
+    // 获得某整数的正平方根的整数部分
     int mySqrtInt(int x) {
         if (x < 0) {
             return -1;
@@ -69,7 +70,7 @@ public:
                 max_loop --;
             }
             
-            // 此时 res 并不是精确的平方根，但整数部分没错
+            // 只返回整数部分
             return int(res);
         }
     }
