@@ -77,11 +77,12 @@ public:
         }
         
         // 笨蛋方法1：时间复杂度 O(m+n)，用O(m+n)的时间合并两个有序数组，然后O(1)随机查找
-        // 笨蛋方法2：时间复杂度 O(m+n)，用O((m+n)/2)的时间有序遍历两个有序数组，遍历到一半就得到结果
+        // 笨蛋方法2：时间复杂度 O(m+n)，改进方法1，用O((m+n)/2)的时间遍历两个有序数组，遍历一半就得到结果
         // 方法3：二分查找，时间复杂度O(log(m+n))
         double ans = 0.0;
         long size_sum = nums1.size() + nums2.size();
         long mid = floor(size_sum / 2);
+        long count = 0;
         vector<int>::iterator ite1 = nums1.begin();
         vector<int>::iterator ite2 = nums2.begin();
         vector<int> nums;
@@ -102,6 +103,12 @@ public:
                     nums.push_back(*ite2);
                     ite2 ++;
                 }
+            }
+            
+            // 遍历到一半就可以结束循环了
+            count ++;
+            if (count == (mid + 1)) {
+                break;
             }
         }
         
@@ -124,7 +131,7 @@ public:
 int main(int argc, const char * argv[]) {
     // 设置测试数据
     vector<int> nums1 = {1, 3};
-    vector<int> nums2 = {2, 4};
+    vector<int> nums2 = {2, 4, 9};
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
