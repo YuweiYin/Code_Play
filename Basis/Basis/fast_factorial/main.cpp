@@ -86,7 +86,7 @@ int main(int argc, const char * argv[]) {
     cout << number << "! = " << result << endl;
     
     finish = clock();
-    prog_duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    prog_duration = (double)(finish - start) * 1000 / CLOCKS_PER_SEC;
     
     cout << "程序耗时: " << prog_duration << "ms." << endl;
     
