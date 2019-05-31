@@ -14,20 +14,20 @@ using namespace std;
 
 typedef long long ll;
 
-const ll mod = 1e9+7;
+const ll MOD = 1e9+7;
 
 
 // 快速幂并取模，注释略
 template <typename T>
 T powerMod(T base, T exp) {
     T res = 1;
-    base %= mod;
+    base %= MOD;
     assert(exp >= 0); // assert 宏的原型定义在 <assert.h> 中，其作用是如果它的条件返回错误，则终止程序执行
     while (exp) {
         if (exp & 1) {
-            res = res * base % mod;
+            res = res * base % MOD;
         }
-        base = base * base % mod;
+        base = base * base % MOD;
         exp >>= 1;
     }
     return res;
