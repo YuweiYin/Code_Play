@@ -82,7 +82,7 @@ using namespace std;
 
 class Solution {
 public:
-    string convert(string s, int numRows) {
+    string convert (string s, int numRows) {
         if (s.empty() || numRows <= 0) {
             return "";
         }
@@ -93,9 +93,20 @@ public:
         
         string res = "";
         
+        res = this->solution2(s, numRows);
+        
+        return res;
+    }
+    
+    // 模拟法：
+    // 模拟 Z 字形过程构建二维数组，然后逐行输出
+    string solution1 (string s, int numRows) {
+        string res = "";
+        
         int s_len = (int)s.length();
         int max_row = 1;
         
+        // 确定二维数组的列数
         if (s_len > numRows) {
             int module = 2 * (numRows - 1); // 记录每个模块的字符个数
             int module_num = 0; // 记录总共有多少个整体模块
@@ -111,6 +122,7 @@ public:
             max_row = module_row + rest_row;
         }
         
+        // 初始化二维数组
         char zigzag[numRows][max_row];
         for (int i = 0; i < numRows; i ++) {
             for (int j = 0; j < max_row; j ++) {
@@ -118,10 +130,12 @@ public:
             }
         }
         
+        // 模拟遍历过程，构造 Z 字形二维数组
         int s_index = 0, x = 0, y = 0;
         int direction = 1; // 0 表示停下，1 表示向下走，2 表示向右上走
         while (direction != 0) {
             if (direction == 1) {
+                // 向下走
                 // cout << x << "," << y << "," << s[s_index] << endl;
                 zigzag[x++][y] = s[s_index++];
                 if (x >= numRows) {
@@ -130,6 +144,7 @@ public:
                     y ++;
                 }
             } else if (direction == 2) {
+                // 向右上走
                 // cout << x << "," << y << "," << s[s_index] << endl;
                 zigzag[x--][y++] = s[s_index++];
                 if (x < 0) {
@@ -148,6 +163,7 @@ public:
             }
         }
         
+        // 按行遍历构造好的二维数组
         for (int i = 0; i < numRows; i ++) {
             for (int j = 0; j < max_row; j ++) {
                 if (zigzag[i][j] == '\0') {
@@ -159,6 +175,53 @@ public:
                 }
             }
             // cout << endl;
+        }
+        
+        return res;
+    }
+    
+    // 规律法：
+    // 仔细分析，找出每一行依次出现的字符所在 s 串的坐标 index 相对于 Z 字形二维数组的行列 i,j 之间的关系
+    string solution2 (string s, int numRows) {
+        string res = "";
+        int s_len = (int)s.length();
+        
+        for (int i = 0; i < numRows; i++) {
+            int k = 0;
+            if (i == 0) {
+                // 第 0 行，最初的一行。
+                // 在该行出现的字符，在 s 中的坐标是 0, 2n-2, 4n-4...
+                // 规律为 2k(n-1), k=0,1,2,3...
+                while ((k << 1) * (numRows - 1) < s_len) {
+                    res += s[(k << 1) * (numRows - 1)];
+                    k ++;
+                }
+            } else if (i == numRows - 1) {
+                // 第 n - 1 行，最后一行。
+                // 在该行出现的字符，在 s 中的坐标是 n-1, 3n-3, 5n-5...
+                // 规律为 (2k+1)(n-1), k=0,1,2,3...
+                while (((k << 1) + 1) * (numRows - 1) < s_len) {
+                    res += s[((k << 1) + 1) * (numRows - 1)];
+                    k ++;
+                }
+            } else {
+                // 中间第 i 行。
+                // 在该行出现的字符，在 s 中的坐标分为两个规律部分，以 i=1 为例，
+                // 分别是 1, 2n-3, 4n-5... 和 2n-1, 4n-3, 6n-5... 两组数据交替出现
+                // 规律为 2k(n-1)+m, k=0,1,2,3... 和 2k(n-1)-m, k=1,2,3,...
+                while ((k << 1) * (numRows - 1) - i < s_len) {
+                    int index = (k << 1) * (numRows - 1);
+                    if (index >= i) {
+                        res += s[index - i];
+                    }
+                    
+                    // 在 2k(n-1)-m 符合条件的情况下，用相同的 k 判断 2k(n-1)+m 是否也成立
+                    if (index + i < s_len) {
+                        res += s[index + i];
+                    }
+                    k ++;
+                }
+            }
         }
         
         return res;
@@ -178,7 +241,7 @@ int main(int argc, const char * argv[]) {
     // int numRows = 3; // "LCIRETOESIIGEDHN"
     // int numRows = 4; // "LDREOEIIECIHNTSG"
     
-    string s = "AB";
+    string s = "ABC";
     int numRows = 2; // "AB"
     
     // 调用解决方案，获得处理结果，并输出展示结果
