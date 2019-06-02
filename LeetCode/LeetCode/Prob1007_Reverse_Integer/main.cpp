@@ -77,6 +77,38 @@ const int MIN_INT32 = -0x80000000;
 class Solution {
 public:
     int reverse(int x) {
+        return this->solution1(x);
+    }
+    
+    // 方法一：时间复杂度 O(log_10(x)), 空间复杂度 O(1)
+    // 在 res * 10 前判断当前 res 是否超过了 INT_MAX / 10（或 INT_MIN / 10）
+    int solution1 (int x) {
+        int res = 0;
+        
+        while (x != 0) {
+            int pop = x % 10;
+            x /= 10;
+            
+            if (res > INT_MAX / 10 || (res == INT_MAX / 10 && pop > 7)) {
+                // 后半部分的判断，是因为最大值是 2147483647，如果当前 res 等于 INT_MAX / 10
+                // 表示当前 res == 214748364，只剩末位需要判断，如果末位超过 7，那 res 乘 10 加末位就溢出了
+                return 0;
+            }
+            if (res < INT_MIN / 10 || (res == INT_MIN / 10 && pop < -8)) {
+                // 同理，后半部分的判断是因为最小负数为 -2147483648，需要将末位与 -8 相比判断
+                return 0;
+            }
+            
+            // 累积每一位
+            res = res * 10 + pop;
+        }
+        
+        return res;
+    }
+    
+    // 用一个范围更大的 long long 型数来存储反转值，然后判断溢出
+    // 这个方法不是完美满足题目要求，题目可能是假设机器至多存储 int32_t
+    int solution2 (int x) {
         ll y = x;
         if (y == 0) {
             return 0;
@@ -143,7 +175,7 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    int x = 15123;
+    int x = -15123;
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
