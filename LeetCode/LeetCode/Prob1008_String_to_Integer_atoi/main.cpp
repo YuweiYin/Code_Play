@@ -114,11 +114,153 @@ public:
         return this->solution1(str);
     }
     
-    // 方法一：时间复杂度 O(n), 空间复杂度
+    int atoi(const char *str) {
+        return this->solution2(str);
+    }
+    
+    // 方法一：时间复杂度 O(n), 空间复杂度 O(1)
     int solution1 (string str) {
-        int res = 0;
+        // 如果字符串为空，直接返回 0
+        if (str.empty()) {
+            return 0;
+        }
         
-        return res;
+        // 除去开头的空格
+        while (*str.begin() == ' ') {
+            str.erase(str.begin());
+        }
+        
+        int res = 0; // 最终结果
+        bool positive = true; // 记录正负号
+        
+        // 判断正负号，判断完后删除符号位字符
+        if (*str.begin() == '+') {
+            str.erase(str.begin());
+        } else if (*str.begin() == '-') {
+            positive = false;
+            str.erase(str.begin());
+        } else if (*str.begin() < '0' || *str.begin() > '9') {
+            // 首位不是正负号or数字
+            return 0;
+        }
+        
+        // 除去数字开头的 0
+        while (*str.begin() == '0') {
+            str.erase(str.begin());
+        }
+        
+        int res_len = 0; // 记录结果的位数，最多 10 位
+        while (!str.empty() && res_len <= 10 && *str.begin() >= '0' && *str.begin() <= '9') {
+            int number = (int)(*str.begin() - '0');
+            
+            // 如果到了第 11 位还是数字，那么肯定溢出了，返回最值即可
+            if (res_len >= 10) {
+                if (positive) {
+                    return MAX_INT32;
+                } else {
+                    return MIN_INT32;
+                }
+            }
+            
+            // 判断溢出
+            if (res_len == 9) {
+                if (positive) {
+                    // MAX_INT32 = 2147483647 (0x7FFFFFFF)
+                    if (res > 214748364 || (res == 214748364 && number >= 7)) {
+                        return MAX_INT32;
+                    }
+                } else {
+                    // MIN_INT32 = -2147483648 (0x80000000)
+                    if (res > 214748364 || (res == 214748364 && number >= 8)) {
+                        return MIN_INT32;
+                    }
+                }
+            }
+            // 累加末位、增加 res 长度、删去 str 头字符
+            res = res * 10 + number;
+            res_len ++;
+            str.erase(str.begin());
+        }
+        
+        // 根据正负号输出结果
+        if (positive) {
+            return res;
+        } else {
+            return -res;
+        }
+    }
+    
+    // 方法一：（牛客网版本）时间复杂度 O(n), 空间复杂度 O(1)
+    int solution2 (const char *s) {
+        string str = s;
+        // 如果字符串为空，直接返回 0
+        if (str.empty()) {
+            return 0;
+        }
+        
+        // 除去开头的空格
+        while (*str.begin() == ' ') {
+            str.erase(str.begin());
+        }
+        
+        int res = 0; // 最终结果
+        bool positive = true; // 记录正负号
+        
+        // 判断正负号，判断完后删除符号位字符
+        if (*str.begin() == '+') {
+            str.erase(str.begin());
+        } else if (*str.begin() == '-') {
+            positive = false;
+            str.erase(str.begin());
+        } else if (*str.begin() < '0' || *str.begin() > '9') {
+            // 首位不是正负号or数字
+            return 0;
+        }
+        
+        // 除去数字开头的 0
+        while (*str.begin() == '0') {
+            str.erase(str.begin());
+        }
+        
+        int res_len = 0; // 记录结果的位数，最多 10 位
+        while (!str.empty() && res_len <= 10 && *str.begin() >= '0' && *str.begin() <= '9') {
+            int number = (int)(*str.begin() - '0');
+            
+            // 如果到了第 11 位还是数字，那么肯定溢出了，返回最值即可
+            if (res_len >= 10) {
+                if (positive) {
+                    return MAX_INT32;
+                } else {
+                    return MIN_INT32;
+                }
+            }
+            
+            // 判断溢出
+            if (res_len == 9) {
+                if (positive) {
+                    // MAX_INT32 = 2147483647 (0x7FFFFFFF)
+                    if (res > 214748364 || (res == 214748364 && number >= 7)) {
+                        return MAX_INT32;
+                    }
+                } else {
+                    // MIN_INT32 = -2147483648 (0x80000000)
+                    if (res > 214748364 || (res == 214748364 && number >= 8)) {
+                        return MIN_INT32;
+                    }
+                }
+            }
+            // 累加末位、增加 res 长度、删去 str 头字符
+            res = res * 10 + number;
+            res_len ++;
+            str.erase(str.begin());
+        }
+        
+        // 根据正负号输出结果
+        if (positive) {
+            return res;
+        } else {
+            return -res;
+        }
     }
 };
 
@@ -131,11 +273,18 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    string str = "-4193 with words";
+    // string str = "   -419 3 with words"; // -419
+    // string str = "  0000000000012345678"; // 12345678
+    // string str = "2147483646"; // 2147483646
+    // string str = "-2147483648"; // -2147483648
+    string str = "-20000000000000000000"; // -2147483648
+    
+    char *s = (char *)str.data();
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
     cout << solution->myAtoi(str) << endl;
+    cout << solution->atoi(s) << endl;
     
     // 程序执行时间
     finish = clock();
