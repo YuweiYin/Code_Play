@@ -86,19 +86,22 @@ public:
     }
     
     int solution1 (TreeNode* root) {
+        // 根为空，则层数为 0
         if (root == NULL) {
             return 0;
         }
         
+        // 根无子女，则层数为 1
         if (root->left == NULL && root->right == NULL) {
             return 1;
         }
         
-        int depth = 0;
+        int depth = 0; // 层数，最终结果
         
-        queue<TreeNode*> node_queue{};
-        node_queue.push(root);
+        queue<TreeNode*> node_queue{}; // 宽度优先搜索，结点队列
+        node_queue.push(root); // 把根结点加入队列
         
+        // 若队列不空，则继续搜索
         while (!node_queue.empty()) {
             int len_queue = (int)node_queue.size();
             depth ++;
@@ -107,14 +110,17 @@ public:
                 TreeNode* cur = node_queue.front();
                 node_queue.pop();
                 
+                // 如果当前结点没有子女结点，则输出层数
                 if (cur->left == NULL && cur->right == NULL) {
                     return depth;
                 }
                 
+                // 否则，如果左孩子存在，则把左孩子加入队列
                 if (cur->left != NULL) {
                     node_queue.push(cur->left);
                 }
                 
+                // 如果右孩子存在，则把左孩子加入队列
                 if (cur->right != NULL) {
                     node_queue.push(cur->right);
                 }
@@ -124,6 +130,7 @@ public:
         return depth;
     }
     
+    // 前序遍历输出树结构
     int PreOrderRetrival (TreeNode* root) {
         if (!root) {
             return -1;
