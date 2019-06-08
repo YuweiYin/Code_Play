@@ -120,7 +120,7 @@ public:
                     node_queue.push(cur->left);
                 }
                 
-                // 如果右孩子存在，则把左孩子加入队列
+                // 如果右孩子存在，则把右孩子加入队列
                 if (cur->right != NULL) {
                     node_queue.push(cur->right);
                 }
