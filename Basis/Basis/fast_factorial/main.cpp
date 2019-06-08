@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <time.h>
+#include <assert.h>
 //#include <iterator>
 //#include <algorithm>
 using namespace std;
@@ -26,6 +27,32 @@ unsigned long long int power(unsigned long base, unsigned long exp) {
     }
     
     return result;
+}
+
+
+// 快速幂并取模
+// 思路: a^10 = a^(0b1010) = (a^1)^0 * (a^2)^1 * (a^4)^0 * (a^8)^1
+template <typename T>
+T powerMod(T base, T exp, T MOD) {
+    T res = 1;
+    base %= MOD;
+    assert(exp >= 0); // 如果 exp < 0，则终止程序执行
+    
+    // 指数不为 0 则继续循环处理
+    while (exp) {
+        if (exp & 1) {
+            // 若指数的当前二进制位为 1，则累乘到 res
+            res = res * base % MOD;
+        }
+        
+        // 累乘底数 a^k -> a^(2k) 也即 (a^k)^2
+        base = base * base % MOD;
+        
+        // 指数右移一位
+        exp >>= 1;
+    }
+    
+    return res;
 }
 
 
