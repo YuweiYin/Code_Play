@@ -69,7 +69,11 @@ public:
     }
     
     double drawCardsSolution (int n) {
-        for (int i = 0; i <= n; i++) {
+        if (this->dp.find(n) != this->dp.end()) {
+            return this->dp[n];
+        }
+        
+        for (int i = (int)dp.size(); i <= n; i++) {
             this->dp.insert({i, this->drawCards(i)});
         }
         
@@ -118,6 +122,9 @@ int main(int argc, const char * argv[]) {
     Solution* solution = new Solution();
     
     cout << solution->drawCardsSolution(n) << endl;
+//    cout << solution->drawCardsSolution(n - 1) << endl;
+//    cout << solution->drawCardsSolution(n + 2) << endl;
+//    cout << solution->drawCardsSolution(2 * n) << endl;
     
     // 计时
     finish = clock();
