@@ -75,20 +75,19 @@ using namespace std;
 
 class Solution {
 private:
-    map<string, vector<string>> dict = {};
-    vector<vector<string>> list = {};
-    vector<string> res = {}; // 最终结果
+    map<char, vector<char>> dict = {};
+    vector<string> res = {};
 
 public:
     Solution () {
-        dict.insert({"2", {"a", "b", "c"}});
-        dict.insert({"3", {"d", "e", "f"}});
-        dict.insert({"4", {"g", "h", "i"}});
-        dict.insert({"5", {"j", "k", "l"}});
-        dict.insert({"6", {"m", "n", "o"}});
-        dict.insert({"7", {"p", "q", "r", "s"}});
-        dict.insert({"8", {"t", "u", "v"}});
-        dict.insert({"9", {"w", "x", "y", "z"}});
+        dict.insert({'2', {'a', 'b', 'c'}});
+        dict.insert({'3', {'d', 'e', 'f'}});
+        dict.insert({'4', {'g', 'h', 'i'}});
+        dict.insert({'5', {'j', 'k', 'l'}});
+        dict.insert({'6', {'m', 'n', 'o'}});
+        dict.insert({'7', {'p', 'q', 'r', 's'}});
+        dict.insert({'8', {'t', 'u', 'v'}});
+        dict.insert({'9', {'w', 'x', 'y', 'z'}});
     }
     
     vector<string> letterCombinations(string digits) {
@@ -96,56 +95,61 @@ public:
     }
     
 private:
-    // 方法一：递归回溯
+    // 方法一：DFS
     vector<string> solution1 (string digits) {
         if (digits.empty()) {
             return {};
         }
         
+        // 预处理 digits，使其中只含有 2～9 数字
+        string _digits = "";
         for (int i = 0; i < (int)digits.size(); i++) {
-            string sub = digits.substr(i, 1);
-            if (this->dict.find(sub) != this->dict.end()) {
-                this->list.push_back(this->dict[sub]);
+            if (dict.find(digits[i]) != dict.end()) {
+                _digits += digits[i];
             }
+//            if (digits[i] >= '2' && digits[i] <= '9') {
+//                _digits += digits[i];
+//            }
         }
         
-        this->BFS(0, "");
-        
-        // 元素排序
-        // sort(digits.begin(), digits.end());
-        
-        // 排序，使得小数字的三元组在前（观察夹逼过程，发现此时 res 已经是该排序状态）
-        // sort(res.begin(), res.end(), this->myComp);
+        this->DFS(_digits, "", 0);
         
         return this->res;
     }
     
-    void BFS (int i, string cur_str) {
-        if (i == (int)list.size() - 1) {
-            for (int j = 0; j < (int)list[i].size(); j++) {
-                this->res.push_back(cur_str + list[i][j]);
-            }
+    // 深度优先搜索
+    void DFS (string digits, string cur_str, int i) {
+        if (i > (int)digits.size() - 1) {
             return;
         }
         
-        for (int j = 0; j < (int)list[i].size(); j++) {
-            this->BFS(i + 1, cur_str + list[i][j]);
-        }
-    }
-    
-    // 自定义排序函数
-    static bool myComp (const vector<int> &a, const vector<int> &b) {
-        int size_min = min((int)a.size(), (int)b.size());
-        for (int i = 0; i < size_min; i++) {
-            // 相等则看下一个元素
-            if (a[i] == b[i]) {
-                continue;
+        char cur_char = digits[i];
+        
+        if (i == (int)digits.size() - 1) {
+//            if (dict.find(cur_char) != dict.end()) {
+//                for (int j = 0; j < (int)dict[cur_char].size(); j++) {
+//                    this->res.push_back(cur_str + dict[cur_char][j]);
+//                }
+//            } else {
+//                this->res.push_back(cur_str);
+//            }
+            // 预处理后，不用上述判断
+            for (int j = 0; j < (int)dict[cur_char].size(); j++) {
+                this->res.push_back(cur_str + dict[cur_char][j]);
             }
-            // 谁小谁在前
-            return a[i] < b[i];
+            
+            return;
         }
-        // 全都相等，则不动排序
-        return true;
+        
+        for (int j = 0; j < (int)dict[cur_char].size(); j++) {
+//            if (dict.find(cur_char) != dict.end()) {
+//                this->BFS(digits, cur_str + dict[cur_char][j], i + 1);
+//            } else {
+//                this->BFS(digits, cur_str, i + 1);
+//            }
+            // 预处理后，不用上述判断，深度往下遍历
+            this->DFS(digits, cur_str + dict[cur_char][j], i + 1);
+        }
     }
 };
 
@@ -159,7 +163,7 @@ int main(int argc, const char * argv[]) {
     
     // 设置测试数据
     // 预期结果 ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]
-    string digits = "23";
+    string digits = "12#3";
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
