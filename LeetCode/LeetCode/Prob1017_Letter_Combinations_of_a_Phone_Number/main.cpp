@@ -98,7 +98,7 @@ private:
     // 方法一：DFS
     vector<string> solution1 (string digits) {
         if (digits.empty()) {
-            return {};
+            return {""};
         }
         
         // 预处理 digits，使其中只含有 2～9 数字
