@@ -144,7 +144,6 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    // 预期结果 ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"]
     ListNode* head = new ListNode(1);
     head->next = new ListNode(2);
     head->next->next = new ListNode(3);
@@ -159,9 +158,10 @@ int main(int argc, const char * argv[]) {
     if (ans) {
         ListNode* ptr = ans;
         while (ptr) {
-            cout << ptr->val << endl;
+            cout << ptr->val << ", ";
             ptr = ptr->next;
         }
+        cout << endl;
     } else {
         cout << "No Answer." << endl;
     }
