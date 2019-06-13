@@ -106,6 +106,7 @@ private:
             return false;
         }
         
+        // stack<char> parentheses_stack;
         stack<char> parentheses_stack = {};
         
         for (int i = 0; i < (int)s.size(); i++) {
@@ -136,7 +137,6 @@ int main(int argc, const char * argv[]) {
     // 计时
     time_t start, finish;
     double prog_duration;
-    
     start = clock();
     
     // 设置测试数据
