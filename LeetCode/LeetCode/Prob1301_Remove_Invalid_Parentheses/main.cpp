@@ -122,7 +122,7 @@ public:
         // cout << "s: " << s << endl;
         
         // 调用具体方法
-        return this->solution1(s);
+        return this->solution2(s);
     }
     
 private:
@@ -278,8 +278,8 @@ int main(int argc, const char * argv[]) {
     // 设置测试数据
 //    string s = "(a)())()"; // 预期结果 ["(a)()()", "(a())()"]
 //    string s = ")b(a)())()c("; // 预期结果 ["b(a)()()c", "b(a())()c"]
-    string s = ")t))()()bo)"; // 预期结果 ["t(()bo)", "t()(bo)", "t()()bo"]
-//    string s = "(())))(((((vp)()(("; // 预期结果 ["(())((vp))", "(())(vp)()"]
+//    string s = ")t))()()bo)"; // 预期结果 ["t(()bo)", "t()(bo)", "t()()bo"]
+    string s = "(())))(((((vp)()(("; // 预期结果 ["(())((vp))", "(())(vp)()"]
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
