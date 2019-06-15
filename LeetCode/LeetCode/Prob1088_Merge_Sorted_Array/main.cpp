@@ -97,6 +97,28 @@ public:
         this->solution2(nums1, m, nums2, n);
     }
     
+    void mergeArray(int A[], int m, int B[], int n) {
+        // 把输入数组转为向量
+        vector<int> nums1(A, A + m);
+        vector<int> nums2(B, B + n);
+        
+        // 边界情况处理
+        if (nums1.empty() || m == 0) {
+            copy(nums2.begin(), nums2.end(), A);
+            return;
+        }
+        
+        if (nums2.empty() || n == 0) {
+            return;
+        }
+        
+        // 调用核心解决方案
+        this->solution2(nums1, m, nums2, n);
+        
+        // 把结果向量转为数组
+        copy(nums1.begin(), nums1.end(), A);
+    }
+    
 private:
     // 方法一。暴力法。时间复杂度 O(m+n)，空间复杂度 O(m+n)
     void solution1(vector<int>& nums1, int m, vector<int>& nums2, int n) {
@@ -157,8 +179,10 @@ int main(int argc, const char * argv[]) {
     
     // 设置测试数据
     vector<int> nums1 = {1, 2, 3, 0, 0, 0};
+    int A[] = {1, 2, 3, 0, 0, 0};
     int m = 3;
     vector<int> nums2 = {2, 5, 6};
+    int B[] = {2, 5, 6};
     int n = 3;
     
     // 调用解决方案，获得处理结果，并输出展示结果
@@ -166,6 +190,12 @@ int main(int argc, const char * argv[]) {
     solution->merge(nums1, m, nums2, n);
     for (int i = 0; i < (int)nums1.size(); i++) {
         cout << nums1[i] << ", ";
+    }
+    cout << "End." << endl;
+    
+    solution->mergeArray(A, m, B, n);
+    for (int i = 0; i < (m + n); i++) {
+        cout << A[i] << ", ";
     }
     cout << "End." << endl;
     
