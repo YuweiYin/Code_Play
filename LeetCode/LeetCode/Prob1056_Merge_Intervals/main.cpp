@@ -71,12 +71,28 @@ using namespace std;
 //const ll MIN_INT32 = -2147483648;
 
 
+
+// Definition for an interval.
+struct Interval {
+    int start;
+    int end;
+    Interval () : start(0), end(0) {}
+    Interval (int s, int e) : start(s), end(e) {}
+};
+
+
 class Solution {
 public:
     // TODO 本题的两个方法还是不够快，C++ 提交结果中未超过 90+%
     vector<vector<int>> merge(vector<vector<int>>& intervals) {
         // 调用核心解决方案
         return this->solution2(intervals);
+    }
+    
+    // 牛客网的 LeetCode 题
+    vector<Interval> merge(vector<Interval> &intervals) {
+        // 调用核心解决方案
+        return this->solution3(intervals);
     }
     
 private:
@@ -174,6 +190,58 @@ private:
         
         return res;
     }
+    
+    vector<Interval> solution3(vector<Interval> &intervals) {
+        // 边界情况
+        if (intervals.empty() || (int)intervals.size() == 1) {
+            return intervals;
+        }
+        
+        // 数据预处理，保证 intervals 的元素都是有且仅有两个元素的向量
+//        for (auto ite = intervals.begin(); ite < intervals.end();) {
+//            if ((*ite).size() != 2) {
+//                intervals.erase(ite);
+//            } else {
+//                ite ++;
+//            }
+//        }
+        
+        // 区间排序，头号排序指标为更小的左边界，次级排序指标为更小的右边界
+        sort(intervals.begin(), intervals.end(), this->myIntervalObjectComp);
+        
+        vector<Interval> res = {};
+        
+        int left = intervals[0].start;
+        int right = intervals[0].end;
+        int len = (int)intervals.size();
+        
+        for (int i = 1; i < len; i++) {
+            if (intervals[i].start <= right) {
+                // 如果有交集，扩大右边界 right
+                right = max(right, intervals[i].end);
+            } else {
+                // 如果没交集，把之前的整段区间加入结果集
+                res.push_back({left, right});
+                
+                // 然后处理新的区间
+                left = intervals[i].start;
+                right = intervals[i].end;
+            }
+        }
+        // 把最后一段区间加到结果集
+        res.push_back({left, right});
+        
+        return res;
+    }
+    
+    // 区间排序函数，头号排序指标为更小的左边界，次级排序指标为更小的右边界
+    static bool myIntervalObjectComp (Interval& a, Interval& b) {
+        if (a.start == b.start) {
+            return a.end < b.end;
+        } else {
+            return a.start < b.start;
+        }
+    }
 };
 
 
@@ -186,6 +254,7 @@ int main(int argc, const char * argv[]) {
     // 设置测试数据
     // 预期输出 [[1,6], [8,10], [15,18]]
     vector<vector<int>> intervals = {{1, 3}, {2, 6}, {8, 10}, {15, 18}};
+    vector<Interval> intervals2 = {Interval(1, 3), Interval(2, 6), Interval(8, 10), Interval(15, 18)};
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
@@ -199,6 +268,16 @@ int main(int argc, const char * argv[]) {
                 }
                 cout << "],";
             }
+        }
+        cout << "End." << endl;
+    } else {
+        cout << "No Answer." << endl;
+    }
+    
+    vector<Interval> ans2 = solution->merge(intervals2);
+    if (!ans2.empty()) {
+        for (int i = 0; i < (int)ans2.size(); i++) {
+            cout << "[" << ans2[i].start << "," << ans2[i].end << "], ";
         }
         cout << "End." << endl;
     } else {
