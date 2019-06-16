@@ -88,7 +88,7 @@ public:
     }
     
 private:
-    // 方法一。法。时间复杂度 O()，空间复杂度 O()
+    // 方法一。三计数器、一遍扫描。时间复杂度 O(N)，空间复杂度 O(1)
     void solution1(vector<int>& nums) {
         if (nums.empty() || (int)nums.size() == 1) {
             return;
@@ -103,44 +103,33 @@ private:
             int index = 0;
             if (nums[i] == 0) {
                 index = zero_count;
-                cout << "i=" << i << ", index=" << index << endl;
                 if (i > index) {
-                    cout << "swap i=" << i << ", index=" << index << endl;
                     this->swap(nums[i], nums[index]);
+                    
+                    // 如果被 0 替换到后面去的是 1，那么还要考虑 1 不能在 2 之后
+                    if (nums[i] == 1) {
+                        index = zero_count + one_count;
+                        if (i > index) {
+                            this->swap(nums[i], nums[index]);
+                        }
+                    }
                 }
                 zero_count ++;
             } else if (nums[i] == 1) {
                 index = zero_count + one_count;
-                cout << "i=" << i << ", index=" << index << endl;
                 if (i > index) {
-                    cout << "i=" << i << ", index=" << index << endl;
                     this->swap(nums[i], nums[index]);
                 }
                 one_count ++;
             } else if (nums[i] == 2) {
                 index = zero_count + one_count + two_count;
-                cout << "i=" << i << ", index=" << index << endl;
                 if (i > index) {
-                    cout << "i=" << i << ", index=" << index << endl;
                     this->swap(nums[i], nums[index]);
                 }
                 two_count ++;
             } else {
                 continue;
             }
-            
-//            if (i > 0 && nums[i] < nums[i - 1]) {
-//                if (nums[i] == 0) {
-//                    if (nums[i - 1] == 1) {
-//                        nums[zero_count] = 0;
-//                        nums[i] = nums[i - 1];
-//                    } else if (nums[i - 1] == 2) {
-//
-//                    } else {
-//
-//                    }
-//                }
-//            }
         }
     }
     
@@ -160,15 +149,6 @@ int main(int argc, const char * argv[]) {
     
     // 设置测试数据
     vector<int> nums = {2, 0, 2, 1, 1, 0}; // 预期输出 [0,0,1,1,2,2]
-    
-    if (!nums.empty()) {
-        for (int i = 0; i < (int)nums.size(); i++) {
-            cout << nums[i] << ", ";
-        }
-        cout << "End." << endl;
-    } else {
-        cout << "Vector Nums is Empty." << endl;
-    }
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
