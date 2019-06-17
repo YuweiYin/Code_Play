@@ -84,11 +84,12 @@ using namespace std;
 class Solution {
 public:
     void wiggleSort(vector<int>& nums) {
-        return this->solution2(nums);
+        return this->solution1(nums);
     }
     
 private:
-    // 方法一。排序后交换。时间复杂度 O(N)，空间复杂度 O(1)
+    // 方法一。排序后，分两半，交替取值。时间复杂度 O(N)，空间复杂度 O(N)
+    // 由于本方法的基础操作更简单，所以本方法较快。
     void solution1(vector<int>& nums) {
         if (nums.empty() || (int)nums.size() == 1) {
             return;
@@ -97,31 +98,37 @@ private:
         int len = (int)nums.size();
         int half = (int)(len / 2);
         
-        // 排序
-        sort(nums.begin(), nums.end());
+        vector<int> res = {};
         
-        for (int i = 0; i < (int)nums.size(); i++) {
-            cout << nums[i] << ", ";
+        // 降序排序
+        sort(nums.begin(), nums.end(), this->myComp);
+        
+        bool choice = true; // choice 为真时，把较小数加入 res，否则加入较大数
+        int i = 0, j = half;
+        
+        while (i < half && j < len) {
+            if (choice) {
+                choice = !choice;
+                res.push_back(nums[j++]);
+            } else {
+                choice = !choice;
+                res.push_back(nums[i++]);
+            }
         }
-        cout << "End." << endl;
         
-        // 将后一半的较大数用交换的方法插入到较小数到中间
-        int insert_index = 1; // 插入位置 2k-1 (k=1,2,3...)
-        
-        int i;
-        if (len % 2 == 0) {
-            // 例：[1, 2, 3, 4, 5, 6] -> [1, 4, 3, 2, 5, 6] -> [1, 4, 3, 5, 2, 6]
-            i = half;
+        // 处理剩余情况
+        if (choice) {
+            if (j < len) {
+                res.push_back(nums[j++]);
+            }
         } else {
-            // 例：[1, 2, 3, 4, 5, 6, 7] -> [1, 5, 3, 4, 2, 6, 7]
-            //  -> [1, 5, 3, 6, 2, 4, 7] -> [1, 5, 3, 6, 2, 7, 4]
-            i = half + 1;
+            if (i < half) {
+                res.push_back(nums[i++]);
+            }
         }
-        for (; i < len && insert_index < len && insert_index < i; i++) {
-            cout << "swap: nums[" << i << "]=" << nums[i] << ",nums[" << insert_index << "]=" << nums[insert_index] << endl;
-            this->swap(nums[i], nums[insert_index]);
-            insert_index += 2;
-        }
+        
+        // 修改 nums 向量
+        nums = res;
     }
     
     void swap (int& a, int& b) {
@@ -131,6 +138,7 @@ private:
     }
     
     // 方法二。排序后插入。时间复杂度 O(N/2)，空间复杂度 O(N/2)
+    // 由于本方法的基础操作更繁杂，所以本方法较慢。在超时 TLE 边缘试探
     // 例1：[1, 2, 3, 4, 5, 6] -> [4, 1, 2, 3, 5, 6]
     // -> [4, 1, 5, 2, 3, 6] -> [4, 1, 5, 2, 6, 3]
     // 例2：[1, 2, 3, 4, 5, 6, 7] -> [4, 1, 2, 3, 5, 6, 7]
@@ -145,11 +153,6 @@ private:
         
         // 降序排列
         sort(nums.begin(), nums.end(), this->myComp);
-        
-//        for (int i = 0; i < (int)nums.size(); i++) {
-//            cout << nums[i] << ", ";
-//        }
-//        cout << "End." << endl;
         
         // 将后一半的较小数插入到较大数前
         // 注意：不能是升序排列后，将后一半的较大数插入到较小数后
@@ -188,13 +191,13 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-//    vector<int> nums = {1, 5, 1, 1, 6, 4}; // 预期结果 [1, 6, 1, 5, 1, 4]
+    vector<int> nums = {1, 5, 1, 1, 6, 4}; // 预期结果 [1, 6, 1, 5, 1, 4]
 //    vector<int> nums = {1, 2, 2, 1, 2, 1, 1, 1, 1, 2, 2, 2}; // 预期结果 [1,2,1,2,1,2,1,2,1,2,1,2]
 //    vector<int> nums = {1, 3, 2, 2, 3, 1}; // 预期结果 [2, 3, 1, 3, 1, 2]
 //    vector<int> nums = {1, 1, 2, 1, 2, 2, 1}; // 预期结果 [1, 2, 1, 2, 1, 2, 1]
 //    vector<int> nums = {4, 5, 5, 6}; // 预期结果 [5, 6, 4, 5]
 //    vector<int> nums = {4, 5, 5, 5, 5, 6, 6, 6}; // 预期结果 [5, 6, 5, 6, 5, 6, 4, 5]
-    vector<int> nums = {5, 3, 1, 2, 6, 7, 8, 5, 5}; // 预期结果 [5, 8, 5, 7, 3, 6, 2, 5, 1]
+//    vector<int> nums = {5, 3, 1, 2, 6, 7, 8, 5, 5}; // 预期结果 [5, 8, 5, 7, 3, 6, 2, 5, 1]
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
