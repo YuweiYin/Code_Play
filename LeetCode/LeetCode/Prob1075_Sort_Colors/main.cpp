@@ -97,13 +97,15 @@ private:
         int len = (int)nums.size();
         int zero_count = 0; // red
         int one_count = 0; // white
-        int two_count = 0; // blue
+//        int two_count = 0; // blue
         
         for (int i = 0; i < len; i++) {
             int index = 0;
             if (nums[i] == 0) {
+                // 如果当前是 0，则将它应该位于 zero_count 位置
                 index = zero_count;
                 if (i > index) {
+                    // 如果 0 不在它该在的位置，那么把该位置的元素替换到后面去
                     this->swap(nums[i], nums[index]);
                     
                     // 如果被 0 替换到后面去的是 1，那么还要考虑 1 不能在 2 之后
@@ -116,20 +118,24 @@ private:
                 }
                 zero_count ++;
             } else if (nums[i] == 1) {
+                // 同理，如果当前是 0，则将它应该位于 zero_count + one_count 位置
                 index = zero_count + one_count;
                 if (i > index) {
+                    // 如果 1 不在它该在的位置，那么把该位置的元素替换到后面去
                     this->swap(nums[i], nums[index]);
                 }
                 one_count ++;
-            } else if (nums[i] == 2) {
-                index = zero_count + one_count + two_count;
-                if (i > index) {
-                    this->swap(nums[i], nums[index]);
-                }
-                two_count ++;
-            } else {
-                continue;
             }
+//            else if (nums[i] == 2) {
+//                // 本题中 2 是末尾元素，所以不用替换到前面去
+//                index = zero_count + one_count + two_count;
+//                if (i > index) {
+//                    this->swap(nums[i], nums[index]);
+//                }
+//                two_count ++;
+//            } else {
+//                continue;
+//            }
         }
     }
     
