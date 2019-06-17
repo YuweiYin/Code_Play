@@ -239,6 +239,7 @@ private:
         int len = (int)S.size();
         
         // 存放每个字符最后一次出现的下标位置
+        // 用 vector<int> memo 来存储 memo[S[i] - 'a'] = i; 算法速度更快些
         map<char, int> memo = {};
         for (int i = len - 1; i >= 0; i--) {
             if (memo.find(S[i]) == memo.end()) {
