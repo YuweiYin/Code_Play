@@ -88,9 +88,9 @@ using namespace std;
 
 class Solution {
 private:
-//    map<int, int> map_int = {{0, 0}, {1, 1}, {6, 9}, {8, 8}, {9, 6}};
+    // map<int, int> map_int = {{0, 0}, {1, 1}, {6, 9}, {8, 8}, {9, 6}};
     map<char, char> map_char = {{'0', '0'}, {'1', '1'}, {'6', '9'}, {'8', '8'}, {'9', '6'}};
-//    map<string, string> map_string = {{"0", "0"}, {"1", "1"}, {"6", "9"}, {"8", "8"}, {"9", "6"}};
+    // map<string, string> map_string = {{"0", "0"}, {"1", "1"}, {"6", "9"}, {"8", "8"}, {"9", "6"}};
     
 public:
     int confusingNumberII(int N) {
@@ -98,17 +98,15 @@ public:
     }
     
 private:
-    // 方法一。暴力判断法，超时。时间复杂度 O(N^2)，空间复杂度 O(1)
+    // 方法一。暴力判断法，超时。时间复杂度 O(N)，空间复杂度 O(1)
     int solution1(int N) {
         int res = 0;
         
         for (int i = 1; i <= N; i++) {
             if (this->checkConfusingNumber(i)) {
-                // cout << i << ",";
                 res ++;
             }
         }
-        // cout << endl;
         
         return res;
     }
@@ -119,7 +117,7 @@ private:
         return res;
     }
     
-    // 方法三。深度优先遍历法，筛法，构造合法数字。时间复杂度 O(NlogN)，空间复杂度 O(logN) 系统栈空间
+    // 方法三。深度优先遍历法，筛法，构造合法数字。时间复杂度 O(logN)，空间复杂度 O(logN) 系统栈空间
     // 执行用时 : 884 ms , 在所有 C++ 提交中击败了 34.88% 的用户
     // 内存消耗 : 8.2 MB , 在所有 C++ 提交中击败了 100.00% 的用户
     int solution3(int N) {
@@ -138,8 +136,6 @@ private:
             depth ++;
         }
         
-        // cout << "depth = " << depth << endl;
-        
         // 分别构造以 1、6、8、9 为根的树，并 DFS 遍历之
         this->DFS(res, N, "1", depth, 1, "1");
         this->DFS(res, N, "6", depth, 1, "6");
@@ -154,13 +150,11 @@ private:
             return;
         }
         
-//        cout << res << ", " << N << ", " << root << ", " << depth << ", " << cur_depth << ", " << cur_str << endl;
-        
         if (cur_depth == depth) {
             if (cur_depth == 10 && (stoi(root) > 2)) {
                 return;
             }
-            // TODO 仍有越界风险
+            // TODO 若非题意限制 N <= 1000000000 , 仍有越界风险
             if (stoi(cur_str) > N) {
                 return;
             }
@@ -168,7 +162,6 @@ private:
         
         if (this->checkConfusingNumber(cur_str)) {
             res ++;
-//            cout << res << ": " << cur_str << endl;
         }
         
         if (cur_depth < depth) {
