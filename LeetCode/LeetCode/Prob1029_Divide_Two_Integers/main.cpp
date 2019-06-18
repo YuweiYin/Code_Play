@@ -26,11 +26,11 @@
 //Note:
 //    Both dividend and divisor will be 32-bit signed integers.
 //    The divisor will never be 0.
-//    Assume we are dealing with an environment which could only store integers within the 32-bit signed integer range: [−231,  231 − 1]. For the purpose of this problem, assume that your function returns 231 − 1 when the division result overflows.
+//    Assume we are dealing with an environment which could only store integers within the 32-bit signed integer range: [−2^31,  2^31 − 1]. For the purpose of this problem, assume that your function returns 2^31 − 1 when the division result overflows.
 //说明:
 //    被除数和除数均为 32 位有符号整数。
 //    除数不为 0。
-//    假设我们的环境只能存储 32 位有符号整数，其数值范围是 [−231,  231 − 1]。本题中，如果除法结果溢出，则返回 231 − 1。
+//    假设我们的环境只能存储 32 位有符号整数，其数值范围是 [−2^31,  2^31 − 1]。本题中，如果除法结果溢出，则返回 2^31 − 1。
 
 
 // 设置系统栈深度
@@ -83,12 +83,6 @@ const int HALF_MAX_INT32 = MAX_INT32 >> 1;
 class Solution {
 public:
     int divide(int dividend, int divisor) {
-        return this->solution2(dividend, divisor);
-    }
-    
-private:
-    // 方法一。循环做减法。时间复杂度 O(dividend / divisor)，空间复杂度 O(1)
-    int solution1(int dividend, int divisor) {
         // 边界情况：除数为 0，结果溢出
         if (divisor == 0) {
             return MAX_INT32;
@@ -109,49 +103,24 @@ private:
             return MAX_INT32;
         }
         
+        // 调用核心解决方案
+        return this->solution2(dividend, divisor);
+    }
+    
+private:
+    // 方法一。循环做减法。时间复杂度 O(dividend / divisor)，空间复杂度 O(1)
+    int solution1(int dividend, int divisor) {
         // 用于记录结果的符号，被除数与除数正负性的同或
         bool positive = true;
         // 如果被除数是 MIN_INT32 且除数不为 -1，那么需要正常做除法，但是把 MIN_INT32 取负号是溢出 int 的
         // 所以用 residual 来记录被除数为 MIN_INT32，它转为正数时会成为 MAX_INT32，少了 1
         bool residual = false;
         
-        // 预处理，记录结果的符号，并把被除数和除数的符号转为正数
-        if (dividend > 0 && divisor < 0) {
-            if (divisor == MIN_INT32) {
-                // 如果被除数是 MIN_INT32，它不能直接取负号变为正数
-                // 不过显然，任何 MAX_INT32 都小于 MIN_INT32 的绝对值，所以商为 0
-                return 0;
-            }
-            // 正常取负号转换，把除数转为正数，没有缺失值
-            divisor = -divisor;
-            positive = false;
-        } else if (dividend < 0 && divisor > 0) {
-            if (dividend == MIN_INT32) {
-                // 把被除数转为正数，记录缺失的 1
-                dividend = MAX_INT32;
-                residual = true;
-            } else {
-                // 正常取负号转换，把被除数转为正数，没有缺失值
-                dividend = -dividend;
-            }
-            positive = false;
-        } else if (dividend < 0 && divisor < 0) {
-            if (dividend == MIN_INT32 && divisor == MIN_INT32) {
-                // 最小除以最小，商为 1
-                return 1;
-            } else if (divisor == MIN_INT32) {
-                // 被除数不是最小，但除数是最小，商为 0
-                return 0;
-            } else if (dividend == MIN_INT32) {
-                // 把被除数转为正数，记录缺失的 1
-                dividend = MAX_INT32;
-                divisor = -divisor;
-                residual = true;
-            } else {
-                // 正常取负号转换，把被除数和除数都转为正数，没有缺失值
-                dividend = -dividend;
-                divisor = -divisor;
-            }
+        // 调用预处理过程
+        int pre_ans = this->pretreatment(positive, residual, dividend, divisor);
+        if (pre_ans != MIN_INT32) {
+            // 如果不等于正常约定值，则表示中途有返回值，直接返回该返回值即可
+            return pre_ans;
         }
         
         // 如果被除数小于除数，商为 0，余数为被除数
@@ -185,69 +154,17 @@ private:
     // 方法一-优化。先用移位操作大致定位结果位置，再循环做减法。
     // 时间复杂度 O(lg(dividend / divisor))，空间复杂度 O(1)
     int solution2(int dividend, int divisor) {
-        // 边界情况：除数为 0，结果溢出
-        if (divisor == 0) {
-            return MAX_INT32;
-        }
-        
-        // 边界情况：被除数为 0，结果为 0
-        if (dividend == 0) {
-            return 0;
-        }
-        
-        // 边界情况：除数为 1，结果为被除数
-        if (divisor == 1) {
-            return dividend;
-        }
-        
-        // MIN_INT32 / -1 溢出
-        if (dividend == MIN_INT32 && divisor == -1) {
-            return MAX_INT32;
-        }
-        
         // 用于记录结果的符号，被除数与除数正负性的同或
         bool positive = true;
         // 如果被除数是 MIN_INT32 且除数不为 -1，那么需要正常做除法，但是把 MIN_INT32 取负号是溢出 int 的
         // 所以用 residual 来记录被除数为 MIN_INT32，它转为正数时会成为 MAX_INT32，少了 1
         bool residual = false;
         
-        // 预处理，记录结果的符号，并把被除数和除数的符号转为正数
-        if (dividend > 0 && divisor < 0) {
-            if (divisor == MIN_INT32) {
-                // 如果被除数是 MIN_INT32，它不能直接取负号变为正数
-                // 不过显然，任何 MAX_INT32 都小于 MIN_INT32 的绝对值，所以商为 0
-                return 0;
-            }
-            // 正常取负号转换，把除数转为正数，没有缺失值
-            divisor = -divisor;
-            positive = false;
-        } else if (dividend < 0 && divisor > 0) {
-            if (dividend == MIN_INT32) {
-                // 把被除数转为正数，记录缺失的 1
-                dividend = MAX_INT32;
-                residual = true;
-            } else {
-                // 正常取负号转换，把被除数转为正数，没有缺失值
-                dividend = -dividend;
-            }
-            positive = false;
-        } else if (dividend < 0 && divisor < 0) {
-            if (dividend == MIN_INT32 && divisor == MIN_INT32) {
-                // 最小除以最小，商为 1
-                return 1;
-            } else if (divisor == MIN_INT32) {
-                // 被除数不是最小，但除数是最小，商为 0
-                return 0;
-            } else if (dividend == MIN_INT32) {
-                // 把被除数转为正数，记录缺失的 1
-                dividend = MAX_INT32;
-                divisor = -divisor;
-                residual = true;
-            } else {
-                // 正常取负号转换，把被除数和除数都转为正数，没有缺失值
-                dividend = -dividend;
-                divisor = -divisor;
-            }
+        // 调用预处理过程
+        int pre_ans = this->pretreatment(positive, residual, dividend, divisor);
+        if (pre_ans != MIN_INT32) {
+            // 如果不等于正常约定值，则表示中途有返回值，直接返回该返回值即可
+            return pre_ans;
         }
         
         // 如果被除数小于除数，商为 0，余数为被除数
@@ -288,6 +205,50 @@ private:
         } else {
             return -res;
         }
+    }
+    
+    // 预处理，记录结果的符号，并把被除数和除数的符号转为正数
+    int pretreatment (bool& positive, bool& residual, int& dividend, int& divisor) {
+        if (dividend > 0 && divisor < 0) {
+            if (divisor == MIN_INT32) {
+                // 如果被除数是 MIN_INT32，它不能直接取负号变为正数
+                // 不过显然，任何 MAX_INT32 都小于 MIN_INT32 的绝对值，所以商为 0
+                return 0;
+            }
+            // 正常取负号转换，把除数转为正数，没有缺失值
+            divisor = -divisor;
+            positive = false;
+        } else if (dividend < 0 && divisor > 0) {
+            if (dividend == MIN_INT32) {
+                // 把被除数转为正数，记录缺失的 1
+                dividend = MAX_INT32;
+                residual = true;
+            } else {
+                // 正常取负号转换，把被除数转为正数，没有缺失值
+                dividend = -dividend;
+            }
+            positive = false;
+        } else if (dividend < 0 && divisor < 0) {
+            if (dividend == MIN_INT32 && divisor == MIN_INT32) {
+                // 最小除以最小，商为 1
+                return 1;
+            } else if (divisor == MIN_INT32) {
+                // 被除数不是最小，但除数是最小，商为 0
+                return 0;
+            } else if (dividend == MIN_INT32) {
+                // 把被除数转为正数，记录缺失的 1
+                dividend = MAX_INT32;
+                divisor = -divisor;
+                residual = true;
+            } else {
+                // 正常取负号转换，把被除数和除数都转为正数，没有缺失值
+                dividend = -dividend;
+                divisor = -divisor;
+            }
+        }
+        
+        // 约定的正常返回值
+        return MIN_INT32;
     }
 };
 
