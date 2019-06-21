@@ -124,10 +124,40 @@
 			<key>orderHint</key>
 			<integer>28</integer>
 		</dict>
+		<key>Prob1024_Swap_Nodes_in_Pairs.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>43</integer>
+		</dict>
+		<key>Prob1025_Reverse_Nodes_in_k-Group.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>47</integer>
+		</dict>
+		<key>Prob1029_Divide_Two_Integers.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>38</integer>
+		</dict>
 		<key>Prob1032_Longest_Valid_Parentheses.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>24</integer>
+		</dict>
+		<key>Prob1056_Merge_Intervals.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>30</integer>
+		</dict>
+		<key>Prob1057_Insert_Interval.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>34</integer>
+		</dict>
+		<key>Prob1075_Sort_Colors.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>35</integer>
 		</dict>
 		<key>Prob1088_Merge_Sorted_Array.xcscheme_^#shared#^_</key>
 		<dict>
@@ -139,10 +169,25 @@
 			<key>orderHint</key>
 			<integer>11</integer>
 		</dict>
+		<key>Prob1143_Reorder_List.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>48</integer>
+		</dict>
+		<key>Prob1147_Insertion_Sort_List.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>36</integer>
+		</dict>
 		<key>Prob1148_Sort_List.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>30</integer>
+			<integer>31</integer>
+		</dict>
+		<key>Prob1160_Intersection_of_Two_Linked_Lists.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>49</integer>
 		</dict>
 		<key>Prob1301_Remove_Invalid_Parentheses.xcscheme_^#shared#^_</key>
 		<dict>
@@ -154,15 +199,65 @@
 			<key>orderHint</key>
 			<integer>13</integer>
 		</dict>
+		<key>Prob1324_Wiggle_Sort_II.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>37</integer>
+		</dict>
+		<key>Prob1344_Reverse_String.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>42</integer>
+		</dict>
+		<key>Prob1345_Reverse_Vowels_of_a_String.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>44</integer>
+		</dict>
+		<key>Prob1445_Add_Two_Numbers_II.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>50</integer>
+		</dict>
+		<key>Prob1541_Reverse_String_II.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>45</integer>
+		</dict>
+		<key>Prob1557_Reverse_Words_in_a_String_III.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>46</integer>
+		</dict>
+		<key>Prob1763.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>39</integer>
+		</dict>
+		<key>Prob1763_Partition_Labels.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>40</integer>
+		</dict>
 		<key>Prob1977_Squares_of_a_Sorted_Array.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>31</integer>
+			<integer>32</integer>
+		</dict>
+		<key>Prob1986_Interval_List_Intersections.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>33</integer>
 		</dict>
 		<key>Prob2003_Check_If_Word_Is_Valid_After_Substitutions.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>26</integer>
+		</dict>
+		<key>Prob2088_Confusing_Number_II.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>41</integer>
 		</dict>
 	</dict>
 </dict>
