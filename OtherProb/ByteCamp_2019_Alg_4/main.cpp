@@ -277,7 +277,17 @@ int main(int argc, const char * argv[]) {
     // Case 6 预期结果 zyxwvutsrqponmlkjihgfedcba
     // 老方法贪心递归：最坏情况-程序执行时间: 特别久. recur_count = 1024=2^26
     // 新剪枝方法的贪心递归：程序执行时间: 8.868ms. recur_count = 352 loop_count = 351
-    string str = "zyxwvutsrqponmlkjihgfedcba";
+//    string str = "zyxwvutsrqponmlkjihgfedcba";
+    
+    // Case 7 预期结果 abcdefghijklmnopqrstuvwxyz
+    // 老方法贪心递归：最优情况-程序执行时间: 1.129ms. recur_count = 27 loop_count = 26
+    // 新剪枝方法的贪心递归：程序执行时间: 0.994ms. recur_count = 27 loop_count = 26
+//    string str = "aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwwxxxxxyyyyyzzzzz";
+    
+    // Case 8 预期结果 zyxwvutsrqponmlkjihgfedcba
+    // 老方法贪心递归：最坏情况-程序执行时间: 特别久. recur_count = 1024=2^26
+    // 新剪枝方法的贪心递归：程序执行时间: 9.488ms. recur_count = 352 loop_count = 351
+    string str = "zzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaa";
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
