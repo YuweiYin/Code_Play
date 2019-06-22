@@ -73,7 +73,7 @@ private:
 public:
     // 解决方案入口函数
     string MinAllSubstring(string str) {
-        return this->solution1(str);
+        return this->solution2(str);
     }
     
 private:
@@ -287,7 +287,17 @@ int main(int argc, const char * argv[]) {
     // Case 8 预期结果 zyxwvutsrqponmlkjihgfedcba
     // 老方法贪心递归：最坏情况-程序执行时间: 特别久. recur_count = 1024=2^26
     // 新剪枝方法的贪心递归：程序执行时间: 9.488ms. recur_count = 352 loop_count = 351
-    string str = "zzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaa";
+//    string str = "zzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaa";
+    
+    // Case 9 预期结果 abcdefghijklmnopqrstuvwxyz
+    // 老方法贪心递归：最优情况-程序执行时间: 1.457ms. recur_count = 27 loop_count = 26
+    // 新剪枝方法的贪心递归：程序执行时间: 1.509ms. recur_count = 27 loop_count = 26
+//    string str = "aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwwxxxxxyyyyyzzzzzaaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwwxxxxxyyyyyzzzzzaaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwwxxxxxyyyyyzzzzzaaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwwxxxxxyyyyyzzzzzaaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrssssstttttuuuuuvvvvvwwwwwwxxxxxyyyyyzzzzz";
+    
+    // Case 10 预期结果 zyxwvutsrqponmlkjihgfedcba
+    // 老方法贪心递归：最坏情况-程序执行时间: 特别久.
+    // 新剪枝方法的贪心递归：程序执行时间: 8.969ms. recur_count = 258 loop_count = 5347
+    string str = "zzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaazzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaazzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaazzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaazzzzzyyyyyxxxxxwwwwwvvvvvuuuuutttttsssssrrrrrqqqqqpppppooooonnnnnmmmmmlllllkkkkkjjjjjiiiiihhhhhgggggfffffeeeeedddddcccccbbbbbaaaaa";
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
