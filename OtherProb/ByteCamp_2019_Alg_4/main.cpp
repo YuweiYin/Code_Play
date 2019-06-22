@@ -104,7 +104,8 @@ private:
     }
     
     // 贪心树型算法，每次尝试用字典序较小的数开头，成功搜索到的第一个解，就是最优解
-    void greedySearch (map<char, vector<int>> dict, string key, int depth, string str, string cur_str, int cur_index) {
+    void greedySearch (map<char, vector<int>> dict, string key, int depth,
+                       string str, string cur_str, int cur_index) {
         recur_count ++;
         
         if (this->end_tag) {
@@ -144,7 +145,8 @@ private:
                 
                 if (index_vec[j] > cur_index) {
                     // 把 key[i] 从 key 中取出，加在 cur_str 之后，贪心递归执行
-                    this->greedySearch(dict, key.substr(0, i) + key.substr(i + 1, key_len), depth + 1, str, cur_str + key[i], index_vec[j]);
+                    this->greedySearch(dict, key.substr(0, i) + key.substr(i + 1, key_len),
+                                       depth + 1, str, cur_str + key[i], index_vec[j]);
                     break;
                 }
             }
