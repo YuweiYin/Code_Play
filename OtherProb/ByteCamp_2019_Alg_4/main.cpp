@@ -78,7 +78,7 @@ public:
     
 private:
     // 方法一。贪心递归，高效剪枝。线性时间复杂度。
-    // 时间复杂度 O(N), Omega(N), Theta(N),空间复杂度 O(N)
+    // 时间复杂度 O(N), Omega(lgN), 空间复杂度 O(N)
     string solution1(string str) {
         
         map<char, vector<int>> dict = {}; // 记录某个字符各次出现的下标列表
