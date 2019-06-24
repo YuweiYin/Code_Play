@@ -80,15 +80,16 @@ using namespace std;
 class Solution {
 public:
     int strStr(string haystack, string needle) {
-        return this->solution1(haystack, needle);
+        return this->solution2(haystack, needle);
     }
 private:
-    // 方法一：从左到右暴力匹配。时间复杂度 O(N)，空间复杂度 O(1)
+    // 方法一：从左到右暴力匹配。时间复杂度 O(NM)，空间复杂度 O(1)
+    // N 是匹配串 haystack 的长度，M 是模式串 needle 的长度
     // 执行用时 : 0 ms , 在所有 C++ 提交中击败了 100.00% 的用户
     // 内存消耗 : 9.1 MB , 在所有 C++ 提交中击败了 82.45% 的用户
     // Runtime: 4 ms, faster than 95.80% of C++ online submissions for Implement strStr().
     // Memory Usage: 9.1 MB, less than 62.80% of C++ online submissions for Implement strStr().
-    int solution1(string haystack, string needle) {
+    int solution1 (string haystack, string needle) {
         // 边界情况
         if (needle.empty()) {
             return 0;
@@ -131,6 +132,75 @@ private:
         // 之前没有返回，表示前面都匹配失败了
         return -1;
     }
+    
+    // 方法二：KMP 算法。时间复杂度 O(N+M)，空间复杂度 O(1)
+    // N 是匹配串 haystack 的长度，M 是模式串 needle 的长度
+    // KMP 核心思想：如果模式串有"重复结构"，当出现不匹配时，
+    // 不必直接让匹配串从下一个开始、模式串从头开始。而是找到一个恰当的重新开始匹配的位置。
+    int solution2 (string haystack, string needle) {
+        // 边界情况
+        if (needle.empty()) {
+            return 0;
+        }
+        
+        if (haystack.empty()) {
+            return -1;
+        }
+        
+        int h_len = (int)haystack.size();
+        int n_len = (int)needle.size();
+        
+        if (h_len < n_len) {
+            return -1;
+        }
+        
+        // 建表。时间复杂度 O(M)，空间复杂度 O(M)
+        // 如果模式串的 k 位置不匹配了，那么下一次匹配时应当从 kmp_table[k-1] 下标匹配
+        // 并且下一次开始匹配前，匹配串应向右移动 k 步
+        vector<int> kmp_table = vector<int>(n_len, 0);
+        
+        for (int i = 1; i < n_len; i++) {
+            if (needle[i] == needle[kmp_table[i - 1]]) {
+                kmp_table[i] = kmp_table[i - 1] + 1;
+            }
+        }
+        
+        // 匹配。时间复杂度 O(N)，空间复杂度 O(1)
+        int match_start = 0; // 匹配串的初始匹配位置
+        int pattern_start = 0; // 模式串的初始匹配位置
+        while (match_start < h_len) {
+            // 如果剩余的字符串长度不足以匹配模式串，直接返回 -1 不匹配
+            if (h_len - match_start < n_len) {
+                return -1;
+            }
+            
+            bool match_flag = true; // 匹配成功标志
+            
+            // 往后逐个对比匹配
+            for (int j = 0; j < n_len; j++) {
+                if (haystack[match_start + j] != needle[pattern_start + j]) {
+                    // 出现不匹配时，计算重新开始匹配的位置
+                    if (pattern_start > 0) {
+                        pattern_start = kmp_table[pattern_start + j - 1];
+                        match_start += pattern_start;
+                    } else {
+                        // 如果模式串头都不能和当前的原串字符匹配，那么只需右移一次 match_start
+                        match_start ++;
+                    }
+                    
+                    match_flag = false;
+                    break;
+                }
+            }
+            
+            if (match_flag) {
+                return match_start; // 如果匹配成功，返回结果
+            }
+        }
+        
+        // 之前没有返回，表示前面都匹配失败了
+        return -1;
+    }
 };
 
 
@@ -142,9 +212,13 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    string haystack = "hello", needle = "ll"; // 预期结果 2
+//    string haystack = "hello", needle = "ll"; // 预期结果 2
 //    string haystack = "aaaaa", needle = "bba"; // 预期结果 -1
 //    string haystack = "abcde", needle = ""; // 预期结果 0
+//    string haystack = "aaabcdaabcaab", needle = "aabcaa"; // 预期结果 6
+    string haystack = "dgmabdgmxdgmabdgmz", needle = "dgmabdgmz"; // 预期结果 9
+//    string haystack = "aaaabacaaaaabaa", needle = "aaaabaa"; // 预期结果 8
+//    string haystack = "mississippi", needle = "issip"; // 预期结果 4
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
