@@ -176,11 +176,11 @@ private:
     // 贪心树型算法，每次尝试用当前最大的收益值
     void greedySearch (vector<char>& A, int& K, vector<int>& benefit,
                        vector<bool>& used, int depth, int cur_res) {
-        recur_count ++;
-        
         if (this->end_flag) {
             return; // End Recursion
         }
+        
+        recur_count ++;
         
         // 如果深度达到 K，表示用尽了操作次数
         if (depth >= K) {
@@ -201,6 +201,8 @@ private:
                 if (this->end_flag) {
                     return; // End Recursion
                 }
+                loop_count ++;
+                
                 if (!used[i] && benefit[i] == *max_ite) {
                     // 记下当前位置的收益
                     int bene = benefit[i];
