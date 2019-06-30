@@ -79,93 +79,222 @@ class Solution {
 private:
     int w_len = 0;
     int width = 0;
+    bool end_flag = false;
     
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
-        return this->solution1(s, words);
+        return this->solution2(s, words);
     }
     
 private:
-    // 方法一：。时间复杂度 O()，空间复杂度 O()。N = 
+    // 方法一：回溯法，太慢，需更好的搜索、剪枝策略。时间复杂度 O()，空间复杂度 O()。N =
+    // 目前 166 / 173 个通过测试用例，第 167 测试用例超时 TLE
     vector<int> solution1 (string s, vector<string>& words) {
         // 边界情况
         if (s.empty() || words.empty()) {
             return {};
         }
         
-//        int s_len = (int)s.size();
         this->w_len = (int)words.size();
         this->width = (int)words[0].size(); // 由题意，各个单词是等长的
+        
+        int s_len = (int)s.size();
+        int total_width = this->w_len * this->width; // 总共单词序列长度
         
         vector<int> res = {};
         map<string, int> word_count = {}; // 记录各个单词的个数
         map<string, vector<int>> word_index = {}; // 记录各个单词出现的下标列表
+//        map<int, string> index_to_word = {}; // 记录某下标起始的单词
         
+        // 记录各个单词的个数
         for (int i = 0; i < this->w_len; i++) {
             if (word_count.find(words[i]) == word_count.end()) {
                 word_count.insert({words[i], 1});
             } else {
                 word_count[words[i]] ++;
             }
-            
-            if (word_index.find(words[i]) == word_index.end()) {
-                word_index.insert({words[i], {}});
-            }
-            
-            auto cur_index = s.find(words[i]); // 找第一个 words[i] 所在的 index
-            while (cur_index != string::npos) {
-                word_index[words[i]].push_back((int)cur_index);
-                cur_index = s.find(words[i], cur_index + this->width); // 继续往后找
-            }
         }
         
-        cout << "word_count:" << endl;
+        // 对不重复的每个单词，把该单词在 s 中出现的各个下标位置记录进列表
         for (auto ite = word_count.begin(); ite != word_count.end(); ite++) {
-            cout << ite->first << ": " << ite->second << endl;
-        }
-        
-        cout << "\nword_index:" << endl;
-        for (auto ite = word_index.begin(); ite != word_index.end(); ite++) {
-            cout << ite->first << ": ";
-            for (int j = 0; j < (int)(ite->second).size(); j++) {
-                cout << ite->second[j] << ", ";
+            if (word_index.find(ite->first) == word_index.end()) {
+                word_index.insert({ite->first, {}});
             }
-            cout << "End." <<endl;
+            
+            auto cur_index = s.find(ite->first); // 找第一个 words[i] 所在的 index
+            while (cur_index != string::npos) {
+                word_index[ite->first].push_back((int)cur_index);
+                cur_index = s.find(ite->first, cur_index + 1); // 继续往后找
+            }
         }
-        cout << "End." <<endl;
         
-        this->backtrack(res, s, words, word_count, word_index, 0, 0);
+//        cout << "word_count:" << endl;
+//        for (auto ite = word_count.begin(); ite != word_count.end(); ite++) {
+//            cout << ite->first << ": " << ite->second << endl;
+//        }
+//
+//        cout << "\nword_index:" << endl;
+//        for (auto ite = word_index.begin(); ite != word_index.end(); ite++) {
+//            cout << ite->first << ": ";
+//            for (int j = 0; j < (int)(ite->second).size(); j++) {
+//                cout << ite->second[j] << ", ";
+//            }
+//            cout << "End." <<endl;
+//        }
+//        cout << "End." <<endl;
+        
+        for (auto ite = word_count.begin(); ite != word_count.end(); ite++) {
+            vector<int> start_index = word_index[ite->first];
+            for (int j = 0; j < (int)start_index.size(); j++) {
+                // 如果当前起点加上总共单词序列长度不超过 s 的长度，
+                // 并且：结果向量为空，或者当前要找的起点还没记录进 res，则继续找
+                if (start_index[j] + total_width <= s_len &&
+                    ( res.empty() || find(res.begin(), res.end(), start_index[j]) == res.end() )) {
+                    
+                    // 递归回溯法
+                    word_count[ite->first] --;
+                    
+                    this->end_flag = false;
+                    this->backtrack(res, s, words, word_count, word_index, 1, start_index[j], start_index[j] + 1);
+                    
+                    word_count[ite->first] ++;
+                }
+            }
+        }
         
         return res;
     }
     
     void backtrack (vector<int>& res, string s, vector<string> words, map<string, int>& word_count,
-              map<string, vector<int>> word_index, int depth, int cur_index) {
+              map<string, vector<int>> word_index, int depth, int start_index, int cur_index) {
+        if (this->end_flag) {
+            return; // End all recursion
+        }
+        
         // 深度达到 words 列表长度，用尽了所有单词
         if (depth >= this->w_len) {
-            res.push_back(cur_index - this->w_len * this->width);
+            if (res.empty() || find(res.begin(), res.end(), start_index) == res.end()) {
+                res.push_back(start_index);
+            }
+            this->end_flag = true;
             return;
         }
         
+        // 在 s 中，从 cur_index 开始找单词子串 words[i]
+        // auto find_word = s.find(words[i], cur_index);
+        
+        // 利用下标信息，模拟查找过程。找目标下标，如果有则表示 words[i] 连续跟在当前子串后面
+        // 如果 cur_index != 0，cur_index 是上个单词起点的下一位置，
+        // 如果与新找到的单词相隔 this->width - 1，则表示是连续单词
+        int aim_index = cur_index + this->width - 1;
+        
+        // 在 words 里面找下一个应出现的单词，如果找不到，表示当前起始的单词不能够连续构成单词序列
+        string aim_word = s.substr(cur_index + this->width - 1, this->width);
+        auto find_word = find(words.begin(), words.end(), aim_word);
+        
+        if (find_word != words.end() && word_count[aim_word] > 0) {
+            // 如果找得到，执行回溯法
+            word_count[aim_word] --;
+            
+            this->backtrack(res, s, words, word_count, word_index,
+                            depth + 1, start_index, aim_index + 1);
+            
+            word_count[aim_word] ++;
+            
+            if (this->end_flag) {
+                return; // End all recursion
+            }
+        } else {
+            // 如果找不到，表示当前起始的单词不能够连续构成单词序列
+            this->end_flag = true;
+            return;
+        }
+    }
+    
+    
+    // 方法二：滑动窗口。时间复杂度 O()，空间复杂度 O()。N =
+    // Runtime: 632 ms, faster than 17.43% of C++ online submissions for Substring with Concatenation of All Words.
+    // Memory Usage: 24.8 MB, less than 37.34% of C++ online submissions for Substring with Concatenation of All Words.
+    vector<int> solution2 (string s, vector<string>& words) {
+        // 边界情况
+        if (s.empty() || words.empty()) {
+            return {};
+        }
+        
+        this->w_len = (int)words.size();
+        this->width = (int)words[0].size(); // 由题意，各个单词是等长的
+        
+        int s_len = (int)s.size();
+        int total_width = this->w_len * this->width; // 总共单词序列长度
+        
+        if (s_len < total_width) {
+            return {};
+        }
+        
+        int start = 0;
+        int end = total_width - 1;
+        
+        vector<int> res = {};
+        map<string, int> word_count = {}; // 记录各个单词的个数
+        
+        // 记录各个单词的个数
         for (int i = 0; i < this->w_len; i++) {
-            if (word_count[words[i]] > 0) {
-                // 在 s 中，从 cur_index 开始找单词子串 words[i]
-                auto find_word = s.find(words[i], cur_index);
-                if (find_word != string::npos) {
-                    // 如果找得到，判断是否为连续单词
-                    if (cur_index == 0 || (int)find_word == cur_index + this->width - 1) {
-                        // cur_index == 0 表示是找到的第一个单词，直接加进来
-                        // 如果 cur_index != 0，cur_index 是上个单词起点的下一位置，
-                        // 如果与新找到的单词相隔 this->width - 1，则表示是连续单词，则执行回溯法
-                        word_count[words[i]] --;
-                        
-                        this->backtrack(res, s, words, word_count, word_index, depth + 1, (int)find_word + 1);
-                        
+            if (word_count.find(words[i]) == word_count.end()) {
+                word_count.insert({words[i], 1});
+            } else {
+                word_count[words[i]] ++;
+            }
+        }
+        
+        while (end < s_len) {
+            // 从当前 start 开始匹配应出现的单词，如果找不到，表示当前起始的单词不能够连续构成单词序列
+            int cur_index = start;
+            
+            string aim_word = s.substr(cur_index, this->width);
+            int count = 0;
+            
+            while (cur_index <= end + 1 - this->width) {
+                // 查看该单词是否在 words 里面，并且还可以使用
+                if (word_count.find(aim_word) != word_count.end() && word_count[aim_word] > 0) {
+                    // 记录连续成功匹配的单词数量
+                    count ++;
+                    if (count == this->w_len) {
+                        break;
+                    }
+                    word_count[aim_word] --;
+                    
+                    // 截取下一个应出现的单词
+                    cur_index += this->width;
+                    aim_word = s.substr(cur_index, this->width);
+                } else {
+                    break;
+                }
+            }
+            
+            // 用尽了目标单词数
+            if (count == this->w_len) {
+                res.push_back(start);
+            }
+            
+            // 如果 count > 0，表示执行过 word_count[aim_word] --; 需要重新赋值 word_count
+            // TODO 在 this->w_len == 1 时，找到了该单词后就 break 了，不会修改 word_count
+            // TODO 每次使用前，调用 map 的深拷贝或许更快？
+            if (count > 0) {
+                word_count = {};
+                for (int i = 0; i < this->w_len; i++) {
+                    if (word_count.find(words[i]) == word_count.end()) {
+                        word_count.insert({words[i], 1});
+                    } else {
                         word_count[words[i]] ++;
                     }
                 }
             }
+            
+            start ++;
+            end ++;
         }
+        
+        return res;
     }
 };
 
@@ -180,12 +309,28 @@ int main(int argc, const char * argv[]) {
     // 设置测试数据
     // 预期结果 [0 ,9] 解释：从索引 0 和 9 开始的子串分别是 "barfoor" 和 "foobar"
     // 输出的顺序不重要, [9, 0] 也是有效答案。
-    string s = "barfoothefoobarman";
-    vector<string> words = {"foo", "bar"};
+//    string s = "barfoothefoobarman";
+//    vector<string> words = {"foo", "bar"};
     
     // 预期结果 []
 //    string s = "wordgoodgoodgoodbestword";
 //    vector<string> words = {"word", "good", "best", "word"};
+    
+    // 预期结果 [6,9,12]
+//    string s = "barfoofoobarthefoobarman";
+//    vector<string> words = {"bar", "foo", "the"};
+    
+    // 预期结果 [8]
+//    string s = "wordgoodgoodgoodbestword";
+//    vector<string> words = {"word", "good", "best", "good"};
+    
+    // 预期结果 [0,1,2]
+//    string s = "aaaaaaaa";
+//    vector<string> words = {"aa", "aa", "aa"};
+    
+    // 预期结果 [373]  1程序执行时间: 1308.15ms.  2程序执行时间: 31.348ms.
+    string s = "ejwwmybnorgshugzmoxopwuvshlcwasclobxmckcvtxfndeztdqiakfusswqsovdfwatanwxgtctyjvsmlcoxijrahivwfybbbudosawnfpmomgczirzscqvlaqhfqkithlhbodptvdhjljltckogcjsdbbktotnxgwyuapnxuwgfirbmdrvgapldsvwgqjfxggtixjhshnzphcemtzsvodygbxpriwqockyavfscvtsewyqpxlnnqnvrkmjtjbjllilinflkbfoxdhocsbpirmcbznuioevcojkdqvoraeqdlhffkwqbjsdkfxstdpxryixrdligpzldgtiqryuasxmxwgtcwsvwasngdwovxzafuixmjrobqbbnhwpdokcpfpxinlfmkfrfqrtzkhabidqszhxorzfypcjcnopzwigmbznmjnpttflsmjifknezrneedvgzfmnhoavxqksjreddpmibbodtbhzfehgluuukupjmbbvshzxyniaowdjamlfssndojyyephstlonsplrettspwepipwcjmfyvfybxiuqtkdlzqedjxxbvdsfurhedneauccrkyjfiptjfxmpxlssrkyldfriuvjranikluqtjjcoiqffdxaukagphzycvjtvwdhhxzagkevvuccxccuoccdkbboymjtimdrmerspxpktsmrwrlkvpnhqrvpdekmtpdfuxzjwpvqjjhfaupylefbvbsbhdncsshmrhxoyuejenqgjheulkxjnqkwvzznriclrbzryfaeuqkfxrbldyusoeoldpbwadhrgijeplijcvqbormrqglgmzsprtmryvkeevlthvflsvognbxfjilwkdndyzwwxgdbeqwlldyezmkopktzugxgkklimhhjqkmuaifnodtpredhqygmedtqpezboimeuyyujfjxkdmbjpizpqltvgknnlodtbhnbhjkmuhwxvzgmkhbcvvadhnssbvneecglnqxhavhvxpkjxlluilzpysjcnwguyofnhfvhaceztoiscumkhociglkvispihvyoatxcxbeqsmluixgsliatukrecgoldmzfhwkgaqzsckonjuhxdhqztjfxstjvikdrhpyjfxbjjryslfpqoiphrwfjqqhaamrjbrsiovrxmqsyxhqmritjeauwqbwtpqcqhvyyssvfknfhxvtodpzipueixdbntdfcaeatyyainfpkclbgaaqrwwzwbcjwiqzkwzfuxfclmsxpdyvfbnwxjytnaejivivriamhgqsskqhnqeurttrfrmstrbeokzhuzvbfmwywohmgogyhzpmsdemugqkspsmoppwbnwabdmiruibwznqcuczculujfiavzwynsyqxmarjkshjhxobandwyzggjibjgzyaaqxorqxbkenscbveqbaociwmqxxyzvyblypeongzrttvwqzmrccwkzidyfbxcaypyquodcpwxkstbthuvjqgialhfmgjohzoxvdaxuywfqrgmyahhtpqtazbphmfoluliznftodyguesshcacrsvutylalqrykehjuofisdookjhrljvedsywrlyccpaowjaqyfaqioesxnlkwgpbznzszyudpwrlgrdgwdyhucztsneqttsuirmjriohhgunzatyfrfzvgvptbgpwajgtysligupoqeoqxoyqtzozufvvlktnvahvsseymtpeyfvxttqosgpplkmxwgmsgtpantazppgnubmpwcdqkvhwfuvcahwibniohiqyywnuzzmxeppokxksrfwrpuzqhjgqryorwboxdauhrkxehiwaputeouwxdfoudcoagcxjcuqvenznxxnprgvhasffxtzaxpcfrcovwgrcwqptoekhmgpoywtxruxokcubekzcrqengviwbtgnzvdzrwwkqvacxwgdhffyvjldgvchoiwnfzoyvkiogisdfyjmfomcazigukqlumyzmnzjzhzfpslwsukykwckvktswjdqxdrlsqvsxwxpqkljeyjpulbswwmuhplfueqnvnhukgjarxlxvwmriqjgmxawmndhsvwnjdjvjtxcsjapfogpesxtpypenunfpjuyoevzztctecilqqbxkaqcyhiobvtqgqruumvvhxolbyzsqcrdchhdqprtkkjsccowrjtyjjmkhleanvfpemuublnnyzfabtxsestncfalqenfcswgerbfcqsapzdtscnzugmwlmidtxkvqhbuaecevwhmwkfqmvpgbefpqpsjmdecmixmmbsjxzwvjdmxydechlraajjmoqpcyoqmrjwoiumuzatydzcnktnkeyztoqvogodxxznhvzduzxudwwqhpftwdspuimioanlzobhjakgajafgzxpqckmhdbbnqmcszpuoqbztnftzgahhxwxbgkilnmzfydyxusnnvngksbjabqjaohdvrniezhmxmkxhemwbbclwdxwgngicplzgajmaryzfkyoqlkrmmfirchzrphveuwmvgaxzbwenvteifxuuefnimnadwxhruvoavlzyhfmeasmgrjawongccgfbgoualiaivbhcgvjjnxpggrewglalthmzvgziobrjeanlvyukwlscexbkibvdjhdgnepdiimmkcxhattwglbkicvsfswocbvphmtpwhcgjbnmxgidtlqcnnwtfujhvgzdussqbwynylzvtjapvqtidpdjkpshvrmqlhindhabubyokzdfrwqvnvgzkyhistydagsgnujiviyijdnabfxqbdqnexvwsvzvcsbrmkbkuzsdehghndyqjodnnblfwmaygdstotfkvxozgwhtbhlkvrzismnozqpfthajafuxekzlgigjpsukjvsdihrjzgovnreqwapdkoqswyclqyvbvpedzyoyedvuuamscbxnqnfmmjyehvidnoimmxmtcinwkbqmcobubjjpshucechrqrffqsyscnqoohcsxenypyqhfklloudgmklcejvgynwouzhtfwuuukdbwpmkjrqxeeaipxrokncholathupdetgaktmvmftqjvzyssocftjwemroghrncynmtchhhcaqxbqpthuaafwgrouaxonzocljeuslzsdwvuoodipdpnlhdihaywzmymxdjrqikughquwtenyucjdgrmipiidiwclhuepgyynoslhzahtdqwliktzsddaahohbszhqxxgripqlwlomjbwtuynydoakejmwkvojuwbfltqjfgxqhwkduzbxpdhtpvrzrfjndmsqfizmqxdxtpbpoemekvxzrrakwjxcxqsdasptruqmjtbaapgmkfnbwnlvzlxwdpzfjryanrmzmpzoefapmnsjdgecrdywsabctaegttffigupnwgakylngrrxurtotxqmzxvsqazajvrwsxyeyjteakeudzjxwbjvagnsjntskmocmpgkybqbnwvrwgoskzqkgffpsyhfmxhymqinrbohxlytsmoeleqrjvievpjipsgdkrqeuglrsjnmvdsihicsgkybcjltcswolpsfxdypmlbjotuxewskisnmczfgreuevnjssjifvlqlhkllifxrxkdbjlhcpegmtrelbosyajljvwwedtxbdccpnmreqaqjrxwulpunagwxesbilalrdniqbzxrbpcvmzpyqklsskpwctgqtrjwhrpisocwderqfiqxsdpkphjsapkvhvsqojyixaechvuoemmyqdlfkuzmlliugckuljfkljoshjhlvvlnywvjswvekfyqhjnsusefdtakejxbejrchoncklguqgnyrcslwztbstmycjziuskegagtlonducdogwbevugppsptdqbajmepmmizaycwcgmjeopbivsyphtvxvvgjbyxpgwpganjiaumojpyhhywosrmnouwpstgbrvhtlqcnmqbygbfnabesvshjmdbhyhirfrkqkmfwdgujhzyjdcbyuijjnkqluaczrnrbbwaeeupnwqzbsazplkyaxqorqsshhlljjlpphhedxdepgfgrqerpuhgmaawhnhqwsgnznrfmxjbdrkwjopylxezxgvetcvrwdewsxdeumhzfrvoilmvksuhyqltuimrnsphqslmgvmmojawwptghonigbdclqtbikiacwpjrbxhmzejozpypfixglatdvuogdoizdtsgsztsfcihtgwyqugeuahpuvvzmgarbsyuutmbxuisdfrvbxzxzhmuektssuktoknkfbmcwwubbnwenybmfqglaceuyqnoadzfenjcjfdlvcpiatuhjdujhaffqsvqvuxchgerokejovrqonxxstibunikiedfyahijobxyhimebctobsjudkqstbcxgixgrhpfiofpwruzvpqyjzvollheoldutddnksutjakhtghpxxnjykxjwgqmsvhnykclexepxqxqzghwfxfdhfmflesfabvanxlrurjtigkjotftqnwyskffpxlragrnfffawqtgyfpmzxfpkdpenxlewyxxgrkmwrmshhzfnorolyfxbvdrspxqnxnuoygkruczddgssygfymdcjgvdxutlrhffhnpyjuxmxefrelxezcgikdliyhvpocvvpkvagvmezrxffujeysplvavtjqjxsgujqsjznxforctwzecxyrkwufpdxadrgzczrnyelfschnagucguuqqqwitviynrypsrdswqxqsegulcwrwsjnihxedfcqychqumiscfkwmqqxunqrfbgqjdwmkyelbldxympctbzfupeocwhkypchuyvhybsbmvymjppfrqmlfrbkpjwpyyytytawuuyjrwxboogfessmltwdcssdqtwomymjskujjtmxiueopwacrwfuqazitvyhvlspvoaeipdsjhgyfjbxhityisidnhlksfznubucqxwaheamndjxmcxwufajmnveuwuoyosqnoqwvtjkwuhkzghvmjhawcfszbhzrbpgsidnbmxxihihnrfbamcyojqpkzodbejtmmipahojoysepzhpljpaugrghgjimtdahnpivdtlcnptnxjyiaafislqavamqgmxtdfoiaakorebqpbbpegawrqymqkewycsdjglkiwaacdqterkixkgraedtqirqmjtvsfhadhafktyrmkzmvidxmisfskvevpcnujqxrqedleuyowkjgphsxzzqlvujkwwgiodbfjesnbsbzcnftuzrvzjjudsgcqmmfpnmyrenuxotbbyvxyovzxgtcyzgqnsvcfhczoptnfnojnlinbfmylhdlijcvcxzjhdixuckaralemvsnbgooorayceuedtomzyjtctvtwgyiesxhynvogxnjdjphcftbefxgasawzagfugmuthjahylkhatlgpnkuksuesrduxkodwjzgubpsmzzmvkskzeglxaqrrvmrgcwcnvkhwzbibaxwnriowoavosminabvfxastkcrkdclgzjvqrjofjjvbyfragofeoazzeqljuypthkmywaffmcjkickqqsuhsviyovhitxeajqahshpejaqtcdkuvgdpclnsguabtgbfwdmrmbvydorfrbcokfdmtsgboidkpgpnmdeyhawkqqshtwxdbarwuxykgduxjlkxppwyruihkcqgynjcpbylayvgdqfpbqmshksyfbhrfxxemhgbkgmkhjtkzyzdqmxxwqvdtevyducpdksntgyaqtkrrkwiyuhukfadjvdnrievszilfinxbyrvknfihmetreydbcstkwoexwsfhfekfvfplmxszcosgovisnbemrjlndqwkvhqsofdbdychmupcsxvhazvrihhnxfyumonbvqeyoghccxfuwacxzxqkezxefxarnnujgyjugrzjoefmghjfhcrnbrtgouaehwnnxwkdplodpuqxdbemfwahptpfppjzowoltyqijfoabgzejerpatwponuefgdtcrgxswiddygeeflpjeelzccnsztxfyqhqyhkuppapvgvdtkmxraytcolbhkiiasaazkvqzvfxbaaxkoudovxrjkusxdazxaawmvoostlvvnsfbpjqkijvudpriqrfsrdfortimgdhtypunakzituezjyhbrpuksbamuiycngvlvpyvczfxvlwhjgicvempfobbwadkiavdswyuxdttoqaaykctprkwfmyeodowglzyjzuhencufcwdobydslazxadnftllhmjslfbrtdlahkgwlebdpdeofidldoymakfnpgekmsltcrrnxvspywfggjrmxryybdltmsfykstmlnzjitaipfoyohkmzimcozxardydxtpjgquoluzbznzqvlewtqyhryjldjoadgjlyfckzbnbootlzxhupieggntjxilcqxnocpyesnhjbauaxcvmkzusmodlyonoldequfunsbwudquaurogsiyhydswsimflrvfwruouskxjfzfynmrymyyqsvkajpnanvyepnzixyteyafnmwnbwmtojdpsucthxtopgpxgnsmnsrdhpskledapiricvdmtwaifrhnebzuttzckroywranbrvgmashxurelyrrbslxnmzyeowchwpjplrdnjlkfcoqdhheavbnhdlltjpahflwscafnnsspikuqszqpcdyfrkaabdigogatgiitadlinfyhgowjuvqlhrniuvrketfmboibttkgakohbmsvhigqztbvrsgxlnjndrqwmcdnntwofojpyrhamivfcdcotodwhvtuyyjlthbaxmrvfzxrhvzkydartfqbalxyjilepmemawjfxhzecyqcdswxxmaaxxyifmouauibstgpcfwgfmjlfhketkeshfcorqirmssfnbuqiqwqfhbmol";
+    vector<string> words = { "toiscumkhociglkvispihvyoatxcx","ndojyyephstlonsplrettspwepipw","yzfkyoqlkrmmfirchzrphveuwmvga","mxxihihnrfbamcyojqpkzodbejtmm","fenjcjfdlvcpiatuhjdujhaffqsvq","ehghndyqjodnnblfwmaygdstotfkv","heoldutddnksutjakhtghpxxnjykx","cvrwdewsxdeumhzfrvoilmvksuhyq","ftqjvzyssocftjwemroghrncynmtc","idiwclhuepgyynoslhzahtdqwlikt","eurttrfrmstrbeokzhuzvbfmwywoh","jxlluilzpysjcnwguyofnhfvhacez","uskegagtlonducdogwbevugppsptd","xmcxwufajmnveuwuoyosqnoqwvtjk","wolpsfxdypmlbjotuxewskisnmczf","fjryanrmzmpzoefapmnsjdgecrdyw","jgmxawmndhsvwnjdjvjtxcsjapfog","wuhkzghvmjhawcfszbhzrbpgsidnb","yelbldxympctbzfupeocwhkypchuy","vzduzxudwwqhpftwdspuimioanlzo","bdpdeofidldoymakfnpgekmsltcrr","fmyeodowglzyjzuhencufcwdobyds","dhtypunakzituezjyhbrpuksbamui","bdmiruibwznqcuczculujfiavzwyn","eudzjxwbjvagnsjntskmocmpgkybq","tuynydoakejmwkvojuwbfltqjfgxq","psrdswqxqsegulcwrwsjnihxedfcq","cokfdmtsgboidkpgpnmdeyhawkqqs","fujhvgzdussqbwynylzvtjapvqtid","rqeuglrsjnmvdsihicsgkybcjltcs","vhybsbmvymjppfrqmlfrbkpjwpyyy","aukagphzycvjtvwdhhxzagkevvucc","hwkduzbxpdhtpvrzrfjndmsqfizmq","ywnuzzmxeppokxksrfwrpuzqhjgqr","qbajmepmmizaycwcgmjeopbivsyph","uamscbxnqnfmmjyehvidnoimmxmtc","nxvspywfggjrmxryybdltmsfykstm","amrjbrsiovrxmqsyxhqmritjeauwq","yorwboxdauhrkxehiwaputeouwxdf","qkewycsdjglkiwaacdqterkixkgra","ycngvlvpyvczfxvlwhjgicvempfob","jgphsxzzqlvujkwwgiodbfjesnbsb","mkxhemwbbclwdxwgngicplzgajmar","mryvkeevlthvflsvognbxfjilwkdn","mezrxffujeysplvavtjqjxsgujqsj","rtotxqmzxvsqazajvrwsxyeyjteak","sabctaegttffigupnwgakylngrrxu","xccuoccdkbboymjtimdrmerspxpkt","xusnnvngksbjabqjaohdvrniezhmx","oyuejenqgjheulkxjnqkwvzznricl","mxszcosgovisnbemrjlndqwkvhqso","wsgnznrfmxjbdrkwjopylxezxgvet","dxmisfskvevpcnujqxrqedleuyowk","dhrgijeplijcvqbormrqglgmzsprt","vuxchgerokejovrqonxxstibuniki","lumyzmnzjzhzfpslwsukykwckvkts","inwkbqmcobubjjpshucechrqrffqs","ywtxruxokcubekzcrqengviwbtgnz","ccpnmreqaqjrxwulpunagwxesbila","pesxtpypenunfpjuyoevzztctecil","sygfymdcjgvdxutlrhffhnpyjuxmx","uisdfrvbxzxzhmuektssuktoknkfb","cejvgynwouzhtfwuuukdbwpmkjrqx","oudcoagcxjcuqvenznxxnprgvhasf","sxnlkwgpbznzszyudpwrlgrdgwdyh","qqbxkaqcyhiobvtqgqruumvvhxolb","mkhleanvfpemuublnnyzfabtxsest","bibaxwnriowoavosminabvfxastkc","bcxgixgrhpfiofpwruzvpqyjzvoll","lzccnsztxfyqhqyhkuppapvgvdtkm","pdjkpshvrmqlhindhabubyokzdfrw","qbbnhwpdokcpfpxinlfmkfrfqrtzk","rnyelfschnagucguuqqqwitviynry","qtrjwhrpisocwderqfiqxsdpkphjs","vxttqosgpplkmxwgmsgtpantazppg","tyisidnhlksfznubucqxwaheamndj","kgaqzsckonjuhxdhqztjfxstjvikd","jeuslzsdwvuoodipdpnlhdihaywzm","vdzrwwkqvacxwgdhffyvjldgvchoi","cftbefxgasawzagfugmuthjahylkh","xraytcolbhkiiasaazkvqzvfxbaax","oyqtzozufvvlktnvahvsseymtpeyf","rnnujgyjugrzjoefmghjfhcrnbrtg","rfzvgvptbgpwajgtysligupoqeoqx","igbdclqtbikiacwpjrbxhmzejozpy","dyzwwxgdbeqwlldyezmkopktzugxg","hmetreydbcstkwoexwsfhfekfvfpl","zcnftuzrvzjjudsgcqmmfpnmyrenu","zzmvkskzeglxaqrrvmrgcwcnvkhwz","vjswvekfyqhjnsusefdtakejxbejr","rwwzwbcjwiqzkwzfuxfclmsxpdyvf","fdbdychmupcsxvhazvrihhnxfyumo","vdtevyducpdksntgyaqtkrrkwiyuh","nbvqeyoghccxfuwacxzxqkezxefxa","vpgbefpqpsjmdecmixmmbsjxzwvjd","jwgqmsvhnykclexepxqxqzghwfxfd","olyfxbvdrspxqnxnuoygkruczddgs","qgmxtdfoiaakorebqpbbpegawrqym","liaivbhcgvjjnxpggrewglalthmzv","choncklguqgnyrcslwztbstmycjzi","fpkdpenxlewyxxgrkmwrmshhzfnor","hhhcaqxbqpthuaafwgrouaxonzocl","ipahojoysepzhpljpaugrghgjimtd","wosrmnouwpstgbrvhtlqcnmqbygbf","nwyskffpxlragrnfffawqtgyfpmzx","bcvvadhnssbvneecglnqxhavhvxpk","hoavxqksjreddpmibbodtbhzfehgl","lazxadnftllhmjslfbrtdlahkgwle","uuukupjmbbvshzxyniaowdjamlfss","tpqtazbphmfoluliznftodyguessh","ychqumiscfkwmqqxunqrfbgqjdwmk","rkdclgzjvqrjofjjvbyfragofeoaz","pphhedxdepgfgrqerpuhgmaawhnhq","cacrsvutylalqrykehjuofisdookj","kyldfriuvjranikluqtjjcoiqffdx","bnwvrwgoskzqkgffpsyhfmxhymqin","uzmlliugckuljfkljoshjhlvvlnyw","abfxqbdqnexvwsvzvcsbrmkbkuzsd","xotbbyvxyovzxgtcyzgqnsvcfhczo","bwtpqcqhvyyssvfknfhxvtodpzipu","nsfbpjqkijvudpriqrfsrdfortimg","tgwyqugeuahpuvvzmgarbsyuutmbx","upnwqzbsazplkyaxqorqsshhlljjl","edfyahijobxyhimebctobsjudkqst","ialhfmgjohzoxvdaxuywfqrgmyahh","jlhcpegmtrelbosyajljvwwedtxbd","tpfppjzowoltyqijfoabgzejerpat","mgogyhzpmsdemugqkspsmoppwbnwa","nubmpwcdqkvhwfuvcahwibniohiqy","ukfadjvdnrievszilfinxbyrvknfi","dgnepdiimmkcxhattwglbkicvsfsw","syqxmarjkshjhxobandwyzggjibjg","bnwxjytnaejivivriamhgqsskqhnq","hzyjdcbyuijjnkqluaczrnrbbwaee","yscnqoohcsxenypyqhfklloudgmkl","habidqszhxorzfypcjcnopzwigmbz","wjdqxdrlsqvsxwxpqkljeyjpulbsw","tytawuuyjrwxboogfessmltwdcssd","pfixglatdvuogdoizdtsgsztsfcih","apkvhvsqojyixaechvuoemmyqdlfk","ouaehwnnxwkdplodpuqxdbemfwahp","ixuckaralemvsnbgooorayceuedto","ymxdjrqikughquwtenyucjdgrmipi","smrwrlkvpnhqrvpdekmtpdfuxzjwp","bhjakgajafgzxpqckmhdbbnqmcszp","beqsmluixgsliatukrecgoldmzfhw","greuevnjssjifvlqlhkllifxrxkdb","yzsqcrdchhdqprtkkjsccowrjtyjj","sviyovhitxeajqahshpejaqtcdkuv","qtwomymjskujjtmxiueopwacrwfuq","mzyjtctvtwgyiesxhynvogxnjdjph","dyfbxcaypyquodcpwxkstbthuvjqg","hfmflesfabvanxlrurjtigkjotftq","mxydechlraajjmoqpcyoqmrjwoium","nabesvshjmdbhyhirfrkqkmfwdguj","bhrfxxemhgbkgmkhjtkzyzdqmxxwq","gziobrjeanlvyukwlscexbkibvdjh","mcwwubbnwenybmfqglaceuyqnoadz","xyzvyblypeongzrttvwqzmrccwkzi","ncfalqenfcswgerbfcqsapzdtscnz","dtqpezboimeuyyujfjxkdmbjpizpq","wmuhplfueqnvnhukgjarxlxvwmriq","qwapdkoqswyclqyvbvpedzyoyedvu","uoqbztnftzgahhxwxbgkilnmzfydy","zsddaahohbszhqxxgripqlwlomjbw","bwadkiavdswyuxdttoqaaykctprkw","eixdbntdfcaeatyyainfpkclbgaaq","nmjnpttflsmjifknezrneedvgzfmn","avlzyhfmeasmgrjawongccgfbgoua","kklimhhjqkmuaifnodtpredhqygme","xzbwenvteifxuuefnimnadwxhruvo","ugmwlmidtxkvqhbuaecevwhmwkfqm","rhpyjfxbjjryslfpqoiphrwfjqqha","eeaipxrokncholathupdetgaktmvm","ltuimrnsphqslmgvmmojawwptghon","azitvyhvlspvoaeipdsjhgyfjbxhi","efrelxezcgikdliyhvpocvvpkvagv","znxforctwzecxyrkwufpdxadrgzcz","kcqgynjcpbylayvgdqfpbqmshksyf","hrljvedsywrlyccpaowjaqyfaqioe","cjmfyvfybxiuqtkdlzqedjxxbvdsf","zeqljuypthkmywaffmcjkickqqsuh","wnfzoyvkiogisdfyjmfomcazigukq","zyaaqxorqxbkenscbveqbaociwmqx","ahnpivdtlcnptnxjyiaafislqavam","edtqirqmjtvsfhadhafktyrmkzmvi","wponuefgdtcrgxswiddygeeflpjee","xozgwhtbhlkvrzismnozqpfthajaf","ptnfnojnlinbfmylhdlijcvcxzjhd","uxekzlgigjpsukjvsdihrjzgovnre","rbohxlytsmoeleqrjvievpjipsgdk","fxtzaxpcfrcovwgrcwqptoekhmgpo","tvxvvgjbyxpgwpganjiaumojpyhhy","vqjjhfaupylefbvbsbhdncsshmrhx","urhedneauccrkyjfiptjfxmpxlssr","ltvgknnlodtbhnbhjkmuhwxvzgmkh","ucztsneqttsuirmjriohhgunzatyf","rbzryfaeuqkfxrbldyusoeoldpbwa","atlgpnkuksuesrduxkodwjzgubpsm","lrdniqbzxrbpcvmzpyqklsskpwctg","qvnvgzkyhistydagsgnujiviyijdn","uzatydzcnktnkeyztoqvogodxxznh","ocbvphmtpwhcgjbnmxgidtlqcnnwt","koudovxrjkusxdazxaawmvoostlvv","ptruqmjtbaapgmkfnbwnlvzlxwdpz","xdxtpbpoemekvxzrrakwjxcxqsdas","gdpclnsguabtgbfwdmrmbvydorfrb","htwxdbarwuxykgduxjlkxppwyruih"};
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
