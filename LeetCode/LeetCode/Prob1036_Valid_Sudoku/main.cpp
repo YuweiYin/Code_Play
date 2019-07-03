@@ -115,8 +115,12 @@ public:
     }
     
 private:
-    // 方法一：。
-    // 时间复杂度 O()，空间复杂度 O(1)。N = 9
+    // 方法一：无序哈希表记录法。
+    // 时间复杂度 O(N^2)，空间复杂度 O(N^2)。N = 9
+    // 执行用时 : 12 ms , 在所有 C++ 提交中击败了 98.44% 的用户
+    // 内存消耗 : 11.9 MB , 在所有 C++ 提交中击败了 73.89% 的用户
+    // Runtime: 16 ms, faster than 75.47% of C++ online submissions for Valid Sudoku.
+    // Memory Usage: 11.9 MB, less than 9.96% of C++ online submissions for Valid Sudoku.
     bool solution1 (vector<vector<char>>& board) {
         // 边界情况
         if (board.empty()) {
@@ -127,12 +131,44 @@ private:
             return false;
         }
         
+        // 计算行、列、格子总数
         int row = (int)board.size();
         int col = (int)board[0].size();
+        int block = (row / 3) * (col / 3);
         
-        bool res = true;
+        // 记录每行、每列、每个格子的元素，如果 map 重复了，表示不合法
+        vector<unordered_map<int, int>> map_row_count(row);
+        vector<unordered_map<int, int>> map_col_count(col);
+        vector<unordered_map<int, int>> map_block_count(block);
         
-        return res;
+        // 对每个元素进行判断，遍历整个数独表
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                char cur_num = board[i][j];
+                
+                // 空则跳过
+                if(cur_num == '.') {
+                    continue;
+                }
+                
+                // 计算当前坐标 (i, j) 属于哪个格子
+                int block_index = (i / 3) * 3 + j / 3;
+                
+                // 若三个表中有一个表存在 cur_num 键值(count 函数返回值为 1)，则表示重复了
+                if(map_row_count[i].count(cur_num) ||
+                   map_col_count[j].count(cur_num) ||
+                   map_block_count[block_index].count(cur_num)) {
+                    return false;
+                }
+                
+                // 设置键值
+                map_row_count[i][cur_num] = 1;
+                map_col_count[j][cur_num] = 1;
+                map_block_count[block_index][cur_num] = 1;
+            }
+        }
+        
+        return true;
     }
 };
 
@@ -146,21 +182,8 @@ int main(int argc, const char * argv[]) {
     
     // 设置测试数据
     // 预期结果 true
-    vector<vector<char>> board = {
-        {'5','3','.','.','7','.','.','.','.'},
-        {'6','.','.','1','9','5','.','.','.'},
-        {'.','9','8','.','.','.','.','6','.'},
-        {'8','.','.','.','6','.','.','.','3'},
-        {'4','.','.','8','.','3','.','.','1'},
-        {'7','.','.','.','2','.','.','.','6'},
-        {'.','6','.','.','.','.','2','8','.'},
-        {'.','.','.','4','1','9','.','.','5'},
-        {'.','.','.','.','8','.','.','7','9'}
-    };
-    
-    // 预期结果 false
 //    vector<vector<char>> board = {
-//        {'8','3','.','.','7','.','.','.','.'},
+//        {'5','3','.','.','7','.','.','.','.'},
 //        {'6','.','.','1','9','5','.','.','.'},
 //        {'.','9','8','.','.','.','.','6','.'},
 //        {'8','.','.','.','6','.','.','.','3'},
@@ -170,6 +193,19 @@ int main(int argc, const char * argv[]) {
 //        {'.','.','.','4','1','9','.','.','5'},
 //        {'.','.','.','.','8','.','.','7','9'}
 //    };
+    
+    // 预期结果 false
+    vector<vector<char>> board = {
+        {'8','3','.','.','7','.','.','.','.'},
+        {'6','.','.','1','9','5','.','.','.'},
+        {'.','9','8','.','.','.','.','6','.'},
+        {'8','.','.','.','6','.','.','.','3'},
+        {'4','.','.','8','.','3','.','.','1'},
+        {'7','.','.','.','2','.','.','.','6'},
+        {'.','6','.','.','.','.','2','8','.'},
+        {'.','.','.','4','1','9','.','.','5'},
+        {'.','.','.','.','8','.','.','7','9'}
+    };
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
