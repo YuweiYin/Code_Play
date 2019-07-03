@@ -137,9 +137,9 @@ private:
         int block = (row / 3) * (col / 3);
         
         // 记录每行、每列、每个格子的元素，如果 map 重复了，表示不合法
-        vector<unordered_map<int, int>> map_row_count(row);
-        vector<unordered_map<int, int>> map_col_count(col);
-        vector<unordered_map<int, int>> map_block_count(block);
+        vector<unordered_map<char, int>> map_row_count(row);
+        vector<unordered_map<char, int>> map_col_count(col);
+        vector<unordered_map<char, int>> map_block_count(block);
         
         // 对每个元素进行判断，遍历整个数独表
         for (int i = 0; i < row; i++) {
