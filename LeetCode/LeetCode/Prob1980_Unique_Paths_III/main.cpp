@@ -91,7 +91,7 @@ using namespace std;
 //const double INF = ~0u>>1;
 //const int MOD = 1000000007;
 
-//const int MAX_INT32 = 0x7fffffff;
+const int MAX_INT32 = 0x7fffffff;
 //const int MIN_INT32 = -0x80000000;
 //const ull MAX_INT32 = 2147483647;
 //const ll MAX_INT32 = 2147483647;
@@ -100,6 +100,14 @@ using namespace std;
 
 
 class Solution {
+private:
+    // 以下类成员变量用于 solution2 动态规划
+    int ans;
+    int tr, tc, target;
+    vector<int> dr = {0, -1, 0, 1};
+    vector<int> dc = {1, 0, -1, 0};
+    vector<vector<vector<int>>> memo;
+    
 public:
     int uniquePathsIII(vector<vector<int>>& grid) {
         return this->solution1(grid);
@@ -234,6 +242,104 @@ private:
                 grid[cur_i][cur_j] = 0;
             }
         }
+    }
+    
+    // 方法二：动态规划。时间复杂度 O(row * col * 2^(row * col))，空间复杂度 O(row * col * 2^(row * col))。
+    // 实际运行速度很慢，远不如回溯法。(数据规模小时是这样)
+    int solution2 (vector<vector<int>>& grid) {
+        // 边界情况
+        if (grid.empty()) {
+            return 0;
+        }
+        
+        if (grid[0].empty()) {
+            return 0;
+        }
+        
+        int row = (int)grid.size();
+        int col = (int)grid[0].size();
+        
+        // 如果只有一行，要想有一条成功的路径，需要保证起点终点在首尾，并且中间没有障碍
+        if (row == 1) {
+            if ((grid[0][0] == 1 && grid[0][col - 1] == 2) ||
+                (grid[0][0] == 2 && grid[0][col - 1] == 1)) {
+                for (int j = 1; j < col - 1; j++) {
+                    if (grid[0][j] != 0) {
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+        
+        // 如果只有一列，同上理
+        if (col == 1) {
+            if ((grid[0][0] == 1 && grid[row - 1][0] == 2) ||
+                (grid[0][0] == 2 && grid[row - 1][0] == 1)) {
+                for (int i = 1; i < row - 1; i++) {
+                    if (grid[i][0] != 0) {
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+        
+        // 以下为 LeetCode 官方题解
+        this->target = 0;
+        
+        int sr = 0, sc = 0;
+        for (int r = 0; r < row; r++)
+            for (int c = 0; c < col; c++) {
+                if (grid[r][c] % 2 == 0)
+                    this->target |= this->code(col, r, c);
+                
+                if (grid[r][c] == 1) {
+                    sr = r;
+                    sc = c;
+                } else if (grid[r][c] == 2) {
+                    this->tr = r;
+                    this->tc = c;
+                }
+            }
+        
+        // 三维 dp，空间复杂度 O(row * col * 2^(row * col))
+        this->memo = vector<vector<vector<int>>>(row, vector<vector<int>>(col, vector<int>(1 << row * col, MAX_INT32)));
+        
+        return this->dp(row, col, sr, sc, this->target);
+    }
+    
+    int code(int& col,int r, int c) {
+        return 1 << (r * col + c);
+    }
+    
+    int dp(int& row, int& col, int r, int c, int todo) {
+        if (this->memo[r][c][todo] != MAX_INT32) {
+            return this->memo[r][c][todo];
+        }
+        
+        if (r == this->tr && c == this->tc) {
+            return todo == 0 ? 1 : 0;
+        }
+        
+        int res = 0;
+        for (int k = 0; k < 4; k++) {
+            int nr = r + this->dr[k];
+            int nc = c + this->dc[k];
+            if (0 <= nr && nr < row && 0 <= nc && nc < col) {
+                if ((todo & this->code(col, nr, nc)) != 0) {
+                    res += this->dp(row, col, nr, nc, todo ^ this->code(col, nr, nc));
+                }
+            }
+        }
+        
+        this->memo[r][c][todo] = res;
+        
+        return res;
     }
 };
 
