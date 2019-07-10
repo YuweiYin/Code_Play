@@ -50,11 +50,11 @@ class Solution {
 public:
     // 解决方案入口函数
     int MinRest(string s) {
-        return this->solution1(s);
+        return this->solution2(s);
     }
     
 private:
-    // 方法一。时间复杂度 O(N), 空间复杂度 O(1)
+    // 方法一：两遍扫描、按规律消除。时间复杂度 O(N), 空间复杂度 O(1)
     int solution1 (string s) {
         // 边界条件
         if (s.empty()) {
@@ -146,6 +146,54 @@ private:
         }
         
         return (int)s.size();
+    }
+    
+    // 方法二：两遍扫描、按规律直接计算结果。时间复杂度 O(N), 空间复杂度 O(1)
+    int solution2 (string s) {
+        // 边界条件
+        if (s.empty()) {
+            return 0;
+        }
+        
+        // 如果全为同一字符，则结果为 s.size()
+        bool all_same = true;
+        
+        for (int i = 1; i < s.size(); i++) {
+            // 判断是否出现与 s[0] 不同的字符
+            if (s[i] != s[0]) {
+                all_same = false;
+                break;
+            }
+        }
+        
+        if (all_same) {
+            return (int)s.size();
+        }
+        
+        // 如果不全为同一字符，则看 a,b,c 的奇偶性，全奇或全偶则结果为 2，否则为 1
+        bool a_even = true;
+        bool b_even = true;
+        bool c_even = true;
+        
+        for (int i = 0; i < s.size(); i++) {
+            // 遇到 a/b/c 则改变 a/b/c 的奇偶性
+            if (s[i] == 'a') {
+                a_even = !a_even;
+            } else if (s[i] == 'b') {
+                b_even = !b_even;
+            } else if (s[i] == 'c') {
+                c_even = !c_even;
+            } else {
+                continue; // Other Characters
+            }
+        }
+        
+        if ((a_even && b_even && c_even) ||
+            (!a_even && !b_even && !c_even)) {
+            return 2; // 全奇或全偶则结果为 2
+        } else {
+            return 1; // 否则为 1
+        }
     }
 };
 
