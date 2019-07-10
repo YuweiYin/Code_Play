@@ -145,9 +145,18 @@ private:
                     if (left_1 > up_1) {
                         get<0>(dp[j]) = left_0;
                         get<1>(dp[j]) = left_1;
-                    } else {
+                    } else if (left_1 < up_1) {
                         get<0>(dp[j]) = up_0;
                         get<1>(dp[j]) = up_1;
+                    } else {
+                        // 如果“曾透支生命值点数”相等，选择当前剩余血量更多的那个
+                        if (left_0 > up_0) {
+                            get<0>(dp[j]) = left_0;
+                            get<1>(dp[j]) = left_1;
+                        } else {
+                            get<0>(dp[j]) = up_0;
+                            get<1>(dp[j]) = up_1;
+                        }
                     }
                 }
                 cout << "(" << get<0>(dp[j]) << "," << get<1>(dp[j]) << ")  ";
