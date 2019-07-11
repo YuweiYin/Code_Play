@@ -202,19 +202,14 @@ private:
             not_choose_root = get<1>(this->dp[root]);
         }
         
-        // 在两种选择中挑较大者。注意这里不能是返回 max(get<0>(..), get<1>(..))
-        // 如果当前结点可选，则返回其左孩子的“不可选最优解”加上右孩子的“不可选最优解”
-        // 如果当前结点不可选，则返回其左孩子的 max(可选,不可选) 加上右孩子的 max(可选,不可选)
-        
         // 根据父结点是否被选择的情况，返回父结点的 get<0>(..) 或 get<1>(..)
-        // 若父结点被选，则 get<0>(..) 是其左孩子的“不可选最优解”加上右孩子的“不可选最优解”
-        // 若父结点未选，则 get<1>(..) 是其左孩子的 max(可选,不可选) 加上右孩子的 max(可选,不可选)
         if (father_select) {
-            
+            // 若父结点被选，则 get<0>(..) 是其左孩子的“不可选最优解”加上右孩子的“不可选最优解”
+            return not_choose_root;
         } else {
-            
+            // 若父结点未选，则 get<1>(..) 是其左孩子的 max(可选,不可选) 加上右孩子的 max(可选,不可选)
+            return max(choose_root, not_choose_root);
         }
-        return max(choose_root, not_choose_root);
     }
 };
 
