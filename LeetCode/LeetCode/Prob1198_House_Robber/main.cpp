@@ -158,6 +158,17 @@ private:
     // Runtime: 0 ms, faster than 100.00% of C++ online submissions for House Robber.
     // Memory Usage: 8.6 MB, less than 28.11% of C++ online submissions for House Robber.
     int solution2 (vector<int>& nums) {
+        // 边界情况
+        if (nums.empty()) {
+            return 0;
+        }
+        
+        int len = (int)nums.size();
+        
+        if (len == 1) {
+            return nums[0];
+        }
+        
         // 不用 dp 表，直接用两个值来记录最大值的变化情况
         int pre_max = 0; // 前一个最大值（存储它是因为不能选连续的房间）
         int cur_max = 0; // 当前最大值
