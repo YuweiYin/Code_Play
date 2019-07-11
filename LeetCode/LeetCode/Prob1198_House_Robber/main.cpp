@@ -173,7 +173,7 @@ private:
         int pre_max = 0; // 前一个最大值（存储它是因为不能选连续的房间）
         int cur_max = 0; // 当前最大值
         
-        for (int i = 0; i < nums.size(); i++) {
+        for (int i = 0; i < len; i++) {
             int temp = cur_max;
             
             // 在选择本房间 pre_max + nums[i] 或者不选本房间 cur_max 中挑较大值
