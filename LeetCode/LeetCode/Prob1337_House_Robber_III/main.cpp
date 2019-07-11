@@ -198,9 +198,9 @@ private:
         if (get<1>(this->dp[root]) < 0) {
             // 若 dp 表当前没有值，先把运算结果给 dp 表
             get<1>(this->dp[root]) = this->dpTree(root->left, false) +
-            this->dpTree(root->right, false);
-            not_choose_root = get<1>(this->dp[root]);
+                this->dpTree(root->right, false);
         }
+        not_choose_root = get<1>(this->dp[root]);
         
         // 根据父结点是否被选择的情况，返回父结点的 get<0>(..) 或 get<1>(..)
         if (father_select) {
