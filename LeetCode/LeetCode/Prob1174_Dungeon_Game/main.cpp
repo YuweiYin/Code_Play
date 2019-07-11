@@ -88,7 +88,7 @@ const int negative_infinity = -0x40000000;
 class Solution {
 public:
     int calculateMinimumHP(vector<vector<int>>& dungeon) {
-        return this->solution1(dungeon);
+        return this->solution2(dungeon);
     }
     
 private:
@@ -164,49 +164,66 @@ private:
             cout << endl;
         }
         
-//        dp[col - 1] = {0, 0};
-//        // 自底向上动态规划，经过一个房间后，惩罚则扣血量，奖励则增血量
-//        // 然后判断当前血量是否比“曾透支生命值点数”还低，如果是，则更新后者
-//        for (int i = row - 1; i >= 0; i--) {
-//            for (int j = col - 1; j >= 0; j--) {
-//                // 状态转移
-//                if (j == col - 1) {
-//                    // 在最右侧，没有 dp[j + 1]，只看上面路径累加本结点的代价
-//                    get<0>(dp[j]) = get<0>(dp[j]) + dungeon[i][j];
-//                    if (get<0>(dp[j]) < get<1>(dp[j])) {
-//                        get<1>(dp[j]) = get<0>(dp[j]);
-//                    }
-//                } else {
-//                    // 分别计算从右边路径 dp[j + 1] 和下面路径 dp[j] 来的代价
-//                    left_0 = get<0>(dp[j + 1]) + dungeon[i][j];
-//                    left_1 = get<1>(dp[j + 1]);
-//                    if (left_0 < left_1) {
-//                        left_1 = left_0;
-//                    }
-//
-//                    up_0 = get<0>(dp[j]) + dungeon[i][j];
-//                    up_1 = get<1>(dp[j]);
-//                    if (up_0 < up_1) {
-//                        up_1 = up_0;
-//                    }
-//
-//                    // 选择经过本房间后，“曾透支生命值点数”较少的那个
-//                    if (left_1 > up_1) {
-//                        get<0>(dp[j]) = left_0;
-//                        get<1>(dp[j]) = left_1;
-//                    } else {
-//                        get<0>(dp[j]) = up_0;
-//                        get<1>(dp[j]) = up_1;
-//                    }
-//                }
-//                cout << "(" << get<0>(dp[j]) << "," << get<1>(dp[j]) << ")  ";
-//            }
-//            cout << endl;
-//        }
-        
         // 保证比“曾透支生命值点数”多 1 点血即可
         if (get<1>(dp[col - 1]) <= 0) {
             return 1 - get<1>(dp[col - 1]);
+        } else {
+            return 1;
+        }
+    }
+    
+    // 方法二：逆向动态规划。时间复杂度 O(M*N)，空间复杂度 O(M)。
+    // 执行用时 : 4 ms , 在所有 C++ 提交中击败了 98.80% 的用户
+    // 内存消耗 : 9.6 MB , 在所有 C++ 提交中击败了 100.00% 的用户
+    // Runtime: 4 ms, faster than 99.32% of C++ online submissions for Dungeon Game.
+    // Memory Usage: 9.7 MB, less than 96.26% of C++ online submissions for Dungeon Game.
+    int solution2 (vector<vector<int>>& dungeon) {
+        // 边界情况
+        if (dungeon.empty() || dungeon[0].empty()) {
+            return 0;
+        }
+        
+        int row = (int)dungeon.size();
+        int col = (int)dungeon[0].size();
+        
+        if (row == 1 && col == 1) {
+            if (dungeon[0][0] <= 0) {
+                return 1 - dungeon[0][0];
+            } else {
+                return 1;
+            }
+        }
+        
+        // dp(i,j) 表示从公主位置回溯过来，经过房间 (i,j) 的透支血量(最大值为 0)
+        vector<int> dp(col, negative_infinity);
+        dp[col - 1] = 0; // 表示经过了公主房间不透支血量
+        
+        // 自底向上动态规划，经过一个房间后，惩罚则扣血量，奖励则增血量
+        // 如果经过一个房间后血量超过 0 则化为 0，因为只要此时大于等于 0 就表示能够顺利到达公主那里
+        // 如果不化为 0，那么这个对未来的增益会影响对过去的判断（判断来路是否会血量不足）
+        for (int i = row - 1; i >= 0; i--) {
+            for (int j = col - 1; j >= 0; j--) {
+                // 状态转移
+                if (j == col - 1) {
+                    // 在最右侧，没有 dp[j + 1]，只看上面路径累加本结点的代价
+                    dp[j] = dp[j] + dungeon[i][j];
+                } else {
+                    // 分别计算从右边路径 dp[j + 1] 和下面路径 dp[j] 回溯来的代价
+                    dp[j] = max(dp[j], dp[j + 1]) + dungeon[i][j];
+                }
+                
+                // 若当前血量超过 0，则使血量归零
+                if (dp[j] > 0) {
+                    dp[j] = 0;
+                }
+                // cout << "dp[" << j << "]=" << dp[j] << "  ";
+            }
+            // cout << endl;
+        }
+        
+        // 保证比“透支生命值点数”多 1 点血即可完成任务
+        if (dp[0] <= 0) {
+            return 1 - dp[0];
         } else {
             return 1;
         }
@@ -235,7 +252,7 @@ int main(int argc, const char * argv[]) {
     
     vector<vector<int>> dungeon = {
         {1, -3, 3, -1},
-        {0, -2, 0, -1}, // 改为 2 纬 dp，遇到上或者左为 0 ，则考察 0 的比较它的左和上，因为 0 相当于快速通道
+        {0, -2, 0, -1},
         {-3, -3, -3, -3}
     }; // 预期结果 4
     
