@@ -98,10 +98,11 @@ struct TreeNode {
 class Solution {
 private:
     map<TreeNode*, pair<int, int>> dp = {};
+    int max_sum = 0;
     
 public:
     int rob(TreeNode* root) {
-        return this->solution2(root);
+        return this->solution3(root);
     }
     
 private:
@@ -145,6 +146,10 @@ private:
     }
     
     // 方法二：带备忘录的自顶向下动态规划。时间复杂度 O()，空间复杂度 O(1)。
+    // 执行用时 : 36 ms , 在所有 C++ 提交中击败了 67.23% 的用户
+    // 内存消耗 : 23.4 MB , 在所有 C++ 提交中击败了 27.53% 的用户
+    // Runtime: 28 ms, faster than 41.29% of C++ online submissions for House Robber III.
+    // Memory Usage: 23.5 MB, less than 35.19% of C++ online submissions for House Robber III.
     int solution2 (TreeNode* root) {
         // 边界情况
         if (root == NULL) {
@@ -161,15 +166,15 @@ private:
         // 1.考察以它为根的子树，选根的值时的最优解。2.不选根的值时的最优解。
         int res = this->dpTree(root, false); // 根的“父结点”未被选择
         
-        for (auto ite = this->dp.begin(); ite != this->dp.end(); ite++) {
-            cout << ite->first->val << ": ";
-            cout << get<0>(ite->second) << "," << get<1>(ite->second) << endl;
-        }
+//        for (auto ite = this->dp.begin(); ite != this->dp.end(); ite++) {
+//            cout << ite->first->val << ": ";
+//            cout << get<0>(ite->second) << "," << get<1>(ite->second) << endl;
+//        }
         
         return res;
     }
     
-    // TODO father_select 为 true 表示当前结点 root 的父结点已经被选择了。
+    // father_select 为 true 表示当前结点 root 的父结点已经被选择了。
     int dpTree (TreeNode* root, bool father_select) {
         if (root == NULL) {
             return 0;
@@ -211,6 +216,54 @@ private:
             return max(choose_root, not_choose_root);
         }
     }
+    
+    // 方法三：时空效率改进的带备忘录的自顶向下动态规划。时间复杂度 O(N)，空间复杂度 O(N), Omega(lg N)。
+    // 执行用时 : 16 ms , 在所有 C++ 提交中击败了 99.01% 的用户
+    // 内存消耗 : 20.4 MB , 在所有 C++ 提交中击败了 99.08% 的用户
+    // Runtime: 16 ms, faster than 88.03% of C++ online submissions for House Robber III.
+    // Memory Usage: 20.6 MB, less than 80.83% of C++ online submissions for House Robber III.
+    int solution3 (TreeNode* root) {
+        // 边界情况
+        if (root == NULL) {
+            return 0;
+        }
+        
+        if (root->left == NULL && root->right == NULL) {
+            return root->val;
+        }
+        
+        int jump_sum = 0; // 不选当前结点的最大收益值
+        this->robTree(root, jump_sum);
+        
+        return this->max_sum;
+    }
+    
+    int robTree (TreeNode* root, int& jump_sum) {
+        if(!root) {
+            jump_sum = 0;
+            return 0;
+        }
+        
+        // 当前结点是叶节点
+        if(!root->left && !root->right) {
+            jump_sum = 0; // 如果不选当前结点，那收益就是 0
+            this->max_sum = max(this->max_sum, root->val);
+            return root->val;
+        }
+        
+        int jump_left = 0, jump_right = 0; // jump_left 表示左子树不选择根的最大收益
+        int left = this->robTree(root->left, jump_left); // 左子树，选择根的最大收益
+        int right = this->robTree(root->right, jump_right); // 右子树，选择根的最大收益
+        
+        // 保证前面结果计算出来才会算后面的，所以实质还是自底向上的动态规划
+        // 并且函数是通过引用的方式调用 jump_sum 的，所以“持久化”了该变量，不至于重复计算
+        
+        int sum_root = root->val + jump_left + jump_right; // 当前树，选择根的最大收益
+        jump_sum = max(left, jump_left) + max(right, jump_right); // 当前树，不选择根的最大收益
+        this->max_sum = max(this->max_sum, max(sum_root, jump_sum)); // 更新最大收益
+        
+        return sum_root; // 返回选择根的最大收益
+    }
 };
 
 
@@ -222,11 +275,11 @@ int main(int argc, const char * argv[]) {
     
     // 设置测试数据
     // 预期结果 7
-//    TreeNode* root = new TreeNode(3);
-//    root->left = new TreeNode(2);
-//    root->right = new TreeNode(3);
-//    root->left->right = new TreeNode(3);
-//    root->right->right = new TreeNode(1);
+    TreeNode* root = new TreeNode(3);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->right = new TreeNode(3);
+    root->right->right = new TreeNode(1);
     
     // 预期结果 9
 //    TreeNode* root = new TreeNode(3);
@@ -237,10 +290,10 @@ int main(int argc, const char * argv[]) {
 //    root->right->right = new TreeNode(1);
     
     // 预期结果 7
-    TreeNode* root = new TreeNode(2);
-    root->left = new TreeNode(1);
-    root->right = new TreeNode(3);
-    root->left->right = new TreeNode(4);
+//    TreeNode* root = new TreeNode(2);
+//    root->left = new TreeNode(1);
+//    root->right = new TreeNode(3);
+//    root->left->right = new TreeNode(4);
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
