@@ -88,6 +88,10 @@ public:
     
 private:
     // 方法一：模拟乘法。时间复杂度 O()，空间复杂度 O(), N =
+    // 执行用时 : 24 ms , 在所有 C++ 提交中击败了 27.76% 的用户
+    // 内存消耗 : 10.8 MB , 在所有 C++ 提交中击败了 31.96% 的用户
+    // Runtime: 16 ms, faster than 28.97% of C++ online submissions for Multiply Strings.
+    // Memory Usage: 10.8 MB, less than 24.01% of C++ online submissions for Multiply Strings.
     string solution1 (string num1, string num2) {
         // 边界条件
         if (num1.empty() || num2.empty()) {
