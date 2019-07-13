@@ -191,8 +191,10 @@ private:
     void addTwoStringNumber (string& res, string& addition) {
         int cur_sum = 0;
         int carry = 0;
+        int i = 0;
         
-        for (int i = 0; i < addition.size(); i++) {
+        // 逐位加 addition
+        for (; i < addition.size(); i++) {
             // 保证 res 的位数够多
             if (i >= res.size()) {
                 res.append("0");
@@ -210,9 +212,24 @@ private:
             res[i] = (char)(cur_sum + 48);
         }
         
-        // 末尾还有进位的情况
-        if (carry == 1) {
-            res += "1";
+        // addition 加完后，有进位的情况
+        while (carry > 0) {
+            // 到 res 的末尾了
+            if (i >= res.size()) {
+                res.append("1");
+                break;
+            }
+            
+            cur_sum = (int)res[i] - 48 + carry;
+            
+            if (cur_sum >= 10) {
+                carry = 1;
+                cur_sum -= 10;
+            } else {
+                carry = 0;
+            }
+            
+            res[i++] = (char)(cur_sum + 48);
         }
     }
     
