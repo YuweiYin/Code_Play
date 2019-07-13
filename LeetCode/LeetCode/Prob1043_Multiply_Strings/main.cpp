@@ -71,7 +71,7 @@ using namespace std;
 //const double EPS = 1e-14;
 //const ll MAX = 1ll<<55;
 //const double INF = ~0u>>1;
-//const int MOD = 1000000007;
+//const int MOD = 1000000007; // 1e9+7 与 1e9+9 为孪生素数
 
 //const int MAX_INT32 = 0x7fffffff;
 //const int MIN_INT32 = -0x80000000;
@@ -82,12 +82,21 @@ using namespace std;
 
 class Solution {
 public:
+    // 快速数论变换 NTT (Number Theoretic Transform)
+    // 和 FFT 一样，NTT 也用来加速多项式乘法，NTT 最大的优点是可以取模
+    // 原根为 3 的常用模数有 469762049, 998244353, 1004535809
+    // 998244353 = ((7 * 17) << 23) + 1
+    // 二进制表示为 111011100000000000000000000001
+    // 是两个数的平方和 998244353 = 3943^2 + 31348^2
+    // 是勾股数之一 998244353^2 = 247210328^2 + 967149855^2
+    static const int MOD = 998244353;
+    
     string multiply(string num1, string num2) {
-        return this->solution1(num1, num2);
+        return this->solution2(num1, num2);
     }
     
 private:
-    // 方法一：模拟乘法。时间复杂度 O()，空间复杂度 O(), N =
+    // 方法一：模拟乘法。时间复杂度 O(MN), 空间复杂度 O(M+N), N=num1.size M=num2.size
     // 执行用时 : 24 ms , 在所有 C++ 提交中击败了 27.76% 的用户
     // 内存消耗 : 10.8 MB , 在所有 C++ 提交中击败了 31.96% 的用户
     // Runtime: 16 ms, faster than 28.97% of C++ online submissions for Multiply Strings.
@@ -213,6 +222,160 @@ private:
         num1 = num2;
         num2 = temp;
     }
+    
+    // 方法二：模拟乘法，用 NTT 加速乘法。时间复杂度 O(N lg N), 空间复杂度 O(M+N), N=num1.size M=num2.size
+    // 执行用时 : 8 ms , 在所有 C++ 提交中击败了 94.30% 的用户
+    // 内存消耗 : 9 MB , 在所有 C++ 提交中击败了 84.14% 的用户
+    // Runtime: 4 ms, faster than 96.40% of C++ online submissions for Multiply Strings.
+    // Memory Usage: 9.3 MB, less than 33.92% of C++ online submissions for Multiply Strings.
+    string solution2 (string num1, string num2) {
+        vector<int> A, B;
+        
+        // 反转 num1
+        reverse(num1.begin(), num1.end());
+        // 用向量存储各位数字
+        A.resize(num1.size());
+        for (size_t i = 0; i < A.size(); i++) {
+            A[i] = num1[i] - '0';
+        }
+        
+        // 反转 num2
+        reverse(num2.begin(), num2.end());
+        // 用向量存储各位数字
+        B.resize(num2.size());
+        for (size_t i = 0; i < B.size(); i++) {
+            B[i] = num2[i] - '0';
+        }
+        
+        // 向量数字相乘，结果在 A 中
+        this->polyMultiply(A, B);
+        
+        // 把向量 A 转为字符串
+        string str = "";
+        int cur_num = 0;
+        int carry = 0;
+        for (size_t i = 0; i < A.size(); i++) {
+            cur_num = A[i] % 10;
+            carry = A[i] / 10;
+            
+            str += cur_num + '0';
+            
+            if (carry > 0 && i + 1 >= A.size()) {
+                // 如果 A 长度不够，则末尾补进位值
+                A.push_back(carry);
+            } else if (carry > 0) {
+                // 否则直接修改该位的值
+                A[i + 1] += carry;
+            }
+        }
+        
+        // 去掉字符串末尾的 '0' 字符
+        while (*str.rbegin() == '0') {
+            str.pop_back();
+        }
+        
+        if (str == "") {
+            return "0";
+        }
+        
+        // 反转回来
+        reverse(str.begin(), str.end());
+        
+        return str;
+    }
+    
+    // 向量相乘
+    void polyMultiply(vector<int>& A, vector<int>& B) {
+        int len = (int)(A.size() + B.size() - 1);
+        int n = 1;
+        
+        // n 增大到比 len 更大的 2 的某次幂
+        while (n <= len) {
+            n <<= 1;
+        }
+        
+        // 修改 A 和 B 的向量大小
+        A.resize(n);
+        B.resize(n);
+        
+        // 对 A 和 B 分别做 FFT
+        this->fastFourierTransform(A);
+        this->fastFourierTransform(B);
+        
+        // A 和 B 各位对应相乘
+        for (size_t i = 0; i < n; i++) {
+            A[i] = 1LL * A[i] * B[i] % MOD;
+        }
+        
+        // 对乘积结果做 FFT
+        this->fastFourierTransform(A, -1);
+        
+        // 重置 A 的向量大小
+        A.resize(len);
+    }
+    
+    // FFT 优化求点值
+    void fastFourierTransform(vector<int>& A, int d = 1) {
+        static vector<int> rev;
+        
+        if (rev.size() != A.size()) {
+            rev.resize(A.size());
+            rev[0] = 0;
+            
+            for (size_t i = 1; i < A.size(); ++i) {
+                rev[i] = (rev[i >> 1] >> 1) | ((i & 1) * ((int)A.size() >> 1));
+            }
+        }
+        
+        for (size_t i = 0; i < A.size(); ++i) {
+            if (i < rev[i]) {
+                swap(A[i], A[rev[i]]);
+            }
+        }
+        
+        for (size_t i = 1; i < A.size(); i <<= 1) {
+            int wn = this->quickIntPower(3, (MOD - 1) / (i << 1));
+            
+            for (size_t j = 0; j < A.size(); j += (i << 1)) {
+                int w = 1;
+                
+                for (size_t k = 0; k < i; ++k) {
+                    int x = A[j + k];
+                    int y = 1LL * w * A[i + j + k] % MOD;
+                    
+                    A[j + k] = (x + y) % MOD;
+                    A[i + j + k] = (x - y + MOD) % MOD;
+                    
+                    w = 1LL * w * wn % MOD;
+                }
+            }
+        }
+        
+        if (d == -1) {
+            reverse(A.begin() + 1, A.end());
+            int inv = this->quickIntPower((int)A.size(), MOD - 2);
+            
+            for (size_t i = 0; i < A.size(); i++) {
+                A[i] = 1LL * A[i] * inv % MOD;
+            }
+        }
+    }
+    
+    // 正整数快速幂
+    int quickIntPower(int a, int b) {
+        int ans = 1;
+        
+        while (b) {
+            if (b & 1) {
+                ans = 1LL * ans * a % MOD;
+            }
+            
+            a = 1LL * a * a % MOD;
+            b >>= 1;
+        }
+        
+        return ans;
+    }
 };
 
 
@@ -226,7 +389,10 @@ int main(int argc, const char * argv[]) {
 //    string num1 = "2", num2 = "3"; // 预期结果 6
 //    string num1 = "123", num2 = "456"; // 预期结果 56088
 //    string num1 = "12345", num2 = "12345"; // 预期结果 152399025
-    string num1 = "0", num2 = "0"; // 预期结果 0
+//    string num1 = "0", num2 = "0"; // 预期结果 0
+    
+    // 预期结果 1524157875323883675049535156256668194500533455762536198787501905199875019052100
+    string num1 = "1234567890123456789012345678901234567890", num2 = "1234567890123456789012345678901234567890";
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
