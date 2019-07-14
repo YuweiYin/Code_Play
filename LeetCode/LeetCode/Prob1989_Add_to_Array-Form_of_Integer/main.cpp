@@ -122,10 +122,10 @@ private:
         // 反转 A，让低位在前
         reverse(A.begin(), A.end());
         
-        // 字符串数字相加
+        // 向量 A 加数字 K
         this->addIntToArray(A, K);
         
-        // 反转结果串，让高位在前
+        // 反转结果数组，让高位在前
         reverse(A.begin(), A.end());
         
         return A;
