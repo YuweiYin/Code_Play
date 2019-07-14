@@ -89,7 +89,7 @@ public:
     // 二进制表示为 111011100000000000000000000001
     // 是两个数的平方和 998244353 = 3943^2 + 31348^2
     // 是勾股数之一 998244353^2 = 247210328^2 + 967149855^2
-    static const int MOD = 998244353;
+    static const int MOD = 998244353; // 只要原根为 3 就可用于 NTT
     
     string multiply(string num1, string num2) {
         return this->solution2(num1, num2);
@@ -301,7 +301,7 @@ private:
         return str;
     }
     
-    // 向量相乘
+    // 多项式向量相乘
     void polyMultiply(vector<int>& A, vector<int>& B) {
         int len = (int)(A.size() + B.size() - 1);
         int n = 1;
