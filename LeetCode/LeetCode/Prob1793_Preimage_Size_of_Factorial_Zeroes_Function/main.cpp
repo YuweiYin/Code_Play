@@ -61,7 +61,7 @@ using namespace std;
 // 类型命名
 //typedef __int64_t ll;
 //#define ll __int64_t
-//#define ll long long
+#define ll long long
 
 // 全局常量
 //#define PI acos(-1.0)
@@ -80,12 +80,12 @@ using namespace std;
 class Solution {
 public:
     int preimageSizeFZF(int K) {
-        return this->solution3(K);
+        return this->solution2(K);
     }
     
 private:
     // 方法一：暴力法。时间复杂度 O(N), 空间复杂度 O(1), N = n
-    // 25 / 44 个通过测试用例  最后执行的输入：98918711
+    // 25 / 44 个通过测试用例  最后执行的输入：98918711 超时
     int solution1 (int& K) {
         // 边界条件
         if (K < 0) {
@@ -116,7 +116,10 @@ private:
     }
     
     // 方法二：暴力法优化+规律。时间复杂度 O(log_5 N), 空间复杂度 O(1), N = n
-    // 43 / 44 个通过测试用例  最后执行的输入：1000000000  溢出情况
+    // 执行用时 : 0 ms , 在所有 C++ 提交中击败了 100.00% 的用户
+    // 内存消耗 : 8 MB , 在所有 C++ 提交中击败了 100.00% 的用户
+    // Runtime: 0 ms, faster than 100.00% of C++ online submissions for Preimage Size of Factorial Zeroes Function.
+    // Memory Usage: 8.3 MB, less than 26.23% of C++ online submissions for Preimage Size of Factorial Zeroes Function.
     int solution2 (int& K) {
         // 边界条件
         if (K < 0) {
@@ -126,19 +129,19 @@ private:
         int res = 0;
         
         // 先计算 K * 5 的阶乘末尾有多少个 0，即 cur_k，并计算 cur_k 与 K 的差距，按规律，cur_k 大于 K
-        long k = K * 5;
-        int cur_k = this->trailingZeroes<long>(k);
-        int gap = cur_k - K;
+        ll k = (ll)(K) * 5;
+        ll cur_k = this->trailingZeroes<ll>(k);
+        ll gap = cur_k - K;
         
-        cout << gap << ", " << cur_k << ", " << k << ", " << K << endl;
+        // cout << gap << ", " << cur_k << ", " << k << ", " << K << endl;
         
         // 目标是缩小 cur_k 与 K 的差距，cur_k 作为函数值不能直接改变，需要改变的是 k 值
         // 最合适的做法是 k -= gap * 4，此时 k 的函数值 cur_k 与 K 很接近
         k -= gap * 4;
-        cur_k = this->trailingZeroes<long>(k);
+        cur_k = this->trailingZeroes<ll>(k);
         gap = cur_k - K;
         
-        cout << gap << ", " << cur_k << ", " << k << ", " << K << endl;
+        // cout << gap << ", " << cur_k << ", " << k << ", " << K << endl;
         
         // 之后再 +/- 5 地调整 k 的值，使得 cur_k 的值 +/- 1
         if (gap > 0) {
@@ -152,7 +155,7 @@ private:
                     res = 5;
                     break;
                 }
-                cur_k = this->trailingZeroes<long>(k);
+                cur_k = this->trailingZeroes<ll>(k);
             }
         } else if (gap < 0) {
             while (cur_k <= K) {
@@ -165,7 +168,7 @@ private:
                     res = 5;
                     break;
                 }
-                cur_k = this->trailingZeroes<long>(k);
+                cur_k = this->trailingZeroes<ll>(k);
             }
         } else {
             // 直接命中
@@ -175,74 +178,10 @@ private:
         return res;
     }
     
-    // 方法三：方法二+溢出处理。时间复杂度 O(log_5 N), 空间复杂度 O(1), N = n
-    int solution3 (int& K) {
-        // 边界条件
-        if (K < 0) {
-            return 0;
-        }
-        
-        int res = 0;
-        
-        // 通过两个步骤，快速定位使得 trailingZeroes(k) 函数值接近 K 的参数 k
-        // 先计算 K * 5 的阶乘末尾有多少个 0，即 cur_k，并计算 cur_k 与 K 的差距，按规律，cur_k 大于 K
-        // 但 K * 5 可能溢出 int，所以根据 trailingZeroes 函数的特点做等价处理
-        int k = K;
-        int cur_k = k + this->trailingZeroes<int>(k);
-        
-        int gap = cur_k - K;
-        
-        cout << gap << ", " << cur_k << ", " << k << ", " << K << endl;
-        
-        // 目标是缩小 cur_k 与 K 的差距，cur_k 作为函数值不能直接改变，需要改变的是 k 值
-        // 最合适的做法是 k = 5 * K - gap * 4，此时 k 的函数值 cur_k 与 K 很接近
-        // 但还是要避免溢出，所有做等价处理 trailingZeroes(5 * K - gap * 4) =
-        // trailingZeroes(K - gap * 4 / 5) + K - gap * 4 / 5
-        k -= gap * 4 / 5;
-        cur_k = k + this->trailingZeroes<int>(k);
-        gap = cur_k - K;
-        
-        cout << gap << ", " << cur_k << ", " << k << ", " << K << endl;
-        
-        // 之后再 +/- 5 地调整 k 的值，使得 cur_k 的值 +/- 1
-        int base_k = k;
-        if (gap > 0) {
-            while (cur_k >= K) {
-                if (cur_k > K) {
-                    // 规律：k 每减 5，cur_k 就会减一（但不是连续减一，会跳过一些值）
-                    // 如果 cur_k 跳过某些值，表明阶乘函数后 0 数目不可能等于这些值
-                    k -= 5;
-                } else {
-                    // 非 0 即 5，找到即可
-                    res = 5;
-                    break;
-                }
-                cur_k = base_k + this->trailingZeroes<int>(k);
-            }
-        } else if (gap < 0) {
-            while (cur_k <= K) {
-                if (cur_k < K) {
-                    // 规律：k 每加 5，cur_k 就会加一（但不是连续加一，会跳过一些值）
-                    // 如果 cur_k 跳过某些值，表明阶乘函数后 0 数目不可能等于这些值
-                    k += 5;
-                } else {
-                    // 非 0 即 5，找到即可
-                    res = 5;
-                    break;
-                }
-                cur_k = base_k + this->trailingZeroes<int>(k);
-            }
-        } else {
-            // 直接命中
-            res = 5;
-        }
-        
-        return res;
-    }
-    
-    // 子过程：给定一个整数 n，返回 n! 结果尾数中零的数量。时间复杂度 O(log_5 N), 空间复杂度 O(1), N = n
+    // (LeetCode 172) 子过程：给定一个整数 n，返回 n! 结果尾数中零的数量。
+    // 时间复杂度 O(log_5 N), 空间复杂度 O(1), N = n
     template <typename T>
-    int trailingZeroes (T n) {
+    T trailingZeroes (T n) {
         // 边界条件
         if (n < 5) {
             return 0;
@@ -251,7 +190,7 @@ private:
         // 规律：5^1 的整倍数贡献 1 个 5，即贡献 10（2 的倍数很多）
         // 5^2 的整倍数贡献 2 个 5。考虑重复情况，则是 5^2 在 5^1 的贡献基础上额外贡献一个 5
         // 例：n = 101, res = (int)(101/5) + (int)(101/25) + (int)(101/125)  = 24
-        int res = 0;
+        T res = 0;
         
         do {
             n /= 5;
@@ -275,8 +214,8 @@ int main(int argc, const char * argv[]) {
 //    int K = 5; // 预期结果 0
 //    int K = 200; // 预期结果 5
 //    int K = 98918711; // 预期结果 0
-    int K = 98918713; // 预期结果 5
-//    int K = 1000000000; // 预期结果
+//    int K = 98918713; // 预期结果 5
+    int K = 1000000000; // 预期结果 5
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
