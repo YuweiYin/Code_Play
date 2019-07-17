@@ -73,7 +73,6 @@ using namespace std;
 //const ll MIN_INT32 = -2147483648;
 //const int SQRT_MAX_INT32 = (int)sqrt(MAX_INT32);
 
-const double EPS = 1e-1; // 一般 EPS = 1e-10，但是本题只求解平方根的整数部分
 
 class Solution {
 public:
@@ -112,6 +111,7 @@ private:
             double res = 1; // 迭代计算平方根 x_n+1
             double last = 0; // 记录上一轮的计算值 x_n
             int max_loop = 100; // 设置最大迭代计算次数
+            const double EPS = 1e-10; // 精度值
             
             // 循环结束条件：本轮计算值与上轮计算值极度相近
             while (fabs(res - last) > EPS && max_loop > 0) {
@@ -134,6 +134,7 @@ private:
             double res = 1; // 迭代计算平方根
             double last = 0; // 记录上一轮的计算值
             int max_loop = 100; // 设置最大迭代计算次数
+            const double EPS = 1e-1; // 精度值
             
             // 循环结束条件：本轮计算值与上轮计算值极度相近
             while (fabs(res - last) > EPS && max_loop > 0) {
