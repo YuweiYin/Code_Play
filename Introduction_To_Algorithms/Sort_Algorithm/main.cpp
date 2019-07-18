@@ -8,11 +8,12 @@
 
 #include "Header.h"
 #include "Insertion_Sort.cpp"
+#include "Merge_Sort.cpp"
 
 class Solution {
 public:
     void sortVector (vector<int>& nums) {
-        this->solution1(nums);
+        this->solution2(nums);
     }
     
 private:
@@ -23,6 +24,16 @@ private:
 //        i_sort->insertionSort(nums, false, increasingOrder); // increasing order
 //        i_sort->insertionSort(nums, true, increasingOrder); // decreasing order
 //        i_sort->insertionSort(nums, true, decreasingOrder); // increasing order
+    }
+    
+    // 方法一：归并排序。时间复杂度 Theta(N lg N)，空间复杂度 O(N)。N = nums.size
+    // 可以通过对 merge 过程的优化，不使用辅助数组，以使得空间复杂度降为 O(1) 或者 O(lg N) 因为递归栈
+    void solution2 (vector<int>& nums) {
+        MergeSort<int>* m_sort = new MergeSort<int>();
+        m_sort->mergeSort(nums, 0, (int)nums.size() - 1); // default: increasing order
+//        m_sort->mergeSort(nums, 0, (int)nums.size() - 1, false, increasingOrder); // increasing order
+//        m_sort->mergeSort(nums, 0, (int)nums.size() - 1, true, increasingOrder); // decreasing order
+//        m_sort->mergeSort(nums, 0, (int)nums.size() - 1, true, decreasingOrder); // increasing order
     }
     
     static bool increasingOrder (int a, int b) {
