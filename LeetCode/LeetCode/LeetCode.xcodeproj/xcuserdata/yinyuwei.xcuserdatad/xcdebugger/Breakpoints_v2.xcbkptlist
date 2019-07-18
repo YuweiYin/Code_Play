@@ -2,4 +2,214 @@
 <Bucket
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.06766"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.0677429"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "266"
+            endingLineNumber = "266"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.0677969"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "267"
+            endingLineNumber = "267"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.067847"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.0678999"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "273"
+            endingLineNumber = "273"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.067946"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "276"
+            endingLineNumber = "276"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.067989"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "278"
+            endingLineNumber = "278"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.068033"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "281"
+            endingLineNumber = "281"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.0680749"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "287"
+            endingLineNumber = "287"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.06813"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.0681829"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "290"
+            endingLineNumber = "290"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.0682271"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "294"
+            endingLineNumber = "294"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Prob1034_Find_First_and_Last_Position_of_Element_in_Sorted_Array/main.cpp"
+            timestampString = "583941022.068267"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "297"
+            endingLineNumber = "297"
+            landmarkName = "binarySearchLeftAndRight (vector&lt;int&gt;&amp; nums, int&amp; left_index, int&amp; right_index, int&amp; target, int start, int end, int flag)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
