@@ -18,8 +18,19 @@ public:
 private:
     // 方法一：插入排序。时间复杂度 Theta(N^2)，空间复杂度 O(1)。N = nums.size
     void solution1 (vector<int>& nums) {
-        InsertionSort * i_sort = new InsertionSort();
-        i_sort->insertionSort<int>(nums);
+        InsertionSort<int>* i_sort = new InsertionSort<int>();
+        i_sort->insertionSort(nums); // default: increasing order
+//        i_sort->insertionSort(nums, false, increasingOrder); // increasing order
+//        i_sort->insertionSort(nums, true, increasingOrder); // decreasing order
+//        i_sort->insertionSort(nums, true, decreasingOrder); // increasing order
+    }
+    
+    static bool increasingOrder (int a, int b) {
+        return a < b;
+    }
+    
+    static bool decreasingOrder (int a, int b) {
+        return a > b;
     }
 };
 
