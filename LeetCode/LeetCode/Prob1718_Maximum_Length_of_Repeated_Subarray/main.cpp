@@ -75,7 +75,7 @@ using namespace std;
 class Solution {
 public:
     int findLength(vector<int>& A, vector<int>& B) {
-        return this->solution1(A, B);
+        return this->solution2(A, B);
     }
     
 private:
@@ -136,6 +136,48 @@ private:
                     // 更新最优值
                     if (cur_len > res) {
                         res = cur_len;
+                    }
+                }
+            }
+        }
+        
+        return res;
+    }
+    
+    // 方法一：真-动态规划。时间复杂度 O(M*N)，空间复杂度 O(M*N)。M = A.size, N = B.size
+    // 执行用时 : 260 ms , 在所有 C++ 提交中击败了 81.63% 的用户
+    // 内存消耗 : 106.4 MB , 在所有 C++ 提交中击败了 39.88% 的用户
+    // Runtime: 168 ms, faster than 67.33% of C++ online submissions for Maximum Length of Repeated Subarray.
+    // Memory Usage: 106.3 MB, less than 28.37% of C++ online submissions for Maximum Length of Repeated Subarray.
+    int solution2 (vector<int>& A, vector<int>& B) {
+        // 边界情况
+        if (A.empty() || B.empty()) {
+            return 0;
+        }
+        
+        int A_len = (int)A.size();
+        int B_len = (int)B.size();
+        
+        // A: [1,2,3,2,1] B: [3,2,1,4,7]
+        // dp[i+1][j+1] = dp[i][j] + 1
+        // DP  3  2  1  4  7
+        //   ---------------
+        // 1 | 0  0  1  0  0
+        // 2 | 0  1  0  0  0
+        // 3 | 1  0  0  0  0
+        // 2 | 0  2  0  0  0
+        // 1 | 0  0  3  0  0
+        vector<vector<int>> dp(A_len + 1, vector<int>(B_len + 1, 0));
+        
+        int res = 0;
+        
+        for (int i = 0; i < A_len; i++) {
+            for (int j = 0; j < B_len; j++) {
+                if (A[i] == B[j]) {
+                    dp[i + 1][j + 1] = dp[i][j] + 1; // state change
+                    
+                    if (dp[i + 1][j + 1] > res) {
+                        res = dp[i + 1][j + 1]; // update maximum
                     }
                 }
             }
