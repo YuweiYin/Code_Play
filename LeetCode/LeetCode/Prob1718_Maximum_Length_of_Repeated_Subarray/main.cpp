@@ -56,7 +56,7 @@ using namespace std;
 // 类型命名
 //typedef __int64_t ll;
 //#define ll __int64_t
-//#define ll long long
+#define ll long long
 
 // 全局常量
 //#define PI acos(-1.0)
@@ -73,9 +73,15 @@ using namespace std;
 
 
 class Solution {
+private:
+    // for solution3
+    ll P = 113; // 小素数
+    ll MOD = 1e9 + 7; // 模数
+    ll Pinv = 0; // P 在 MOD 下的逆元
+    
 public:
     int findLength(vector<int>& A, vector<int>& B) {
-        return this->solution2(A, B);
+        return this->solution3(A, B);
     }
     
 private:
@@ -144,7 +150,7 @@ private:
         return res;
     }
     
-    // 方法一：真-动态规划。时间复杂度 O(M*N)，空间复杂度 O(M*N)。M = A.size, N = B.size
+    // 方法二：真-动态规划。时间复杂度 O(M*N)，空间复杂度 O(M*N)。M = A.size, N = B.size
     // 执行用时 : 260 ms , 在所有 C++ 提交中击败了 81.63% 的用户
     // 内存消耗 : 106.4 MB , 在所有 C++ 提交中击败了 39.88% 的用户
     // Runtime: 168 ms, faster than 67.33% of C++ online submissions for Maximum Length of Repeated Subarray.
@@ -184,6 +190,155 @@ private:
         }
         
         return res;
+    }
+    
+    // 方法三：Rabin-Karp 算法 + 二分查找 + 哈希散列。
+    // 时间复杂度 O((M+N) * lg(min(M,N)))，空间复杂度 O(M)。M = A.size, N = B.size
+    int solution3 (vector<int>& A, vector<int>& B) {
+        // 边界情况
+        if (A.empty() || B.empty()) {
+            return 0;
+        }
+        
+        int A_len = (int)A.size();
+        int B_len = (int)B.size();
+        
+        // 如果数组 A 和 B 有一个长度为 k 的公共子数组，那么它们一定有长度为 j <= k 的公共子数组。
+        // 这样可以通过二分查找的方法找到最大的 k。二分查找的下界为 0，上界为 min(len(A), len(B))。
+        // 在二分查找的每一步中，可以考虑使用哈希的方法来判断数组 A 和 B 中是否存在相同的长度为 mid 的子数组。
+        
+        // 使用 Rabin-Karp 算法求出一个序列的哈希值。具体地，我们制定一个素数 p，那么序列 S 的哈希值为
+        // 形象地来说，就是把 S 看成一个类似 p 进制的数（但左侧为低位，右侧为高位），它的十进制值就是这个它的哈希值。
+        // 由于这个值一般会非常大，因此会将它对另一个素数 M 取模。
+        // 当要在一个序列 S 中算出所有长度为 l 的子序列的哈希值时，
+        // 可以用类似滑动窗口的方法，在线性时间内得到这些子序列的哈希值。
+        // 为了保证百分百的正确性，当两个字符串的哈希值相等时，需要判断它们对应的字符串是否相等，防止哈希碰撞。
+        
+        // 调用扩展欧几里得算法，计算 this->Pinv，即 P 在模 MOD 下的逆元
+        ll y = 0;
+        this->ex_gcd<ll>(this->P, this->MOD, this->Pinv, y);
+        if (this->Pinv < 0) {
+            this->Pinv += this->MOD;
+        }
+        
+        int low = 0, high = min(A_len, B_len) + 1;
+        
+        while (low < high) {
+            int mid = (low + high) / 2;
+            
+            if (this->check(mid, A, B)) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+        
+        return low - 1;
+    }
+    
+    bool check (int mid, vector<int>& A, vector<int>& B) {
+        map<int, vector<int>> hashes = {};
+        vector<int> A_roll = this->rolling(A, mid);
+        vector<int> B_roll = this->rolling(B, mid);
+        int k = 0;
+        
+        for (int i = 0; i < A_roll.size(); i++) {
+            if (hashes.find(A_roll[i]) == hashes.end()) {
+                hashes.insert({A_roll[i], {k}});
+            } else {
+                hashes[A_roll[i]].push_back(k);
+            }
+            k ++;
+        }
+        
+        k = 0;
+        for (int i = 0; i < B_roll.size(); i++) {
+            vector<int> x;
+            if (hashes.find(B_roll[i]) == hashes.end()) {
+                x = {};
+            } else {
+                x = hashes[B_roll[i]];
+            }
+            
+            for (int j = 0; j < x.size(); j++) {
+                bool equal = true;
+                // 比较 A[i..i+mid] 是否等于 B[j..j+mid]
+                for (int count = 0; count <= mid; count ++) {
+                    if (A[i + count] != B[j + count]) {
+                        equal = false;
+                        break;
+                    }
+                }
+                
+                // 相等则返回 true
+                if (equal) {
+                    return true;
+                }
+            }
+            
+            k++;
+        }
+        
+        return false;
+    }
+    
+    vector<int> rolling (vector<int>& source, int length) {
+        int s_len = (int)source.size();
+        vector<int> ans(s_len - length + 1);
+        long h = 0, power = 1;
+        
+        if (length == 0) {
+            return ans;
+        }
+        
+        for (int i = 0; i < s_len; i++) {
+            h = (h + source[i] * power) % this->MOD;
+            
+            if (i < length - 1) {
+                power = (power * this->P) % this->MOD;
+            } else {
+                ans[i - (length - 1)] = (int) h;
+                h = (h - source[i - (length - 1)]) * Pinv % MOD;
+                
+                if (h < 0) {
+                    h += this->MOD;
+                }
+            }
+        }
+        
+        return ans;
+    }
+    
+    // Greatest Common Divisor，辗转相除法、Euclid's Algorithm
+    // 核心思路：递归执行 gcd(a, b) = gcd(b, a % b)，直到 b == 0时，a 为最大公约数
+    // 求两数的最大公约数，如果为 1，表示两数互素
+    template <typename T>
+    T gcd (T a, T b) {
+        return b ? gcd(b, a % b) : a;
+    }
+    
+    // Extend Euclidean Algorithm 扩展欧几里得算法
+    // 返回值为 gcd(a, b) 即 a 和 b 的最大公约数
+    // 当 gcd(a, b) == 1 时，x 是 a 在模 b 意义下的乘法逆元
+    template <typename T>
+    T ex_gcd (T a, T b, T &x, T &y) {
+        if(b == 0) {
+            // 辗转相除到头，得到最大公约数，返回之
+            x = 1;
+            y = 0;
+            return a;
+        } else {
+            T r = ex_gcd(b, a % b, x, y);
+            // 得到最大公约数之后，一路反向传递之
+            
+            // 往回传递最大公约数过程中，不断根据递推关系修改参数 x 和 y
+            T t = x;
+            x = y; // x_(k-1) = y_k
+            y = t - a / b * y; // y_(k-1) = x_k - (a/b) * y_k
+            
+            // 回传最大公约数
+            return r;
+        }
     }
 };
 
