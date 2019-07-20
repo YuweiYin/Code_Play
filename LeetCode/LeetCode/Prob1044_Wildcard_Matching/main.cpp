@@ -155,20 +155,23 @@ private:
             // i 指示 s 位置，j 指示 p 位置
             if (j < p_len && (s[i] == p[j] || p[j] == '?')) {
                 // j 不越界，并且 s[i] 与 p[j] 相匹配，或者 p[j] 为 '?' 可以任意匹配单字符
-                i ++;
-                j ++;
+                i ++; // 往后看 s 串
+                j ++; // 往后看 p 串
             } else if (j < p_len && p[j] == '*') {
                 // j 不越界，并且 p[j] 为 '*' 可以任意匹配多字符
-                last = i;
-                star = ++j;
+                last = i; // i 不变，继续用 '*' 匹配，但把 i 值记录到 last 变量中
+                star = ++j; // 记录 p 中 '*' 下一个字符的位置到 star 变量中，往后看 p 串(先把 '*' 看作匹配 "")
             } else if (star != 0) {
-                i = ++last;
-                j = star;
+                // 出现不匹配，如果此时 star 不为 0，就表示可以用 p 中前一个 '*' 匹配来弥补
+                i = ++last; // 匹配上 s[i]，往后看 s 串
+                j = star; // j 在 star 位置，即 p 中前一个 '*' 的下个字符(每次只用 '*' 匹配来弥补一个字符，不"贪心")
             } else {
+                // 出现不匹配，p 中也没有 '*' 匹配来弥补，直接返回 false，匹配失败
                 return false;
             }
         }
         
+        // s 匹配结束了，p 还剩字符，必须要全是 '*' 才行
         for(; j < p_len && p[j] == '*'; j++);
         
         return j == p_len;
@@ -182,7 +185,7 @@ private:
         smatch result;
         
         // 设置字符串数据
-        string str = "1994 is my birth year 1994";
+        string str = "1995 is my birth year 1995";
         
         // 正则表达式
         string regex_str = "\\d{4}";
@@ -211,7 +214,7 @@ private:
         
         // 正则替换
         regex reg1("\\d{4}");
-        string t = "1993";
+        string t = "1989";
         str = regex_replace(str, reg1, t); // trim_left
         cout << str << endl;
     }
