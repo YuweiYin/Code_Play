@@ -80,16 +80,16 @@ using namespace std;
 class Solution {
 public:
     vector<vector<string>> groupAnagrams(vector<string>& strs) {
-        return this->solution1(strs);
+        return this->solution2(strs);
     }
     
 private:
-    // 方法一：。时间复杂度 O(N * M lg M)，空间复杂度 O(N * M)。
+    // 方法一：排序+哈希。时间复杂度 O(N * M lg M)，空间复杂度 O(N * M)。
     // N = strs.size  M 是 strs 中最长字符的长度
     // 执行用时 : 124 ms , 在所有 C++ 提交中击败了 24.23% 的用户
     // 内存消耗 : 19.7 MB , 在所有 C++ 提交中击败了 48.56% 的用户
     // Runtime: 52 ms, faster than 39.89% of C++ online submissions for Group Anagrams.
-    // Memory Usage: 19.8 MB, less than 49.64% of C++ online submissions for Group Anagrams.
+    // Memory Usage: 19.8 MB, less than 50.15% of C++ online submissions for Group Anagrams.
     vector<vector<string>> solution1 (vector<string>& strs) {
         // 边界情况
         if (strs.empty()) {
@@ -114,6 +114,61 @@ private:
         
         for (auto ite = strs_map.begin(); ite != strs_map.end(); ite++) {
             res.push_back(ite->second);
+        }
+        
+        return res;
+    }
+    
+    // 方法二：计数+哈希。时间复杂度 O(N * M)，空间复杂度 O(N * M)。
+    // N = strs.size  M 最多为 26
+    // 执行用时 : 84 ms , 在所有 C++ 提交中击败了 51.41% 的用户
+    // 内存消耗 : 20.1 MB , 在所有 C++ 提交中击败了 39.69% 的用户
+    // Runtime: 68 ms, faster than 19.81% of C++ online submissions for Group Anagrams.
+    // Memory Usage: 22.6 MB, less than 18.33% of C++ online submissions for Group Anagrams.
+    vector<vector<string>> solution2 (vector<string>& strs) {
+        // 边界情况
+        if (strs.empty()) {
+            return {};
+        }
+        
+        vector<vector<string>> res = {};
+        map<string, vector<string>> strs_map = {};
+        string str_key = "";
+        
+        int len = (int)strs.size();
+        for (int i = 0; i < len; i++) {
+            // 根据当前字符串计算出 key
+            str_key = this->getKey(strs[i]);
+            
+            if (strs_map.find(str_key) == strs_map.end()) {
+                strs_map.insert({str_key, {strs[i]}});
+            } else {
+                strs_map[str_key].push_back(strs[i]);
+            }
+        }
+        
+        for (auto ite = strs_map.begin(); ite != strs_map.end(); ite++) {
+            res.push_back(ite->second);
+        }
+        
+        return res;
+    }
+    
+    // 不通过排序，而是通过计算 a~z 字符出现的数目来设置 key，可以减少时间空间消耗
+    // 比较排序需要 O(M lg M) 时间，而这样做类似于计数排序，是线性时间复杂度 O(M)
+    string getKey (string& str) {
+        string res = ""; // count a~z
+        
+        for (int i = 0; i< str.size(); i++) {
+            int index = str[i] - 'a';
+            
+            // 长度不够，则增加至必要的长度
+            if (res.size() <= index) {
+                res.append(index - res.size() + 1, '0');
+            }
+            
+            // 对应位数字加一
+            res[index] ++;
         }
         
         return res;
