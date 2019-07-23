@@ -86,7 +86,7 @@ public:
     }
     
 private:
-    // 方法一：。时间复杂度 O(N!)，空间复杂度 O(N^2)。N = n
+    // 方法一：回溯法。时间复杂度 O(N!)，空间复杂度 O(N^2)。N = n
     // 执行用时 : 16 ms , 在所有 C++ 提交中击败了 66.96% 的用户
     // 内存消耗 : 10.1 MB , 在所有 C++ 提交中击败了 72.18% 的用户
     // Runtime: 12 ms, faster than 44.31% of C++ online submissions for N-Queens.
@@ -110,7 +110,6 @@ private:
         vector<int> pos_vec(n, 0); // pos_vec[i] = j 表示第 i 行的皇后放在 j 位置。用于构造解
 //        vector<bool> i_positioned(n, false); // i_positioned[i] 为真表示第 i 行已放置皇后。用于加速判断
 //        vector<bool> j_positioned(n, false); // j_positioned[j] 为真表示第 j 列已放置皇后。用于加速判断
-//        vector<int> queen_pos(n, 0); // queen_pos[i] = j 表示第 i 行的 queen 放置在 j 位置
         
         this->backtrack(res, queens, pos_vec, n, 0);
         
