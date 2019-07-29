@@ -87,15 +87,107 @@ public:
     }
     
 private:
-    // 方法一。Partition 分配函数。时间复杂度 O()，空间复杂度 O()。N = n
-    int solution1(int n) {
+    // 方法一。Fibonacci。时间复杂度 O(N)，空间复杂度 O(1)。N = n
+    // 执行用时 : 0 ms , 在所有 C++ 提交中击败了 100.00% 的用户
+    // 内存消耗 : 8.2 MB , 在所有 C++ 提交中击败了 75.90% 的用户
+    // Runtime: 4 ms, faster than 58.74% of C++ online submissions for Climbing Stairs.
+    // Memory Usage: 8 MB, less than 94.88% of C++ online submissions for Climbing Stairs.
+    int solution1 (int n) {
         if (n <= 0) {
             return 0;
         }
         
-        int res = 0;
+        if (n == 1) {
+            return 1;
+        }
+        
+        int first = 1;
+        int second = 2;
+        
+        for (int i = 3; i <= n; i++) {
+            int third = first + second;
+            first = second;
+            second = third;
+        }
+        
+        return second;
+    }
+    
+    // 方法二。矩阵快速幂求 Fibonacci 数 - Binets 方法。时间复杂度 O(lg N)，空间复杂度 O(1)。N = n
+    // 执行用时 : 0 ms , 在所有 C++ 提交中击败了 100.00% 的用户
+    // 内存消耗 : 8.4 MB , 在所有 C++ 提交中击败了 50.66% 的用户
+    // Runtime: 4 ms, faster than 58.74% of C++ online submissions for Climbing Stairs.
+    // Memory Usage: 8.5 MB, less than 18.65% of C++ online submissions for Climbing Stairs.
+    int solution2 (int n) {
+        if (n <= 0) {
+            return 0;
+        }
+        
+        if (n == 1) {
+            return 1;
+        }
+        
+        vector<vector<int>> q = {{1, 1}, {1, 0}};
+        vector<vector<int>> res = this->fastPowerMatrix(q, n);
+        
+        return res[0][0];
+    }
+    
+    // 矩阵快速幂 a^n
+    vector<vector<int>> fastPowerMatrix(vector<vector<int>>& a, int n) {
+        // 1 0
+        // 0 1
+        vector<vector<int>> res = {{1, 0}, {0, 1}};
+        
+        while (n > 0) {
+            if ((n & 1) == 1) {
+                res = this->multiplyMatrix(res, a);
+            }
+            
+            n >>= 1;
+            
+            if (n <= 0) {
+                break;
+            }
+            
+            a = this->multiplyMatrix(a, a);
+        }
         
         return res;
+    }
+    
+    // 2*2 矩阵乘法 a*b
+    vector<vector<int>> multiplyMatrix(vector<vector<int>>& a, vector<vector<int>>& b) {
+        vector<vector<int>> product(2, vector<int>(2, 0));
+        
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                product[i][j] = a[i][0] * b[0][j] + a[i][1] * b[1][j];
+            }
+        }
+        
+        return product;
+    }
+    
+    // 方法三。Fibonacci 公式。时间复杂度 O(lg N)，空间复杂度 O(1)。N = n
+    // 但 n 较大时存在精度问题
+    // 执行用时 : 4 ms , 在所有 C++ 提交中击败了 78.41% 的用户
+    // 内存消耗 : 8.1 MB , 在所有 C++ 提交中击败了 90.99% 的用户
+    // Runtime: 4 ms, faster than 58.74% of C++ online submissions for Climbing Stairs.
+    // Memory Usage: 8.4 MB, less than 50.51% of C++ online submissions for Climbing Stairs.
+    int solution3 (int n) {
+        if (n <= 0) {
+            return 0;
+        }
+        
+        if (n == 1) {
+            return 1;
+        }
+        
+        const double sqrt_5 = sqrt(5.0);
+        double fibn = pow((1 + sqrt_5) / 2, n + 1) - pow((1 - sqrt_5) / 2, n + 1);
+        
+        return (int)(fibn / sqrt_5);
     }
 };
 
@@ -107,7 +199,7 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    int n = 3; // 预期结果 3
+    int n = 30; // 预期结果 1346269
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
