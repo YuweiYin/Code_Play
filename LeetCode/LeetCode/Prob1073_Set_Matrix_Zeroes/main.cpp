@@ -104,40 +104,51 @@ public:
     }
     
 private:
-    // 方法一。。时间复杂度 O(M*N)，空间复杂度 O(1)。
-    // 执行用时 : 68 ms , 在所有 C++ 提交中击败了 84.18% 的用户
-    // 内存消耗 : 11.3 MB , 在所有 C++ 提交中击败了 93.02% 的用户
-    // Runtime: 48 ms, faster than 67.32% of C++ online submissions for Set Matrix Zeroes.
-    // Memory Usage: 11.3 MB, less than 99.79% of C++ online submissions for Set Matrix Zeroes.
+    // 方法二。原地修改、首行/首列元素记录应归零的列/行。时间复杂度 O(M*N)，空间复杂度 O(1)。
+    // 执行用时 : 68 ms , 在所有 C++ 提交中击败了 83.82% 的用户
+    // 内存消耗 : 11.2 MB , 在所有 C++ 提交中击败了 96.35% 的用户
+    // Runtime: 48 ms, faster than 66.92% of C++ online submissions for Set Matrix Zeroes.
+    // Memory Usage: 11.3 MB, less than 97.90% of C++ online submissions for Set Matrix Zeroes.
     void solution1 (vector<vector<int>>& matrix) {
-        if (matrix.empty() || matrix[0].empty()) {
-            return;
-        }
-        
-        bool col0_flag = false;
+        bool isCol = false; // 首列是否需要设置为 0
         int row = (int)matrix.size();
         int col = (int)matrix[0].size();
         
         for (int i = 0; i < row; i++) {
             if (matrix[i][0] == 0) {
-                col0_flag = true;
+                // 若某列首元素为 0，则表示首列需要设置为 0
+                isCol = true;
             }
             
             for (int j = 1; j < col; j++) {
+                // 若某元素为 0，则设置改元素所在行和列的首元素为 0
                 if (matrix[i][j] == 0) {
-                    matrix[i][0] = matrix[0][j] = 0;
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
                 }
             }
         }
         
-        for (int i = row - 1; i >= 0; i--) {
-            for (int j = col - 1; j >= 1; j--) {
+        // 再次遍历矩阵，如果某元素所在行/列的首元素为 0，则将它设为 0
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
                 if (matrix[i][0] == 0 || matrix[0][j] == 0) {
                     matrix[i][j] = 0;
                 }
             }
-            
-            if (col0_flag) {
+        }
+        
+        // 如果 (0, 0) 位置为 0，则表示首行需要设置为 0
+        if (matrix[0][0] == 0) {
+            for (int j = 0; j < col; j++) {
+                matrix[0][j] = 0;
+            }
+        }
+        
+        // 由于 (0, 0) 位置为 0 只能表示首行是否该设置为 0，
+        // 而不能表示首列是否该设置为 0，所以需要 isCol 来对此进行判断。
+        if (isCol) {
+            for (int i = 0; i < row; i++) {
                 matrix[i][0] = 0;
             }
         }
