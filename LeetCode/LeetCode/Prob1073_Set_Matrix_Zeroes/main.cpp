@@ -104,7 +104,7 @@ public:
     }
     
 private:
-    // 方法二。原地修改、首行/首列元素记录应归零的列/行。时间复杂度 O(M*N)，空间复杂度 O(1)。
+    // 方法一。原地修改、首行/首列元素记录应归零的列/行。时间复杂度 O(M*N)，空间复杂度 O(1)。
     // 执行用时 : 68 ms , 在所有 C++ 提交中击败了 83.82% 的用户
     // 内存消耗 : 11.2 MB , 在所有 C++ 提交中击败了 96.35% 的用户
     // Runtime: 48 ms, faster than 66.92% of C++ online submissions for Set Matrix Zeroes.
@@ -163,7 +163,12 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    // 预期结果 "/home"
+    // 预期结果
+    // {
+    //   {0, 0, 0, 0},
+    //   {0, 4, 5, 0},
+    //   {0, 3, 1, 0}
+    // }
     vector<vector<int>> matrix = {
         {0, 1, 2, 0},
         {3, 4, 5, 2},
