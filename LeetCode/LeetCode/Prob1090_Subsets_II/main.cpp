@@ -79,11 +79,15 @@ private:
     
 public:
     vector<vector<int>> subsetsWithDup(vector<int>& nums) {
-        return this->solution1(nums);
+        return this->solution2(nums);
     }
     
 private:
     // TODO 方法一。回溯法。时间复杂度 O()，空间复杂度 O()。
+    // 执行用时 : 12 ms , 在所有 C++ 提交中击败了 91.17% 的用户
+    // 内存消耗 : 9.4 MB , 在所有 C++ 提交中击败了 55.34% 的用户
+    // Runtime: 8 ms, faster than 84.60% of C++ online submissions for Subsets II.
+    // Memory Usage: 9.5 MB, less than 50.00% of C++ online submissions for Subsets II.
     vector<vector<int>> solution1 (vector<int>& nums) {
         // 边界情况
         if (nums.empty()) {
@@ -145,42 +149,37 @@ private:
         }
     }
     
-    /*
-    // TODO 方法二。哈希、统计数字频次去重。时间复杂度 O()，空间复杂度 O()。
+    // 方法二。位操作去重。时间复杂度 O()，空间复杂度 O()。
     vector<vector<int>> solution2 (vector<int>& nums) {
-        // 不用去重也不用排序的思路：
-        // 先统计每个数字的频次，
-        // 之后再根据每个数字的频次来组合，如 [1，2，2，3，3，3]
-        // 得到字典｛1:1,2:2,3:3｝之后，
-        // 直接按个数组合就能得到结果也能避免重合。即 0 个数字的子集为 1 种，1 个数字的子集为 3 种，
-        // 2 个数字的子集... 6 个数字的子集就能得到所有结果
+        sort(nums.begin(), nums.end());
         
-        map<int, int> dict = {};
-        int index = 0;
-        for (; index < nums.size(); index++) {
-            if (dict.find(index) == dict.end()) {
-                dict.insert({index, 0});
-            } else {
-                dict[index] ++;
+        vector<vector<int>> res = {};
+        int len = (int)nums.size();
+        int subset_num = 1 << len;
+        
+        for(int i = 0; i < subset_num; i++) {
+            vector<int> list = {};
+            bool illegal = false;
+            for (int j = 0; j < len; j++) {
+                if ((i >> j & 1) == 1) {
+                    // 若当前位是 1
+                    if (j > 0 && nums[j] == nums[j - 1] && (i >> (j - 1) & 1) == 0) {
+                        // 若当前是重复数字，并且前一位是 0，则跳过这种情况
+                        illegal = true;
+                        break;
+                    } else {
+                        list.push_back(nums[j]);
+                    }
+                }
+            }
+            
+            if (!illegal) {
+                res.push_back(list);
             }
         }
         
-        vector<vector<int>> res = {{}};
-        index = 0;
-        for (auto ite = dict.begin(); ite != dict.end(); ite++, index++) {
-            vector<vector<int>> temp = copy(dict.begin(), dict.end());
-            for () {
-                
-            }
-        }
-        for i, v in dic.items():
-            temp = res.copy()
-            for j in res:
-                temp.extend(j+[i]*(k+1) for k in range(v))
-            res = temp
         return res;
     }
-    */
 };
 
 
