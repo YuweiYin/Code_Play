@@ -149,7 +149,7 @@ private:
         }
     }
     
-    // 方法二。位操作去重。时间复杂度 O()，空间复杂度 O()。
+    // 方法二。位操作去重。时间复杂度 O()，空间复杂度 O(1)。
     vector<vector<int>> solution2 (vector<int>& nums) {
         sort(nums.begin(), nums.end());
         
