@@ -18,12 +18,12 @@
 //    Input: [1,2,2]
 //    Output:
 //    [
-//     [2],
-//     [1],
-//     [1,2,2],
-//     [2,2],
-//     [1,2],
-//     []
+//      [2],
+//      [1],
+//      [1,2,2],
+//      [2,2],
+//      [1,2],
+//      []
 //    ]
 
 
@@ -150,6 +150,10 @@ private:
     }
     
     // 方法二。位操作去重。时间复杂度 O()，空间复杂度 O(1)。
+    // 执行用时 : 12 ms , 在所有 C++ 提交中击败了 91.17% 的用户
+    // 内存消耗 : 9.4 MB , 在所有 C++ 提交中击败了 55.34% 的用户
+    // Runtime: 8 ms, faster than 84.30% of C++ online submissions for Subsets II.
+    // Memory Usage: 9.3 MB, less than 72.73% of C++ online submissions for Subsets II.
     vector<vector<int>> solution2 (vector<int>& nums) {
         sort(nums.begin(), nums.end());
         
