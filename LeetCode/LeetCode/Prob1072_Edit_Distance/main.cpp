@@ -92,7 +92,11 @@ public:
     }
     
 private:
-    // 方法一。。时间复杂度 O()，空间复杂度 O()。
+    // 方法一。动态规划。时间复杂度 O(M*N)，空间复杂度 O(M*N)。M = word1.size, N = word2.size
+    // 执行用时 : 20 ms , 在所有 C++ 提交中击败了 64.87% 的用户
+    // 内存消耗 : 11.2 MB , 在所有 C++ 提交中击败了 35.30% 的用户
+    // Runtime: 12 ms, faster than 67.54% of C++ online submissions for Edit Distance.
+    // Memory Usage: 11.2 MB, less than 65.63% of C++ online submissions for Edit Distance.
     int solution1 (string& word1, string& word2) {
         // 边界情况
         if (word1 == word2) {
@@ -110,9 +114,38 @@ private:
             return len1;
         }
         
-        int res = 0;
+        vector<vector<int>> dp(len1 + 1, vector<int>(len2 + 1));
         
-        return res;
+        // 初始化编辑距离
+        for (int i = 0; i < len1 + 1; i++) {
+            // 从 word1 的前 i 个字符组成的单词变成 0 个字符的单词，需要 i 步操作
+            dp[i][0] = i;
+        }
+        for (int j = 0; j < len2 + 1; j++) {
+            // 从 0 个字符的单词变成 word2 的前 j 个字符组成的单词，需要 j 步操作
+            dp[0][j] = j;
+        }
+        
+        // 动态规划计算
+        int insert_char = 0, delete_char = 0, replace_char = 0;
+        for (int i = 1; i < len1 + 1; i++) {
+            for (int j = 1; j < len2 + 1; j++) {
+                insert_char = dp[i - 1][j] + 1; // 插入字符到 word1
+                delete_char = dp[i][j - 1] + 1; // 从 word1 删除字符
+                replace_char = dp[i - 1][j - 1]; // 两边均插入一个字符
+                
+                // 在两边均插入一个字符的情况下，如果当前字符是不同的，
+                // 则可以通过额外的一步替换操作来使两边插入的字符相同。
+                if (word1[i - 1] != word2[j - 1]) {
+                    replace_char ++;
+                }
+                
+                // 三种操作中取最小代价，更新 DP 表
+                dp[i][j] = min(insert_char, min(delete_char, replace_char));
+            }
+        }
+        
+        return dp[len1][len2];
     }
 };
 
@@ -124,7 +157,7 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-//    string word1 = "intention", word2 = "execution"; // 预期结果 3
+//    string word1 = "horse", word2 = "ros"; // 预期结果 3
     string word1 = "intention", word2 = "execution"; // 预期结果 5
     
     // 调用解决方案，获得处理结果，并输出展示结果
