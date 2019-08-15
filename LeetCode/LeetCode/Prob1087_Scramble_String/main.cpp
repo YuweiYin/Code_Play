@@ -116,9 +116,6 @@ private:
             return true;
         }
         
-        int len1 = (int)s1.size();
-        int len2 = (int)s2.size();
-        
         return true;
     }
 };
