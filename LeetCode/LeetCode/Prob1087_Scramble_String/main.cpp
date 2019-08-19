@@ -110,13 +110,45 @@ public:
     
 private:
     // 方法一。。时间复杂度 O()，空间复杂度 O()。N =
+    // 执行用时 : 8 ms , 在所有 C++ 提交中击败了 89.78% 的用户
+    // 内存消耗 : 10.5 MB , 在所有 C++ 提交中击败了 79.82% 的用户
+    // Runtime: 8 ms, faster than 69.82% of C++ online submissions for Scramble String.
+    // Memory Usage: 10.5 MB, less than 76.19% of C++ online submissions for Scramble String.
     bool solution1 (string& s1, string& s2) {
         // 边界情况
         if (s1 == s2) {
             return true;
         }
         
-        return true;
+        if (s1.size() != s2.size()) {
+            return false;
+        }
+        
+        string ss1(s1);
+        string ss2(s2);
+        
+        sort(ss1.begin(), ss1.end());
+        sort(ss2.begin(), ss2.end());
+        
+        if (ss1 != ss2) {
+            return false;
+        }
+        
+        for (int i = 1; i < s1.size(); i++) {
+            // s1 前 i 个字符 匹配 s2 前 i 个字符
+            if(isScramble(s1.substr(0, i), s2.substr(0, i))
+               && isScramble(s1.substr(i, s1.size()), s2.substr(i, s2.size()))) {
+                return true;
+            }
+            
+            // s1 前 i 个字符 匹配 s2 后 i 个字符
+            if (isScramble(s1.substr(0, i), s2.substr(s2.size() - i, i))
+                && isScramble(s1.substr(i, s1.size()), s2.substr(0, s2.size() - i))) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 };
 
@@ -128,8 +160,8 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-    string s1 = "great", s2 = "rgeat"; // 预期结果 true
-//    string s1 = "abcde", s2 = "caebd"; // 预期结果 false
+//    string s1 = "great", s2 = "rgeat"; // 预期结果 true
+    string s1 = "abcde", s2 = "caebd"; // 预期结果 false
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
