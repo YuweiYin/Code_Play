@@ -113,8 +113,8 @@ int main(int argc, const char * argv[]) {
     start = clock();
     
     // 设置测试数据
-//    int n = 0; // 预期结果 [0]
-    int n = 2; // 预期结果 [0,1,3,2]
+    int n = 0; // 预期结果 [0]
+//    int n = 2; // 预期结果 [0,1,3,2]
     
     // 调用解决方案，获得处理结果，并输出展示结果
     Solution *solution = new Solution();
