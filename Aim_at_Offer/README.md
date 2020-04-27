@@ -74,3 +74,4 @@ By [YuweiYin](https://github.com/YuweiYin)
 64 | 滑动窗口的最大值 | [Prob_64.py](./source_code/Prob_64.py) | 数组遍历、滑动窗口
 65 | 矩阵中的路径 | [Prob_65.py](./source_code/Prob_65.py) | 回溯法、DFS
 66 | 机器人的运动范围 | [Prob_66.py](./source_code/Prob_66.py) | 回溯法、DFS
+67 | 剪绳子 | [Prob_67.py](./source_code/Prob_67.py) | 回溯法、DFS、找规律、数学
