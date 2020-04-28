@@ -16,7 +16,7 @@ By [YuweiYin](https://github.com/YuweiYin)
 	- 位运算
 	- 剪枝
 	- 函数参数尽可能少
-	- 层数不易过大
+	- 层数不宜过大
 	- 双向搜索或者是轮换搜索
 	- IDA\* 算法
 - 记忆化搜索
