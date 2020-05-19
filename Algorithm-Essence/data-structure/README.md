@@ -1,39 +1,71 @@
-# Code_Play
+# Algorithm - Data Structure
 
-Programming Practice - ACM Algorithm - Data Structure
+By [YuweiYin](https://yuweiyin.github.io/)
 
-By [YuweiYin](https://github.com/YuweiYin)
+> Data structures are nothing different. They are like the bookshelves of your application where you can organize your data. Different data structures will give you different facility and benefits. To properly use the power and accessibility of the data structures you need to know the trade-offs of using one.
 
 ## 目录
 
-- 栈、队列、链表
-- 哈希表、哈希数组
-- 堆、优先队列
-	- 双端队列
-	- 可并堆
-	- 左偏堆
-- 二叉查找树
-	- Treap
-	- 伸展树
-- 并查集
-	- 集合计数问题
-	- 二分图的识别
-- 平衡二叉树
-- 二叉排序树
-- 线段树
-	- 一维线段树
-	- 二维线段树
-- 树状数组
-	- 一维树状数组
-	- N 维树状数组
-- 字典树
-- 后缀数组、后缀树
+- 数组、链表、栈、队列
+- 树形结构
+    - 二叉树及其各类遍历算法
+        - 前序遍历 Preorder Traversal
+        - 中序遍历 Inorder Traversal
+        - 后序遍历 Postorder Traversal
+        - 层序遍历 Level Traversal
+    - [二叉排序/搜索树](./binary-search-tree) (Binary Sort/Search Tree, BST)
+    - [高度平衡二叉搜索树](./avl-tree) AVL 树 (Adelson-Velsky-Landis Tree) (Height Balanced Binary Search Tree)
+    - [红黑树](./red-black-tree) (Red Black Tree, RBT)
+    - AA 树
+    - [堆树](./treap) (Treap)
+    - [伸展树](./splay-tree) (Splay Tree)
+    - [跳表](./skip-list) Skip List
+    - 替罪羊树
+    - 带权平衡树
+    - [B-Tree](./b-tree)
+        - 2-3 树、B- 树、B+ 树、B\* 树
+    - 哈夫曼树 (Huffman Tree)
+    - van Emde Boas 树
+    - 顺序统计树 (Order Statistic Tree)
+    - k 近邻树、k 维树 (k-dimensional Tree, kd-Tree)
+- 区间查询 Range Query
+    - [线段树](./segment-tree) (Segment Tree, ST)
+    - [树状数组](./binary-indexed-tree) Fenwick Tree (Binary Indexed Tree, BIT)
+    - [区间最值查询](./range-min-max-query) Sparse Table (Range Minimum/Maximum Query, RMQ)
+    - [最近公共祖先](./lowest-common-ancestor) (Lowest Common Ancestors, LCA)
+- [哈希散列](./hashing)
+    - 直接寻址表 Direct-Access Table、散列表 Hashing Table
+    - 散列表解决碰撞/冲突：链接法 Chaining、开放寻址法 Open Addressing
+    	- 线性探查 Linear Probing
+    	- 二次探查 Quadratic Probing
+    	- 双重散列 Double Hashing
+    - 散列函数 Hash Function
+    	- 除法散列法 Division Hashing
+    	- 乘法散列法 Multiplication Hashing
+    	- 全域散列法 Universal Hashing
+    - 散列表的动态扩缩 grow / shrink
+    - 完全散列 Perfect Hashing、动态完全散列 Dynamic Perfect Hashing
+    - 布谷鸟散列 Cuckoo Hashing、布隆过滤器 Bloom Filter
+    - 一致性散列 Consistent Hashing
+- 堆
+    - [优先队列](../sort/heap-sort)
+    - 双端队列
+    - 可并堆
+    - 左偏堆
+    - 斐波那契堆
 - 块状链表
-- 哈夫曼树
-- 桶、跳跃表
-- Trie 树
-	- 静态建树
-	- 动态建树
-- AC 自动机
-- LCA 和 RMQ 问题
-- KMP 算法
+- 基本图结构
+    - 邻接矩阵
+    - 邻接表
+- 不相交集合 (Disjoint Set)
+    - [并查集](./union-find) (Union Find)
+- 字符串相关
+    - 前缀树/字典树 (Trie Tree)、01 字段树
+    - 后缀树、后缀数组
+    - 后缀自动机 (Suffix Automaton, SAM)
+    - AC 自动机 (Aho-Corasick Automaton)
+    - 回文自动机 (Palindromic Automaton, PAM)
+    - 回文树 Palindromic Tree
+    - Rabin-Karp 算法
+    - KMP 算法 (D.E.Knuth，J.H.Morris and V.R.Pratt)
+    - 马拉车算法 Manacher's Algorithm
