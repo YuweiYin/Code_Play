@@ -65,6 +65,36 @@ class BTree:
         else:
             return False
 
+    # 辅助操作：B-Tree 结点 keys (非降序排列) 的二分搜索
+    # 返回 k 在 keys 列表中的索引，如果不存在返回当前下标
+    def _binary_search(self, keys, lo, hi, k):
+        assert isinstance(keys, list) and isinstance(lo, int) and isinstance(hi, int)
+        n_keys = len(keys)
+        if n_keys == 0:
+            return n_keys
+        # 越界情况
+        if lo < 0:
+            lo = 0
+        if hi >= n_keys:
+            hi = n_keys - 1
+        # 根据下标大小分情况处理
+        if lo == hi:
+            return lo if k <= keys[lo] else lo + 1
+        elif lo < hi:
+            mid = int((lo + hi) >> 1)
+            # 目标 k 匹配 mid 位置的值，返回 mid
+            if k == keys[mid]:
+                return mid
+            # 目标 k 小于 mid 位置的值，往左看
+            elif k < keys[mid]:
+                return self._binary_search(keys, lo, mid - 1, k)
+            # 目标 k 大于 mid 位置的值，往右看
+            else:
+                return self._binary_search(keys, mid + 1, hi, k)
+        else:
+            # 不存在
+            return lo
+
     # 根据 key 值搜索结点
     # 如果搜索到了，则返回结点 TreeNode 及其孩子下标 kid_index
     # 如果搜索不到，则返回 None, -1
@@ -77,13 +107,14 @@ class BTree:
 
     def _search(self, root, search_key):
         if isinstance(root, TreeNode):
-            key_index = 0  # 当前结点的关键字索引，如果找不到，就是孩子结点索引
+            # key_index = 0  # 当前结点的关键字索引，如果找不到，就是孩子结点索引
             # 线性扫描当前结点的每个关键字，在当前结点中找出下标 kid_index，
             # 使得 search_key 搜索目标关键字 小于等于 root 的某个孩子的关键字
-            while key_index < len(root.keys) and search_key > root.keys[key_index]:
-                key_index += 1
+            # while key_index < len(root.keys) and search_key > root.keys[key_index]:
+            #     key_index += 1
+            key_index = self._binary_search(root.keys, 0, len(root.keys) - 1, search_key)
             # 检查是否已找到关键字
-            if key_index < len(root.keys) and search_key == root.keys[key_index]:
+            if 0 <= key_index < len(root.keys) and search_key == root.keys[key_index]:
                 return root, key_index
             # 如果找不到，判断当前结点 root 是否为叶子，如果是，则表示没有此元素
             elif root.is_leaf:
@@ -143,28 +174,16 @@ class BTree:
     # 插入成功返回 True；否则返回 False
     def _insert_not_full(self, root, insert_key, insert_val):
         if isinstance(root, TreeNode):
-            i = len(root.keys) - 1
+            i = self._binary_search(root.keys, 0, len(root.keys) - 1, insert_key)
             # 如果当前 root 为叶结点，则插入到此叶结点（已确保非满）
             if root.is_leaf:
-                # 增加占位元素
-                root.keys.append(0)
-                root.vals.append(0)
-                # 寻找插入位置
-                while i >= 0 and insert_key < root.keys[i]:
-                    root.keys[i + 1] = root.keys[i]
-                    root.vals[i + 1] = root.vals[i]
-                    i -= 1
                 # 插入 key/val
-                root.keys[i + 1] = insert_key
-                root.vals[i + 1] = insert_val
+                root.keys.insert(i, insert_key)
+                root.vals.insert(i, insert_val)
                 # 将有修改的 root 结点写回外存
                 return self.disk_write(root)
             # 如果当前 root 不是叶结点，则寻找一个孩子结点
             else:
-                # 寻找孩子结点
-                while i >= 0 and insert_key < root.keys[i]:
-                    i -= 1
-                i += 1
                 # 从外存读入孩子结点
                 if self.disk_read(root, i):
                     # 如果此孩子满了，则先将此孩子分裂
@@ -279,16 +298,18 @@ class BTree:
             assert len(root.keys) >= self.bf
 
         # 扫描当前叶结点，判断 delete_key 是否在结点中
-        key_index = 0
-        for key in root.keys:
-            if delete_key == key:
-                break
-            key_index += 1
+        # key_index = 0
+        # for key in root.keys:
+        #     if delete_key == key:
+        #         break
+        #     key_index += 1
+        key_index = self._binary_search(root.keys, 0, len(root.keys) - 1, delete_key)
 
         # 分情况处理（实际发生的删除都是在叶结点上）
         if root.is_leaf:
             # case 1: 如果 x 是叶结点，且关键字 k 在结点 x 中，则直接从 x 中删除 k
-            if key_index < len(root.keys):
+            # if key_index < len(root.keys):
+            if 0 <= key_index < len(root.keys) and root.keys[key_index] == delete_key:
                 # 直接删除 delete_key
                 deleted_key = root.keys.pop(key_index)
                 deleted_val = root.vals.pop(key_index)
@@ -298,7 +319,8 @@ class BTree:
                 return None, None
         else:
             # case 2: 如果 x 是内部结点，且关键字 k 在结点 x 中
-            if key_index < len(root.keys):
+            # if key_index < len(root.keys):
+            if 0 <= key_index < len(root.keys) and root.keys[key_index] == delete_key:
                 # 关键字 k 左右的孩子结点分别称为 left_kid 和 right_kid
                 left_kid = root.kids[key_index]
                 right_kid = root.kids[key_index + 1]
@@ -376,8 +398,9 @@ class BTree:
                     assert len(root.kids) == 1
                 else:
                     # 扫描当前内部结点 x，判断 delete_key 应在在 x 的哪个孩子结点中
-                    while kid_index < n_keys and root.keys[kid_index] < delete_key:
-                        kid_index += 1
+                    # while kid_index < n_keys and root.keys[kid_index] < delete_key:
+                    #     kid_index += 1
+                    kid_index = self._binary_search(root.keys, 0, len(root.keys) - 1, delete_key)
                 assert kid_index < len(root.kids)
 
                 # delete_key 所在的孩子结点 kid
@@ -724,6 +747,15 @@ def main():
         for kv in kv_array:
             if isinstance(kv, list) and len(kv) == 2:
                 b_tree.insert(kv[0], kv[1])
+
+    # 搜索值
+    search_key = 4
+    res_node, key_index = b_tree.search(search_key)
+    if res_node is not None and isinstance(res_node, TreeNode) and \
+            key_index < len(res_node.keys):
+        print('搜索: 找到了 key 为', res_node.keys[key_index], '的元素，其值为:', res_node.vals[key_index])
+    else:
+        print('搜索: 找不到 key 为', search_key, '的元素')
 
     delete_key = 4
     del_key, del_val = b_tree.delete(delete_key)  # case 2.3 & case 2.2
