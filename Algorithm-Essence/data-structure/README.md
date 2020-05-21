@@ -13,27 +13,27 @@ By [YuweiYin](https://yuweiyin.github.io/)
         - 中序遍历 Inorder Traversal
         - 后序遍历 Postorder Traversal
         - 层序遍历 Level Traversal
-    - [二叉排序/搜索树](./binary-search-tree) (Binary Sort/Search Tree, BST)
-    - [高度平衡二叉搜索树](./avl-tree) AVL 树 (Adelson-Velsky-Landis Tree) (Height Balanced Binary Search Tree)
-    - [红黑树](./red-black-tree) (Red Black Tree, RBT)
+    - [二叉排序/搜索树](./binary-search-tree.py) (Binary Sort/Search Tree, BST)
+    - [高度平衡二叉搜索树](./avl-tree.py) AVL 树 (Adelson-Velsky-Landis Tree) (Height Balanced Binary Search Tree)
+    - [红黑树](./red-black-tree.py) (Red Black Tree, RBT)
     - AA 树
-    - [堆树](./treap) (Treap)
-    - [伸展树](./splay-tree) (Splay Tree)
-    - [跳表](./skip-list) Skip List
+    - [堆树](./treap.py) (Treap)
+    - [伸展树](./splay-tree.py) (Splay Tree)
+    - [跳表](./skip-list.py) Skip List
     - 替罪羊树
     - 带权平衡树
-    - [B-Tree](./b-tree)
+    - [B-Tree](./b-tree.py)
         - 2-3 树、B- 树、B+ 树、B\* 树
     - 哈夫曼树 (Huffman Tree)
-    - van Emde Boas 树
+    - [van Emde Boas 树](./van-emde-boas-tree.py)
     - 顺序统计树 (Order Statistic Tree)
     - k 近邻树、k 维树 (k-dimensional Tree, kd-Tree)
 - 区间查询 Range Query
-    - [线段树](./segment-tree) (Segment Tree, ST)
-    - [树状数组](./binary-indexed-tree) Fenwick Tree (Binary Indexed Tree, BIT)
-    - [区间最值查询](./range-min-max-query) Sparse Table (Range Minimum/Maximum Query, RMQ)
-    - [最近公共祖先](./lowest-common-ancestor) (Lowest Common Ancestors, LCA)
-- [哈希散列](./hashing)
+    - [线段树](./segment-tree.py) (Segment Tree, ST)
+    - [树状数组](./binary-indexed-tree.py) Fenwick Tree (Binary Indexed Tree, BIT)
+    - [区间最值查询](./range-min-max-query.py) Sparse Table (Range Minimum/Maximum Query, RMQ)
+    - [最近公共祖先](./lowest-common-ancestor.py) (Lowest Common Ancestors, LCA)
+- [哈希散列](./hashing.py)
     - 直接寻址表 Direct-Access Table、散列表 Hashing Table
     - 散列表解决碰撞/冲突：链接法 Chaining、开放寻址法 Open Addressing
     	- 线性探查 Linear Probing
@@ -48,7 +48,7 @@ By [YuweiYin](https://yuweiyin.github.io/)
     - 布谷鸟散列 Cuckoo Hashing、布隆过滤器 Bloom Filter
     - 一致性散列 Consistent Hashing
 - 堆
-    - [优先队列](../sort/heap-sort)
+    - [优先队列](../sort/heap-sort.py)
     - 双端队列
     - 可并堆
     - 左偏堆
@@ -58,7 +58,7 @@ By [YuweiYin](https://yuweiyin.github.io/)
     - 邻接矩阵
     - 邻接表
 - 不相交集合 (Disjoint Set)
-    - [并查集](./union-find) (Union Find)
+    - [并查集](./union-find.py) (Union Find)
 - 字符串相关
     - 前缀树/字典树 (Trie Tree)、01 字段树
     - 后缀树、后缀数组
