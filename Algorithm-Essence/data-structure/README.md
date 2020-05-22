@@ -48,11 +48,11 @@ By [YuweiYin](https://yuweiyin.github.io/)
     - 布谷鸟散列 Cuckoo Hashing、布隆过滤器 Bloom Filter
     - 一致性散列 Consistent Hashing
 - 堆
-    - [优先队列](../sort/heap-sort.py)
+    - [二叉堆与优先队列](./heap-priority-queue.py)
     - 双端队列
-    - 可并堆
+    - 可合并堆
+        - [斐波那契堆](./fibonacci-heap.py)
     - 左偏堆
-    - 斐波那契堆
 - 块状链表
 - 基本图结构
     - 邻接矩阵
