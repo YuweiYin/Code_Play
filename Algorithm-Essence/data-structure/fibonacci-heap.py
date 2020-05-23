@@ -109,7 +109,7 @@ class FibonacciHeap:
                 if h2.min.key < union_heap.min.key:
                     union_heap.min = h2.min
                 # 增加结点数目
-                union_heap.n += h2.n
+                union_heap.n = h1.n + h2.n
                 # 返回合并后的斐波那契堆
                 return union_heap
             elif isinstance(h1.min, Element):
@@ -136,6 +136,14 @@ class FibonacciHeap:
     def fib_heap_minimum(self):
         return self.min
 
+    # 查询最小结点 - 输出其 key/val
+    # (摊还/实际)时间复杂度 O(1)
+    def fib_heap_print_min_kv(self):
+        if isinstance(self.min, Element):
+            print(self.min.key, self.min.val)
+        else:
+            print('Fibonacci Heap is Empty!')
+
     # 抽取最小结点 (查找、删除、返回)
     # (摊还)时间复杂度 O(log n)
     def fib_heap_extract_min(self):
@@ -151,11 +159,12 @@ class FibonacciHeap:
                 while ptr.right != z.child:
                     ptr = ptr.right
                     ptr.parent = None
-                # 然后将此孩子链表链接到 H 的根链表。孩子的孩子结点则不改动
-                z.child.right = z.right
-                z.right.left = z.child
-                z.child.left = z
-                z.right = z.child
+                # 然后将此孩子链表链接到 H 的根链表 (两个循环双向链表的连接)
+                # 孩子的孩子结点则不改动
+                z.child.right.left = z.left
+                z.left.right = z.child.right
+                z.child.right = z
+                z.left = z.child
                 # 清除 z 的孩子指针
                 z.child = None
 
@@ -201,12 +210,11 @@ class FibonacciHeap:
             d_arr.append(empty_node)
 
         # 循环处理根链表中的每个根结点 cur_root
-        # cur_root 可能会被链接到别的结点上，从而不再位于根链表中，也就不再是一个根结点
-        ptr = self.min
+        ptr = self.min.right
         assert isinstance(ptr, Element)  # 进入 _consolidate 前已保证本斐波那契堆不是空堆，故有此断言
-        while ptr.right != self.min:
-            ptr = ptr.right
-
+        while ptr != self.min:
+            # ptr 可能会成为别的结点的子结点，所以不再是根结点，因此下一个检查的也就不是 ptr.right 了
+            next_root = ptr.right  # 记录下一个应该检查的根结点
             cur_root = ptr
             assert isinstance(cur_root, Element)
             cur_d = cur_root.degree  # 当前结点的度数
@@ -224,12 +232,14 @@ class FibonacciHeap:
                 # 让结点 y 加入结点 cur_root 的孩子链表
                 self._fib_heap_link(cur_root, y)
                 # 让 d_arr[cur_d] 变为占位元素
-                d_arr[cur_d].key = inf
+                empty_node = Element(inf)
+                d_arr[cur_d] = empty_node
                 # 此时 cur_root 的度数增加了 1，所以要检查此新度数会不会又是重复的
                 cur_d += 1
             # 循环处理完后，把 cur_root 加入数组 d_arr 相应的位置
             assert 0 <= cur_d < max_d
             d_arr[cur_d] = cur_root
+            ptr = next_root
 
         # 外层 while 循环忽略了 self.min 结点，所以此时要对 self.min 结点做相同的处理
         cur_root = self.min
@@ -249,7 +259,8 @@ class FibonacciHeap:
             # 让结点 y 加入结点 cur_root 的孩子链表
             self._fib_heap_link(cur_root, y)
             # 让 d_arr[cur_d] 变为占位元素
-            d_arr[cur_d].key = inf
+            empty_node = Element(inf)
+            d_arr[cur_d] = empty_node
             # 此时 cur_root 的度数增加了 1，所以要检查此新度数会不会又是重复的
             cur_d += 1
         # 循环处理完后，把 cur_root 加入数组 d_arr 相应的位置
@@ -327,6 +338,7 @@ class FibonacciHeap:
                 # 视情况更新 self.min
                 if x.key < self.min.key:
                     self.min = x
+                return True
         else:
             return False
 
@@ -345,6 +357,7 @@ class FibonacciHeap:
             # 如果 y 的 child 指针当前指向了 x，则要更换 child 指针的指向
             if y.child == x:
                 y.child = x.right
+        y.degree -= 1
 
         # 2. 把 x 加入到根链表中
         assert isinstance(self.min, Element)
@@ -395,23 +408,106 @@ class FibonacciHeap:
 def main():
     # 键值对列表
     kv_list = [
-        [3, 301], [4, 100], [5, 200], [8, 800],
-        [7, 700], [9, 900], [3, 300]
+        [3, 301], [4, 400], [5, 500], [8, 800],
+        [7, 700], [9, 900], [3, 300], [2, 200],
+        [6, 600], [10, 1000], [12, 1200], [11, 1100]
     ]
 
-    # 建立斐波那契(最小)堆
+    # 以插入的方式 建立斐波那契(最小)堆
     start = time.process_time()
     fib_heap = FibonacciHeap(kv_list)
     end = time.process_time()
-
     print('Running Time: %.5f ms' % ((end - start) * 1000))
 
     # 查询最小结点
+    print('\n查询测试')
     fib_heap_min = fib_heap.fib_heap_minimum()
     if isinstance(fib_heap_min, Element):
-        print(fib_heap_min.key, fib_heap_min.val)  # 3, 301
+        print(fib_heap_min.key, fib_heap_min.val)  # 1, 100
     else:
         print('No Minimum Found.')
+
+    # 插入测试 Done
+    fib_heap_2 = FibonacciHeap()
+    print('\n插入测试')
+    kv_list_2 = [
+        [16, 1600], [17, 1700], [18, 1800], [1, 100]
+    ]
+    if isinstance(kv_list_2, list):
+        for kv in kv_list_2:
+            assert isinstance(kv, list) and len(kv) == 2
+            fib_heap_2.fib_heap_insert(kv[0], kv[1])
+
+    # 抽取最小结点测试 Done
+    # 可断点调试查看结构的正确变化
+    print('\n抽取测试1')
+    fib_heap.fib_heap_print_min_kv()  # 2, 200
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 3, 301
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 3, 300
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 4, 400
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 5, 500
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 6, 600
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 7, 700
+
+    # 合并两个堆，返回合并后的堆
+    print('\n合并测试')
+    fib_heap = fib_heap.fib_heap_union(fib_heap, fib_heap_2)
+
+    # 查询最小结点
+    print('\n查询测试')
+    fib_heap_min = fib_heap.fib_heap_minimum()
+    if isinstance(fib_heap_min, Element):
+        print(fib_heap_min.key, fib_heap_min.val)  # 1, 100
+    else:
+        print('No Minimum Found.')
+
+    # 减关键字测试 & 删除测试
+    # 减关键字和删除操作的参数里要有 Element 对象，一般需将斐波那契堆的结点元素与另一数据结构 (比如图) 的结点绑定起来
+    # 如果斐波那契堆的 key 是唯一的，那么可以在堆中设置 key2ele 字典，从关键字 key 映射到 Element 对象
+    # 此处仅作示意，fib_heap.min 的关键字为 1，此时其 right 的关键字为 18
+    # 可断点调试查看结构的正确变化
+    print('\n减关键字测试')
+    assert isinstance(fib_heap.min.right, Element)
+    print(fib_heap.min.right.key)  # 18
+    fib_heap.fib_heap_decrease_key(fib_heap.min.right, 40)  # 不能增大 key
+    fib_heap.fib_heap_decrease_key(fib_heap.min.right, 4)  # 18 -> 4
+    # 此处仅作示意，fib_heap.min 的关键字为 1，此时其 left.child.left 的关键字是 10
+    assert isinstance(fib_heap.min.left.child.left, Element)
+    print(fib_heap.min.left.child.left.key)  # 10
+    fib_heap.fib_heap_decrease_key(fib_heap.min.left.child.left, 0)  # 10 -> 0
+    print('\n删除测试')
+    assert isinstance(fib_heap.min.left.left, Element)
+    print(fib_heap.min.left.left.key)  # 7
+    fib_heap.fib_heap_delete(fib_heap.min.left.left)
+    assert isinstance(fib_heap.min, Element)
+    print(fib_heap.min.key)  # 0
+    fib_heap.fib_heap_delete(fib_heap.min)
+
+    # 可断点调试查看结构的正确变化
+    print('\n抽取测试2')
+    fib_heap.fib_heap_print_min_kv()  # 1, 100
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 4, 400
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 8, 800
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 9, 900
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 11, 1000
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 12, 1200
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 16, 1600
+    fib_heap.fib_heap_extract_min()
+    fib_heap.fib_heap_print_min_kv()  # 17, 1700
+    fib_heap.fib_heap_extract_min()   # Empty
+    fib_heap.fib_heap_print_min_kv()  # Empty
 
 
 if __name__ == "__main__":
