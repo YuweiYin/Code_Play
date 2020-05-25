@@ -234,7 +234,7 @@ class OrderStatisticTree:
     def search(self, search_key):
         if isinstance(self.bst, TreeNode):
             ptr = self.bst
-            while isinstance(ptr, TreeNode):
+            while isinstance(ptr, TreeNode) and ptr != self.nil:
                 if search_key == ptr.key:
                     # 找到了目标结点，返回此 TreeNode
                     return ptr
@@ -350,7 +350,7 @@ class OrderStatisticTree:
             # 插入过程中维护顺序统计树的 size 属性
             while isinstance(ptr, TreeNode) and ptr != self.nil:
                 ptr_p = ptr
-                ptr.size += 1  # 插入路径中的结点 size 均加 1
+                ptr.size += 1        # 插入路径中的结点 size 均加 1
                 if insert_key <= ptr.key:
                     ptr = ptr.left
                 else:
@@ -369,7 +369,7 @@ class OrderStatisticTree:
             self._rb_insert_fixup(new_node)  # 插入后维护红黑性质
 
     # 辅助操作：将结点 u 替换为结点 v（用于删除时的红黑性质保持）
-    # 时间复杂度 O(log n) 与树高有关
+    # 时间复杂度 O(1)
     def _rb_transplant(self, u, v):
         if isinstance(u, TreeNode) and isinstance(v, TreeNode):
             if u == self.bst or u.parent == self.nil:
@@ -382,8 +382,6 @@ class OrderStatisticTree:
                     u.parent.left = v
                 else:
                     u.parent.right = v
-        else:
-            pass
         # 无条件执行：让 v 的 parent 指针指向 u 的父结点
         v.parent = u.parent
 
@@ -392,7 +390,8 @@ class OrderStatisticTree:
     # 当删除结点 node 时，让其后继 s 替换 node。在结点被移除或者在树中移动之前，必须先记录 s 的颜色
     # 根据当前结点的父结点、兄弟结点、兄弟结点的孩子结点的颜色，分 4 种情况，用旋转操作来调整平衡
     def _rb_delete_fixup(self, node):
-        if isinstance(node, TreeNode) and node != self.nil:
+        # if isinstance(node, TreeNode) and node != self.nil:
+        if isinstance(node, TreeNode) and node != self.bst:
             # 当前结点 node 为真正需要被删除的结点，其祖先中有黑色结点被删除(替换)了
             while node != self.bst and not node.color:
                 # node 的父结点必为树结点 (红黑树性质)
@@ -496,7 +495,7 @@ class OrderStatisticTree:
                 ptr_p = ptr          # 跟踪父结点
                 ptr.size -= 1        # 删除路径中的结点 size 均减 1
                 if delete_key == ptr.key:
-                    break            # 定位到了目标删除结点
+                    break  # 定位到了目标删除结点
                 elif delete_key < ptr.key:
                     ptr = ptr.left   # 小则往左
                 else:
@@ -521,44 +520,350 @@ class OrderStatisticTree:
                     self.sorted_key_list = []
                 else:
                     # 正常删除结点 ptr，不会导致树变为空
-                    # 这里的 y 主要用于记录 ptr 的后继，而 x 记录真正被删除的结点
+                    # 这里的 y 主要用于记录 ptr 的后继，而 x 是覆盖了"真正被删除的结点"的结点
+                    # 如果 x 覆盖了一个黑色的结点，那么在最后 需要从 x 开始向上调整红黑性质
                     y = ptr
                     y_original_color = y.color  # 记录 y 原始的颜色，用于最后判断是否需要维护红黑性质
 
-                    if ptr.left == self.nil:
-                        # 如果欲删除结点 ptr 的左孩子为空，则将 ptr 替换为其右孩子
+                    if ptr.left == self.nil and ptr.right == self.nil:
+                        # 如果欲删除结点 ptr 的左右孩子均为空，则为叶，没有孩子可以覆盖 ptr
+                        # 先让 ptr 父结点的相应孩子指针指向 self.nil
+                        assert isinstance(ptr.parent, TreeNode)
+                        if ptr == ptr.parent.left:
+                            ptr.parent.left = self.nil
+                            bro = ptr.parent.right
+                        else:
+                            ptr.parent.right = self.nil
+                            bro = ptr.parent.left
+
+                        # 如果欲删除的叶结点 ptr 为红色，那么红黑性质不会被破坏
+                        if ptr.color:
+                            return
+                        # 如果欲删除的叶结点 ptr 为黑色，那么红黑性质会被破坏，其父结点的左侧"黑高"低于右侧"黑高"
+                        # 因为原本红黑性质是满足的，所以此时 (删除 ptr 前) 只有如下这几种可能：
+                        # 1. ptr 为黑、ptr 的父结点为黑
+                        if not ptr.parent.color:
+                            assert bro != self.nil  # 兄弟必存在，否则原本就不符合红黑性质了
+                            # 1.1. ptr 为黑、ptr 的父结点为黑、ptr 的兄弟结点为红
+                            # 那么 bro 必有两个黑孩子，而且 bro 的黑孩子必为叶
+                            if bro.color:
+                                assert bro.left != self.nil and bro.right != self.nil
+                                assert (not bro.left.color) and (not bro.right.color)
+                                # 1.1.1. 如果 bro 是右孩子
+                                # 则此时只需要把 bro 染黑、bro 的左孩子染红，然后把 bro 父结点左旋，就维护好红黑性质了
+                                if bro == ptr.parent.right:
+                                    bro.color = False
+                                    bro.left.color = True
+                                    self._left_rotate(ptr.parent)
+                                # 1.1.2. 如果 bro 是左孩子
+                                # 则此时只需要把 bro 染黑、bro 的右孩子染红，然后把 bro 父结点右旋，就维护好红黑性质了
+                                else:
+                                    bro.color = False
+                                    bro.right.color = True
+                                    self._right_rotate(ptr.parent)
+
+                            # 1.2. ptr 为黑、ptr 的父结点为黑、ptr 的兄弟结点为黑
+                            # 那么 bro 若有孩子，必为红孩子，而且 bro 的红孩子必为叶
+                            else:
+                                # 1.1.1. 如果 bro 是右孩子，检查 bro 的孩子情况
+                                if bro == ptr.parent.right:
+                                    # 如果 bro 的右孩子存在(必为红)
+                                    # 则此时只需要把 bro 的右孩子染黑，然后把 bro 父结点左旋，就维护好红黑性质了
+                                    if bro.right != self.nil:
+                                        assert bro.right.color is True
+                                        bro.right.color = False
+                                        self._left_rotate(ptr.parent)
+                                    # 如果 bro 的右孩子不存在，但左孩子存在(必为红)
+                                    # 则此时把 bro 的左孩子染黑，然后先 bro 右旋、再原父结点左旋，就维护好红黑性质了
+                                    elif bro.left != self.nil:
+                                        assert bro.left.color is True
+                                        bro.left.color = False
+                                        self._right_rotate(bro)
+                                        self._left_rotate(ptr.parent)
+                                    else:
+                                        # 如果 bro 的左右孩子都不存在，原本的"黑高"为 2 定然无法维持
+                                        # 此时将 bro 染红，然后从父结点("双黑")开始 fixup
+                                        bro.color = True
+                                        self._rb_delete_fixup(ptr.parent)
+
+                                # 1.1.2. 如果 bro 是左孩子，检查 bro 的孩子情况
+                                else:
+                                    # 如果 bro 的左孩子存在(必为红)
+                                    # 则此时只需要把 bro 的左孩子染黑，然后把 bro 父结点右旋，就维护好红黑性质了
+                                    if bro.left != self.nil:
+                                        assert bro.left.color is True
+                                        bro.left.color = False
+                                        self._right_rotate(bro)
+                                    # 如果 bro 的左孩子不存在，但右孩子存在(必为红)
+                                    # 则此时把 bro 的右孩子染黑，然后先 bro 左旋、再原父结点右旋，就维护好红黑性质了
+                                    elif bro.right != self.nil:
+                                        assert bro.right.color is True
+                                        bro.right.color = False
+                                        self._left_rotate(bro)
+                                        self._right_rotate(ptr.parent)
+                                    else:
+                                        # 如果 bro 的左右孩子都不存在，而原本"黑高"为 2，定然无法维持
+                                        # 此时将 bro 染红，然后从父结点("双黑")开始 fixup
+                                        bro.color = True
+                                        self._rb_delete_fixup(ptr.parent)
+
+                        # 2. ptr 为黑、ptr 的父结点为红
+                        else:
+                            # 此时兄弟必存在，且为黑，否则原本就不符合红黑性质了
+                            assert bro != self.nil and (not bro.color)
+                            # 类似 1.2. 处理
+                            # 2.1. 如果 bro 是右孩子，检查 bro 的孩子情况
+                            if bro == ptr.parent.right:
+                                # 如果 bro 的右孩子存在(必为红)
+                                # 则此时把 bro 染红、bro 父结点和 bro 右孩子染黑，然后把 bro 父结点左旋，就维护好红黑性质了
+                                if bro.right != self.nil:
+                                    bro.color = True
+                                    assert bro.right.color is True
+                                    bro.right.color = False
+                                    ptr.parent.color = False
+                                    self._left_rotate(ptr.parent)
+                                # 如果 bro 的右孩子不存在，但左孩子存在(必为红)
+                                # 则此时把 bro 的父结点染黑，然后先 bro 右旋、再原父结点左旋，就维护好红黑性质了
+                                elif bro.left != self.nil:
+                                    assert bro.left.color is True
+                                    ptr.parent.color = False
+                                    self._right_rotate(bro)
+                                    self._left_rotate(ptr.parent)
+                                else:
+                                    # 如果 bro 的左右孩子都不存在，原本"黑高"为 1，只通过染色就可以维持
+                                    # 此时将 bro 染红、父结点染黑即可
+                                    bro.color = True
+                                    ptr.parent.color = False
+
+                            # 2.2. 如果 bro 是左孩子，检查 bro 的孩子情况
+                            else:
+                                # 如果 bro 的左孩子存在(必为红)
+                                # 则此时把 bro 染红、bro 父结点和 bro 左孩子染黑，然后把 bro 父结点右旋，就维护好红黑性质了
+                                if bro.left != self.nil:
+                                    bro.color = True
+                                    assert bro.left.color is True
+                                    bro.left.color = False
+                                    ptr.parent.color = False
+                                    self._right_rotate(ptr.parent)
+                                # 如果 bro 的左孩子不存在，但右孩子存在(必为红)
+                                # 则此时把 bro 的父结点染黑，然后先 bro 左旋、再原父结点右旋，就维护好红黑性质了
+                                elif bro.right != self.nil:
+                                    assert bro.right.color is True
+                                    ptr.parent.color = False
+                                    self._left_rotate(bro)
+                                    self._right_rotate(ptr.parent)
+                                else:
+                                    # 如果 bro 的左右孩子都不存在，原本"黑高"为 1，只通过染色就可以维持
+                                    # 此时将 bro 染红、父结点染黑即可
+                                    bro.color = True
+                                    ptr.parent.color = False
+                        return
+                    # 如果进入下面的分支，ptr 不为叶
+                    elif ptr.left == self.nil:
+                        # 如果欲删除结点 ptr 的左孩子为空，且右孩子不为空，则将 ptr 替换为其右孩子
                         x = ptr.right
                         self._rb_transplant(ptr, ptr.right)
                     elif ptr.right == self.nil:
-                        # 如果欲删除结点 ptr 的右孩子为空，则将 ptr 替换为其左孩子
+                        # 如果欲删除结点 ptr 的右孩子为空，且左孩子不为空，则将 ptr 替换为其左孩子
                         x = ptr.left
                         self._rb_transplant(ptr, ptr.left)
                     else:
                         # 欲删除结点 ptr 的左右孩子均不为空，则将 ptr 替换为其后继
                         y = self.successor(ptr)     # y 为 ptr 的后继，y 的左孩子为 nil
+                        assert isinstance(y, TreeNode) and y.left == self.nil
                         y_original_color = y.color  # (修改)记录 y 原始的颜色
-                        x = y.right
+                        x = y.right  # 后继结点 y 必无左孩子，让其右孩子 x 替换 y
+
+                        if x == self.nil:
+                            # 如果 x 是哨兵 nil，意味着 y 是叶，类似前面 ptr 为叶的处理方式
+                            assert isinstance(y.parent, TreeNode)
+                            # 如果欲删除结点 y 的左右孩子均为空，则为叶，没有孩子可以覆盖 y
+                            # 先让 y 父结点的相应孩子指针指向 self.nil
+                            assert isinstance(y.parent, TreeNode)
+                            if y == y.parent.left:
+                                y.parent.left = self.nil
+                                bro = y.parent.right
+                            else:
+                                y.parent.right = self.nil
+                                bro = y.parent.left
+
+                            # 如果欲删除的叶结点 y 为红色，那么红黑性质不会被破坏
+                            if y.color:
+                                # 把 ptr 替换为其后继结点 y，并修改链接关系和 color (不修改 y 的 key、value)
+                                if ptr == self.bst or ptr.parent == self.nil:
+                                    self.bst = y
+                                else:
+                                    # 根据 u 是其父结点的左孩子还是右孩子，更换指针
+                                    if ptr == ptr.parent.left:
+                                        ptr.parent.left = y
+                                    else:
+                                        ptr.parent.right = y
+                                # 让 y 的 parent 指针指向 ptr 的父结点
+                                y.parent = ptr.parent
+                                y.left = ptr.left
+                                y.left.parent = y
+                                y.right = ptr.right
+                                y.right.parent = y
+                                y.color = ptr.color  # y 继承 ptr 的颜色
+                                y.size = y.left.size + y.right.size + 1  # 更新 y 的 size
+                                return
+                            # 如果欲删除的叶结点 y 为黑色，那么红黑性质会被破坏，其父结点的左侧"黑高"低于右侧"黑高"
+                            # 因为原本红黑性质是满足的，所以此时 (删除 y 前) 只有如下这几种可能：
+                            # 1. y 为黑、y 的父结点为黑
+                            if not y.parent.color:
+                                assert bro != self.nil  # 兄弟必存在，否则原本就不符合红黑性质了
+                                # 1.1. y 为黑、y 的父结点为黑、y 的兄弟结点为红
+                                # 那么 bro 必有两个黑孩子，而且 bro 的黑孩子必为叶
+                                if bro.color:
+                                    assert bro.left != self.nil and bro.right != self.nil
+                                    assert (not bro.left.color) and (not bro.right.color)
+                                    # 1.1.1. 如果 bro 是右孩子
+                                    # 则此时只需要把 bro 染黑、bro 的左孩子染红，然后把 bro 父结点左旋，就维护好红黑性质了
+                                    if bro == y.parent.right:
+                                        bro.color = False
+                                        bro.left.color = True
+                                        self._left_rotate(ptr.parent)
+                                    # 1.1.2. 如果 bro 是左孩子
+                                    # 则此时只需要把 bro 染黑、bro 的右孩子染红，然后把 bro 父结点右旋，就维护好红黑性质了
+                                    else:
+                                        bro.color = False
+                                        bro.right.color = True
+                                        self._right_rotate(ptr.parent)
+
+                                # 1.2. y 为黑、y 的父结点为黑、y 的兄弟结点为黑
+                                # 那么 bro 若有孩子，必为红孩子，而且 bro 的红孩子必为叶
+                                else:
+                                    # 1.1.1. 如果 bro 是右孩子，检查 bro 的孩子情况
+                                    if bro == y.parent.right:
+                                        # 如果 bro 的右孩子存在(必为红)
+                                        # 则此时只需要把 bro 的右孩子染黑，然后把 bro 父结点左旋，就维护好红黑性质了
+                                        if bro.right != self.nil:
+                                            assert bro.right.color is True
+                                            bro.right.color = False
+                                            self._left_rotate(ptr.parent)
+                                        # 如果 bro 的右孩子不存在，但左孩子存在(必为红)
+                                        # 则此时把 bro 的左孩子染黑，然后先 bro 右旋、再原父结点左旋，就维护好红黑性质了
+                                        elif bro.left != self.nil:
+                                            assert bro.left.color is True
+                                            bro.left.color = False
+                                            self._right_rotate(bro)
+                                            self._left_rotate(ptr.parent)
+                                        else:
+                                            # 如果 bro 的左右孩子都不存在，原本的"黑高"为 2 定然无法维持
+                                            # 此时将 bro 染红，然后从父结点("双黑")开始 fixup
+                                            bro.color = True
+                                            self._rb_delete_fixup(y.parent)
+
+                                    # 1.1.2. 如果 bro 是左孩子，检查 bro 的孩子情况
+                                    else:
+                                        # 如果 bro 的左孩子存在(必为红)
+                                        # 则此时只需要把 bro 的左孩子染黑，然后把 bro 父结点右旋，就维护好红黑性质了
+                                        if bro.left != self.nil:
+                                            assert bro.left.color is True
+                                            bro.left.color = False
+                                            self._right_rotate(ptr.parent)
+                                        # 如果 bro 的左孩子不存在，但右孩子存在(必为红)
+                                        # 则此时把 bro 的右孩子染黑，然后先 bro 左旋、再原父结点右旋，就维护好红黑性质了
+                                        elif bro.right != self.nil:
+                                            assert bro.right.color is True
+                                            bro.right.color = False
+                                            self._left_rotate(bro)
+                                            self._right_rotate(ptr.parent)
+                                        else:
+                                            # 如果 bro 的左右孩子都不存在，而原本"黑高"为 2，定然无法维持
+                                            # 此时将 bro 染红，然后从父结点("双黑")开始 fixup
+                                            bro.color = True
+                                            self._rb_delete_fixup(y.parent)
+
+                            # 2. y 为黑、y 的父结点为红
+                            else:
+                                # 此时兄弟必存在，且为黑，否则原本就不符合红黑性质了
+                                assert bro != self.nil and (not bro.color)
+                                # 类似 1.2. 处理
+                                # 2.1. 如果 bro 是右孩子，检查 bro 的孩子情况
+                                if bro == y.parent.right:
+                                    # 如果 bro 的右孩子存在(必为红)
+                                    # 则此时把 bro 染红、bro 父结点和 bro 右孩子染黑，然后把 bro 父结点左旋，就维护好红黑性质了
+                                    if bro.right != self.nil:
+                                        bro.color = True
+                                        assert bro.right.color is True
+                                        bro.right.color = False
+                                        y.parent.color = False
+                                        self._left_rotate(ptr.parent)
+                                    # 如果 bro 的右孩子不存在，但左孩子存在(必为红)
+                                    # 则此时把 bro 的父结点染黑，然后先 bro 右旋、再原父结点左旋，就维护好红黑性质了
+                                    elif bro.left != self.nil:
+                                        assert bro.left.color is True
+                                        y.parent.color = False
+                                        self._right_rotate(bro)
+                                        self._left_rotate(ptr.parent)
+                                    else:
+                                        # 如果 bro 的左右孩子都不存在，原本"黑高"为 1，只通过染色就可以维持
+                                        # 此时将 bro 染红、父结点染黑即可
+                                        bro.color = True
+                                        y.parent.color = False
+
+                                # 2.2. 如果 bro 是左孩子，检查 bro 的孩子情况
+                                else:
+                                    # 如果 bro 的左孩子存在(必为红)
+                                    # 则此时把 bro 染红、bro 父结点和 bro 左孩子染黑，然后把 bro 父结点右旋，就维护好红黑性质了
+                                    if bro.left != self.nil:
+                                        bro.color = True
+                                        assert bro.left.color is True
+                                        bro.left.color = False
+                                        y.parent.color = False
+                                        self._right_rotate(ptr.parent)
+                                    # 如果 bro 的左孩子不存在，但右孩子存在(必为红)
+                                    # 则此时把 bro 的父结点染黑，然后先 bro 左旋、再原父结点右旋，就维护好红黑性质了
+                                    elif bro.right != self.nil:
+                                        assert bro.right.color is True
+                                        y.parent.color = False
+                                        self._left_rotate(bro)
+                                        self._right_rotate(ptr.parent)
+                                    else:
+                                        # 如果 bro 的左右孩子都不存在，原本"黑高"为 1，只通过染色就可以维持
+                                        # 此时将 bro 染红、父结点染黑即可
+                                        bro.color = True
+                                        y.parent.color = False
+
+                            # TODO 把 ptr 替换为其后继结点 y，并修改链接关系和 color (不修改 y 的 key、value)
+                            if ptr == self.bst or ptr.parent == self.nil:
+                                self.bst = y
+                            else:
+                                # 根据 u 是其父结点的左孩子还是右孩子，更换指针
+                                if ptr == ptr.parent.left:
+                                    ptr.parent.left = y
+                                else:
+                                    ptr.parent.right = y
+                            # 让 y 的 parent 指针指向 ptr 的父结点
+                            y.parent = ptr.parent
+                            y.left = ptr.left
+                            y.left.parent = y
+                            y.right = ptr.right
+                            y.right.parent = y
+                            y.color = ptr.color  # y 继承 ptr 的颜色
+                            y.size = y.left.size + y.right.size + 1  # 更新 y 的 size
+                            return
+                        # 此时后继 y 一定有右孩子，x 不可能为 self.nil
                         if y.parent == ptr:
                             # 如果 ptr 的后继 y 就是 ptr 的直接右孩子
-                            # ptr 的后继 y 的右孩子必为树结点 (红黑树性质)
-                            assert isinstance(x, TreeNode)
+                            assert isinstance(x, TreeNode) and x != self.nil
                             x.parent = y
                         else:
                             # 如果 ptr 的后继 y 不是 ptr 的直接右孩子
                             # 让 y 被其右孩子替换（因为之后 y 要用于替换 ptr）
-                            # 所以真正需要被删除的结点就是 y.right，也就是 x
-                            # ptr 的后继 y 的右孩子必为树结点 (红黑树性质)
-                            assert isinstance(y.right, TreeNode)
+                            # 所以替换了 y 的结点就是 y.right，也即 x
+                            assert isinstance(y.right, TreeNode) and y.right != self.nil
                             self._rb_transplant(y, y.right)
                             y.right = ptr.right
                             y.right.parent = y
 
-                        # 现在把 ptr 替换为其后继结点 y，并修改链接关系和 color（不修改 key、value）
+                        # 现在把 ptr 替换为其后继结点 y，并修改链接关系和 color (不修改 y 的 key、value)
                         self._rb_transplant(ptr, y)
-                        assert isinstance(y, TreeNode)
-                        assert isinstance(y.left, TreeNode) and isinstance(y.right, TreeNode)
                         y.left = ptr.left
                         y.left.parent = y
+                        y.right = ptr.right
+                        y.right.parent = y
                         y.color = ptr.color  # y 继承 ptr 的颜色
                         y.size = y.left.size + y.right.size + 1  # 更新 y 的 size
                     # 最后，如果"真正"删除的结点颜色为黑色，则破坏了红黑性质，需要进行维护
@@ -640,8 +945,8 @@ def main():
     # 以插入的方式，构建 BST/RBT
     # kv_array 为二维数组，内维度的数组，首元素为 key，次元素为 value，可以为任意对象
     kv_array = [
-        [1, 10], [2, 20], [3, 30], [7, 70],
-        [8, 80], [9, 90], [4, 40]
+        [1, 10], [2, 20], [3, 30], [7, 70], [6, 60],
+        [8, 80], [9, 90], [4, 40], [5, 50]
     ]
 
     # kv_array = [[i, 100 * i] for i in range(1000)]
@@ -654,7 +959,7 @@ def main():
     print('建立 Red-Black Tree 耗时: %.5f ms' % ((end - start) * 1000))
 
     # 输出升序排序的结果
-    print(ost.get_sorted_key_list())  # [1, 2, 3, 4, 7, 8, 9]
+    print(ost.get_sorted_key_list())  # [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     # 搜索值
     search_key = 4
@@ -670,7 +975,7 @@ def main():
     print('Running Time: %.5f ms' % ((end - start) * 1000))
 
     # 顺序统计量：查找具有给定秩 target_rank 的元素 (target_rank >= 1)
-    for target_rank in range(10):
+    for target_rank in range(11):
         res_node = ost.os_select(target_rank)
         if isinstance(res_node, TreeNode):
             print(target_rank, '->\t', res_node.key, res_node.val)
@@ -693,39 +998,61 @@ def main():
     # 删除后结点 8 的高度减为 1，因此结点 7 不平衡了，需要调整
     ost.rb_delete(ost.bst, 9)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # [1, 2, 3, 4, 7, 8]
+    print(ost.get_sorted_key_list())  # [1, 2, 3, 4, 5, 6, 7, 8]
     # 此处可通过断点调试查看树结构，ost.bst 为树根
 
     ost.rb_delete(ost.bst, 3)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # [1, 2, 4, 7, 8]
+    print(ost.get_sorted_key_list())  # [1, 2, 4, 5, 6, 7, 8]
 
     ost.rb_delete(ost.bst, 7)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # [1, 2, 4, 8]
+    print(ost.get_sorted_key_list())  # [1, 2, 4, 5, 6, 8]
 
     ost.rb_delete(ost.bst, 8)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # [1, 2, 4]
+    print(ost.get_sorted_key_list())  # [1, 2, 4, 5, 6]
 
     ost.rb_delete(ost.bst, 2)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # [1, 4]
+    print(ost.get_sorted_key_list())  # [1, 4, 5, 6]
 
     ost.rb_delete(ost.bst, 1)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # [4]
+    print(ost.get_sorted_key_list())  # [4, 5, 6]
 
     ost.rb_delete(ost.bst, 4)
     ost.update_sorted_key_list()
-    print(ost.get_sorted_key_list())  # []
+    print(ost.get_sorted_key_list())  # [5, 6]
 
-    # 删空之后测试再删
-    ost.rb_delete(ost.bst, 3)  # 提示 BST 为空
+    # 测试再删不存在的关键字
+    ost.rb_delete(ost.bst, 3)  # 找不到
+    ost.update_sorted_key_list()
+    print(ost.get_sorted_key_list())  # [5, 6]
+
+    # 测试查找不存在的关键字
+    search_key = 4
+    ans = ost.search(search_key)  # 找不到
+    if ans is not None and isinstance(ans, TreeNode):
+        print('找到了 key 为', ans.key, '的元素，其值为:', ans.val)
+    else:
+        print('找不到 key 为', search_key, '的元素')
+
+    # 删空
+    ost.rb_delete(ost.bst, 5)
+    ost.update_sorted_key_list()
+    print(ost.get_sorted_key_list())  # [6]
+
+    ost.rb_delete(ost.bst, 6)
     ost.update_sorted_key_list()
     print(ost.get_sorted_key_list())  # []
 
-    # 删空之后测试查找
+    # 删空后再删
+    ost.rb_delete(ost.bst, 3)  # 找不到
+    ost.update_sorted_key_list()
+    print(ost.get_sorted_key_list())  # [5, 6]
+
+    # 删空后测试查找
     search_key = 4
     ans = ost.search(search_key)  # 找不到
     if ans is not None and isinstance(ans, TreeNode):
