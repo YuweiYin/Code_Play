@@ -52,16 +52,16 @@ class RedBlackTree:
 
     # 中序遍历，将 BST 结点的 key 值（升序排列）存储于 sorted_key_list
     # 时间复杂度 O(n)
-    def inorder_traversal(self, root):
+    def _inorder_traversal(self, root):
         if isinstance(root, TreeNode) and root != self.nil:
-            self.inorder_traversal(root.left)
+            self._inorder_traversal(root.left)
             self.sorted_key_list.append(root.key)
-            self.inorder_traversal(root.right)
+            self._inorder_traversal(root.right)
 
     # 调用中序遍历，更新 sorted_key_list
     def update_sorted_key_list(self):
         self.sorted_key_list = []
-        self.inorder_traversal(self.bst)
+        self._inorder_traversal(self.bst)
 
     # 获得 sorted_key_list
     def get_sorted_key_list(self):
@@ -69,7 +69,7 @@ class RedBlackTree:
 
     # 辅助操作：左旋。返回替代了 node 的新结点
     # 时间复杂度 O(1)
-    def left_rotate(self, node_x):
+    def _left_rotate(self, node_x):
         # 对 x 进行左旋，即让 x 的右孩子 y (x.right) 成为 x 的父结点，且 x 等于 y.left。
         # 而 y 结点原本的左孩子变为新 x 的右孩子
         if isinstance(node_x, TreeNode) and isinstance(node_x.right, TreeNode):
@@ -100,7 +100,7 @@ class RedBlackTree:
 
     # 辅助操作：右旋。返回替代了 node 的新结点
     # 时间复杂度 O(1)
-    def right_rotate(self, node_x):
+    def _right_rotate(self, node_x):
         # 对 x 进行右旋，即让 x 的左孩子 y (x.left) 成为 x 的父结点，且 x 等于 y.right。
         # 而 y 结点原本的右孩子变为新 x 的左孩子
         if isinstance(node_x, TreeNode) and isinstance(node_x.left, TreeNode):
@@ -153,83 +153,72 @@ class RedBlackTree:
     # 辅助操作：插入之后，逐级向上进行红黑性质维护
     # 时间复杂度 O(log n) 与树高有关
     # 根据当前结点的父结点、爷爷结点、叔叔结点的颜色，分 3 种情况，用旋转操作来调整平衡
-    def rb_insert_fixup(self, node):
+    def _rb_insert_fixup(self, node):
         if isinstance(node, TreeNode) and node != self.nil:
             # 当前结点 node 为新插入的结点，是红色的
             while isinstance(node.parent, TreeNode) and node.parent.color:
-                if not isinstance(node.parent.parent, TreeNode):
-                    # node 的爷爷结点为非树结点，红黑树不应如此
-                    print('rb_insert_fixup: Error Path 0')
-                elif node.parent.parent == self.nil:
+                # node 的爷爷结点必为树结点 (红黑树性质)
+                assert isinstance(node.parent.parent, TreeNode)
+                if node.parent.parent == self.nil:
                     # node 的爷爷结点为 nil 结点，而且父结点存在
                     # 这表示父结点为树根，且根是红色。只需要把根改为黑色即可
-                    if node.parent == self.bst:
-                        self.bst.color = False
-                    else:
-                        print('rb_insert_fixup: Error Path 0')
+                    assert node.parent == self.bst
+                    self.bst.color = False
                 else:
                     # node 的爷爷结点为树结点，且非 nil
                     if node.parent == node.parent.parent.left:
                         # 如果 node 的父结点是 node 爷爷结点的左孩子
-                        if isinstance(node.parent.parent, TreeNode):
-                            uncle = node.parent.parent.right
-                            if isinstance(uncle, TreeNode) and uncle.color:
-                                # case 1: 父结点为红色、父结点是爷爷结点的左孩子、叔叔结点也为红色
-                                # 这种情况可以直接处理掉
-                                node.parent.color = False  # 置父结点的颜色为黑色
-                                uncle.color = False        # 置叔叔结点的颜色为黑色
-                                node.parent.parent.color = True  # 置爷爷结点颜色为红色
-                                node = node.parent.parent  # node 上移至其爷爷结点
-                            else:
-                                # 此时：父结点为红色、父结点是爷爷结点的左孩子、叔叔结点不存在或者为黑色
-                                if node == node.parent.right:
-                                    # case 2: 父结点为红色、父结点是爷爷结点的左孩子、
-                                    # 叔叔结点不存在或者为黑色、当前结点是父结点的右孩子
-                                    # 这种情况先转换成 case 3，然后再处理掉
-                                    node = node.parent      # node 上移至其父（旋转后会降下来）
-                                    self.left_rotate(node)  # 左旋，"拉直" 呈 LL 型
-                                # case 3: 父结点为红色、父结点是爷爷结点的左孩子、
-                                # 叔叔结点不存在或者为黑色、当前结点是父结点的左孩子
-                                node.parent.color = False              # 修改父结点为黑色
-                                node.parent.parent.color = True        # 修改爷爷结点为红色
-                                self.right_rotate(node.parent.parent)  # 右旋爷爷结点
+                        uncle = node.parent.parent.right
+                        if isinstance(uncle, TreeNode) and uncle.color:
+                            # case 1: 父结点为红色、父结点是爷爷结点的左孩子、叔叔结点也为红色
+                            # 这种情况可以直接处理掉
+                            node.parent.color = False  # 置父结点的颜色为黑色
+                            uncle.color = False  # 置叔叔结点的颜色为黑色
+                            node.parent.parent.color = True  # 置爷爷结点颜色为红色
+                            node = node.parent.parent  # node 上移至其爷爷结点
                         else:
-                            # node 的爷爷结点为非树结点，红黑树不应如此
-                            print('rb_insert_fixup: Error Path 1')
+                            # 此时：父结点为红色、父结点是爷爷结点的左孩子、叔叔结点不存在或者为黑色
+                            if node == node.parent.right:
+                                # case 2: 父结点为红色、父结点是爷爷结点的左孩子、
+                                # 叔叔结点不存在或者为黑色、当前结点是父结点的右孩子
+                                # 这种情况先转换成 case 3，然后再处理掉
+                                node = node.parent  # node 上移至其父（旋转后会降下来）
+                                self._left_rotate(node)  # 左旋，"拉直" 呈 LL 型
+                            # case 3: 父结点为红色、父结点是爷爷结点的左孩子、
+                            # 叔叔结点不存在或者为黑色、当前结点是父结点的左孩子
+                            node.parent.color = False  # 修改父结点为黑色
+                            node.parent.parent.color = True  # 修改爷爷结点为红色
+                            self._right_rotate(node.parent.parent)  # 右旋爷爷结点
                     else:
                         # 如果 node 的父结点是 node 爷爷结点的右孩子（与前述操作呈镜像处理，减少注释）
-                        if isinstance(node.parent.parent, TreeNode):
-                            uncle = node.parent.parent.left
-                            if isinstance(uncle, TreeNode) and uncle.color:
-                                # case 1': 父结点为红色、父结点是爷爷结点的右孩子、叔叔结点也为红色
-                                # 这种情况可以直接处理掉
-                                node.parent.color = False  # 置父结点的颜色为黑色
-                                uncle.color = False        # 置叔叔结点的颜色为黑色
-                                node.parent.parent.color = True  # 置爷爷结点颜色为红色
-                                node = node.parent.parent  # node 上移至其爷爷结点
-                            else:
-                                # 此时：父结点为红色、父结点是爷爷结点的右孩子、叔叔结点不存在或者为黑色
-                                if node == node.parent.left:
-                                    # case 2': 父结点为红色、父结点是爷爷结点的右孩子、
-                                    # 叔叔结点不存在或者为黑色、当前结点是父结点的左孩子
-                                    # 这种情况先转换成 case 3，然后再处理掉
-                                    node = node.parent      # node 上移至其父（旋转后会降下来）
-                                    self.right_rotate(node)  # 右旋，"拉直" 呈 RR 型
-                                # case 3': 父结点为红色、父结点是爷爷结点的右孩子、
-                                # 叔叔结点不存在或者为黑色、当前结点是父结点的右孩子
-                                node.parent.color = False             # 修改父结点为黑色
-                                node.parent.parent.color = True       # 修改爷爷结点为红色
-                                self.left_rotate(node.parent.parent)  # 左旋爷爷结点
+                        uncle = node.parent.parent.left
+                        if isinstance(uncle, TreeNode) and uncle.color:
+                            # case 1': 父结点为红色、父结点是爷爷结点的右孩子、叔叔结点也为红色
+                            # 这种情况可以直接处理掉
+                            node.parent.color = False  # 置父结点的颜色为黑色
+                            uncle.color = False  # 置叔叔结点的颜色为黑色
+                            node.parent.parent.color = True  # 置爷爷结点颜色为红色
+                            node = node.parent.parent  # node 上移至其爷爷结点
                         else:
-                            # node 的爷爷结点为非树结点，红黑树不应如此
-                            print('rb_insert_fixup: Error Path 2')
+                            # 此时：父结点为红色、父结点是爷爷结点的右孩子、叔叔结点不存在或者为黑色
+                            if node == node.parent.left:
+                                # case 2': 父结点为红色、父结点是爷爷结点的右孩子、
+                                # 叔叔结点不存在或者为黑色、当前结点是父结点的左孩子
+                                # 这种情况先转换成 case 3，然后再处理掉
+                                node = node.parent  # node 上移至其父（旋转后会降下来）
+                                self._right_rotate(node)  # 右旋，"拉直" 呈 RR 型
+                            # case 3': 父结点为红色、父结点是爷爷结点的右孩子、
+                            # 叔叔结点不存在或者为黑色、当前结点是父结点的右孩子
+                            node.parent.color = False  # 修改父结点为黑色
+                            node.parent.parent.color = True  # 修改爷爷结点为红色
+                            self._left_rotate(node.parent.parent)  # 左旋爷爷结点
 
             # while 循环结束、处理完毕，如果此时树根存在，则置为黑色
             if isinstance(self.bst, TreeNode) and self.bst != self.nil:
                 self.bst.color = False
 
     # 辅助操作：新建树结点
-    def create_new_node(self, new_key, new_val, color=True):
+    def _create_new_node(self, new_key, new_val, color=True):
         new_node = TreeNode(new_key, new_val, color=color)
         new_node.left = self.nil
         new_node.right = self.nil
@@ -237,7 +226,7 @@ class RedBlackTree:
 
     # 辅助函数：清除某个结点的所有指针域
     @staticmethod
-    def clear_node_link(node):
+    def _clear_node_link(node):
         if isinstance(node, TreeNode):
             node.parent = None
             node.left = None
@@ -251,7 +240,7 @@ class RedBlackTree:
     def rb_insert(self, insert_key, insert_val):
         if self.is_bst_empty:
             # 如果当前 BST 为空，则直接设置 self.bst 结点，完成插入
-            new_node = self.create_new_node(insert_key, insert_val)
+            new_node = self._create_new_node(insert_key, insert_val)
             new_node.parent = self.nil
             self.bst = new_node
             self.is_bst_empty = False
@@ -266,7 +255,7 @@ class RedBlackTree:
                     ptr = ptr.right
 
             # 找到了插入位置，设置新结点属性：红色、左孩子和右孩子均为哨兵 nil、父结点为 ptr_p
-            new_node = self.create_new_node(insert_key, insert_val, True)
+            new_node = self._create_new_node(insert_key, insert_val, True)
 
             # 根据 key 决定该插入到左边还是右边
             if new_node.key <= ptr_p.key:
@@ -275,24 +264,22 @@ class RedBlackTree:
                 ptr_p.right = new_node
             new_node.parent = ptr_p
 
-            self.rb_insert_fixup(new_node)  # 插入后维护红黑性质
+            self._rb_insert_fixup(new_node)  # 插入后维护红黑性质
 
     # 辅助操作：将结点 u 替换为结点 v（用于删除时的红黑性质保持）
     # 时间复杂度 O(log n) 与树高有关
-    def rb_transplant(self, u, v):
+    def _rb_transplant(self, u, v):
         if isinstance(u, TreeNode) and isinstance(v, TreeNode):
             if u == self.bst or u.parent == self.nil:
                 self.bst = v
             else:
-                if isinstance(u.parent, TreeNode):
-                    # 根据 u 是其父结点的左孩子还是右孩子，更换指针
-                    if u == u.parent.left:
-                        u.parent.left = v
-                    else:
-                        u.parent.right = v
+                # u 的父结点必为树结点 (红黑树性质)
+                assert isinstance(u.parent, TreeNode)
+                # 根据 u 是其父结点的左孩子还是右孩子，更换指针
+                if u == u.parent.left:
+                    u.parent.left = v
                 else:
-                    # u 的父结点为非树结点，红黑树不应如此
-                    print('rb_transplant: Error Path')
+                    u.parent.right = v
         else:
             pass
         # 无条件执行：让 v 的 parent 指针指向 u 的父结点
@@ -302,108 +289,93 @@ class RedBlackTree:
     # 时间复杂度 O(log n) 与树高有关
     # 当删除结点 node 时，让其后继 s 替换 node。在结点被移除或者在树中移动之前，必须先记录 s 的颜色
     # 根据当前结点的父结点、兄弟结点、兄弟结点的孩子结点的颜色，分 4 种情况，用旋转操作来调整平衡
-    def rb_delete_fixup(self, node):
+    def _rb_delete_fixup(self, node):
         if isinstance(node, TreeNode) and node != self.nil:
             # 当前结点 node 为真正需要被删除的结点，其祖先中有黑色结点被删除(替换)了
             while node != self.bst and not node.color:
-                if not isinstance(node.parent, TreeNode):
-                    # 父结点不是树结点，红黑树不应如此
-                    print('rb_delete_fixup: Error Path 0')
-                elif node.parent == self.nil:
+                # node 的父结点必为树结点 (红黑树性质)
+                assert isinstance(node.parent, TreeNode)
+                if node.parent == self.nil:
                     # 父结点是 nil，表示当前 node 为树根，只需要把根改为黑色即可
-                    if node == self.bst:
-                        self.bst.color = False
-                    else:
-                        print('rb_insert_fixup: Error Path 0+')
+                    assert node == self.bst
+                    self.bst.color = False
                 elif node == node.parent.left:
                     # 如果 node 是其父结点的左孩子
-                    if isinstance(node.parent, TreeNode):
-                        # 记录 bro 为 node 父结点的右孩子，即 node 的兄弟结点
-                        bro = node.parent.right
-                        if isinstance(bro, TreeNode):
-                            if bro.color:
-                                # case 1: node 是其父结点的左孩子、其兄弟结点 bro 为红色
-                                bro.color = False  # 让 bro 的颜色改为黑色
-                                node.parent.color = True
-                                self.left_rotate(node.parent)
-                                bro = node.parent.right  # 确保 bro 还是 node 的兄弟结点
-                            if isinstance(bro.left, TreeNode) and isinstance(bro.right, TreeNode):
-                                if not bro.left.color and not bro.right.color:
-                                    # case 2: 此时兄弟结点 bro 一定为黑色，如果原本不是黑色，会经过 case 1 变为黑色
-                                    # 此时 bro 孩子均为黑色，让 bro 变为 红色
-                                    bro.color = True
-                                    node = node.parent  # node 上移
-                                else:
-                                    # 此时 bro 的孩子不全为黑色
-                                    if not bro.right.color:
-                                        # case 3: 此时 node 是其父结点的左孩子，且兄弟结点 bro 一定为黑色
-                                        # bro 的左孩子为红色，右孩子为黑色
-                                        bro.left.color = False   # 修改 bro 左孩子为黑色
-                                        bro.color = True         # 修改 bro 为红色（一红挂两黑）
-                                        self.right_rotate(bro)   # 右旋 bro
-                                        bro = node.parent.right  # 确保 bro 还是 node 的兄弟结点
-                                        # case 3 之后，保证 bro 为黑色、bro 的右孩子为红色
-                                    # case 4: 此时 node 是其父结点的左孩子，且兄弟结点 bro 一定为黑色
-                                    # bro 的右孩子为红色，左孩子颜色为黑色
-                                    bro.color = node.parent.color
-                                    node.parent.color = False
-                                    bro.right.color = False
-                                    self.left_rotate(node.parent)
-                                    node = self.bst
-                            else:
-                                # bro 结点的孩子为非树结点，红黑树不应如此
-                                print('rb_delete_fixup: Error Path 1')
-                        else:
-                            # node 的兄弟结点为非树结点，红黑树不应如此
-                            print('rb_delete_fixup: Error Path 2')
+                    # node 的父结点必为树结点 (红黑树性质)
+                    assert isinstance(node.parent, TreeNode)
+                    # 记录 bro 为 node 父结点的右孩子，即 node 的兄弟结点
+                    bro = node.parent.right
+                    # node 的兄弟结点必为树结点 (红黑树性质)
+                    assert isinstance(bro, TreeNode)
+                    if bro.color:
+                        # case 1: node 是其父结点的左孩子、其兄弟结点 bro 为红色
+                        bro.color = False  # 让 bro 的颜色改为黑色
+                        node.parent.color = True
+                        self._left_rotate(node.parent)
+                        bro = node.parent.right  # 确保 bro 还是 node 的兄弟结点
+                    # bro 结点的孩子必为树结点 (红黑树性质)
+                    assert isinstance(bro.left, TreeNode) and isinstance(bro.right, TreeNode)
+                    if not bro.left.color and not bro.right.color:
+                        # case 2: 此时兄弟结点 bro 一定为黑色，如果原本不是黑色，会经过 case 1 变为黑色
+                        # 此时 bro 孩子均为黑色，让 bro 变为 红色
+                        bro.color = True
+                        node = node.parent  # node 上移
                     else:
-                        # node 的父结点为非树结点，红黑树不应如此
-                        print('rb_delete_fixup: Error Path 3')
+                        # 此时 bro 的孩子不全为黑色
+                        if not bro.right.color:
+                            # case 3: 此时 node 是其父结点的左孩子，且兄弟结点 bro 一定为黑色
+                            # bro 的左孩子为红色，右孩子为黑色
+                            bro.left.color = False  # 修改 bro 左孩子为黑色
+                            bro.color = True  # 修改 bro 为红色（一红挂两黑）
+                            self._right_rotate(bro)  # 右旋 bro
+                            bro = node.parent.right  # 确保 bro 还是 node 的兄弟结点
+                            # case 3 之后，保证 bro 为黑色、bro 的右孩子为红色
+                        # case 4: 此时 node 是其父结点的左孩子，且兄弟结点 bro 一定为黑色
+                        # bro 的右孩子为红色，左孩子颜色为黑色
+                        bro.color = node.parent.color
+                        node.parent.color = False
+                        bro.right.color = False
+                        self._left_rotate(node.parent)
+                        node = self.bst
 
                 else:
                     # 如果 node 是其父结点的右孩子
-                    if isinstance(node.parent, TreeNode):
-                        # 记录 bro 为 node 父结点的左孩子，即 node 的兄弟结点
-                        bro = node.parent.left
-                        if isinstance(bro, TreeNode):
-                            if bro.color:
-                                # case 1': node 是其父结点的右孩子、其兄弟结点 bro 为红色
-                                bro.color = False  # 让 bro 的颜色改为黑色
-                                node.parent.color = True
-                                self.right_rotate(node.parent)
-                                bro = node.parent.left  # 确保 bro 还是 node 的兄弟结点
-                            if isinstance(bro.left, TreeNode) and isinstance(bro.right, TreeNode):
-                                if not bro.left.color and not bro.right.color:
-                                    # case 2': 此时兄弟结点 bro 一定为黑色，如果原本不是黑色，会经过 case 1' 变为黑色
-                                    # 此时 bro 孩子均为黑色，让 bro 变为 红色
-                                    bro.color = True
-                                    node = node.parent  # node 上移
-                                else:
-                                    # 此时 bro 的孩子不全为黑色
-                                    if not bro.left.color:
-                                        # case 3': 此时 node 是其父结点的右孩子，且兄弟结点 bro 一定为黑色
-                                        # bro 的左孩子为黑色，右孩子为红色
-                                        bro.right.color = False  # 修改 bro 右孩子为黑色
-                                        bro.color = True         # 修改 bro 为红色（一红挂两黑）
-                                        self.left_rotate(bro)    # 左旋 bro
-                                        bro = node.parent.left   # 确保 bro 还是 node 的兄弟结点
-                                        # case 3' 之后，保证 bro 为黑色、bro 的左孩子为红色
-                                    # case 4': 此时 node 是其父结点的右孩子，且兄弟结点 bro 一定为黑色
-                                    # bro 的左孩子为红色，右孩子颜色为黑色
-                                    bro.color = node.parent.color
-                                    node.parent.color = False
-                                    bro.left.color = False
-                                    self.right_rotate(node.parent)
-                                    node = self.bst
-                            else:
-                                # bro 结点的孩子为非树结点，红黑树不应如此
-                                print('rb_delete_fixup: Error Path 1+')
-                        else:
-                            # node 的兄弟结点为非树结点，红黑树不应如此
-                            print('rb_delete_fixup: Error Path 2+')
+                    # node 的父结点必为树结点 (红黑树性质)
+                    assert isinstance(node.parent, TreeNode)
+                    # 记录 bro 为 node 父结点的左孩子，即 node 的兄弟结点
+                    bro = node.parent.left
+                    # node 的兄弟结点必为树结点 (红黑树性质)
+                    assert isinstance(bro, TreeNode)
+                    if bro.color:
+                        # case 1': node 是其父结点的右孩子、其兄弟结点 bro 为红色
+                        bro.color = False  # 让 bro 的颜色改为黑色
+                        node.parent.color = True
+                        self._right_rotate(node.parent)
+                        bro = node.parent.left  # 确保 bro 还是 node 的兄弟结点
+                    # bro 结点的孩子必为树结点 (红黑树性质)
+                    assert isinstance(bro.left, TreeNode) and isinstance(bro.right, TreeNode)
+                    if not bro.left.color and not bro.right.color:
+                        # case 2': 此时兄弟结点 bro 一定为黑色，如果原本不是黑色，会经过 case 1' 变为黑色
+                        # 此时 bro 孩子均为黑色，让 bro 变为 红色
+                        bro.color = True
+                        node = node.parent  # node 上移
                     else:
-                        # node 的父结点为非树结点，红黑树不应如此
-                        print('rb_delete_fixup: Error Path 3+')
+                        # 此时 bro 的孩子不全为黑色
+                        if not bro.left.color:
+                            # case 3': 此时 node 是其父结点的右孩子，且兄弟结点 bro 一定为黑色
+                            # bro 的左孩子为黑色，右孩子为红色
+                            bro.right.color = False  # 修改 bro 右孩子为黑色
+                            bro.color = True  # 修改 bro 为红色（一红挂两黑）
+                            self._left_rotate(bro)  # 左旋 bro
+                            bro = node.parent.left  # 确保 bro 还是 node 的兄弟结点
+                            # case 3' 之后，保证 bro 为黑色、bro 的左孩子为红色
+                        # case 4': 此时 node 是其父结点的右孩子，且兄弟结点 bro 一定为黑色
+                        # bro 的左孩子为红色，右孩子颜色为黑色
+                        bro.color = node.parent.color
+                        node.parent.color = False
+                        bro.left.color = False
+                        self._right_rotate(node.parent)
+                        node = self.bst
 
             # 最终将 node 的颜色置为黑色
             node.color = False
@@ -415,7 +387,7 @@ class RedBlackTree:
         if self.is_bst_empty:
             print('提示：红黑树为空，无法继续删除。')
         else:
-            ptr = root           # 用 ptr 指针从 root 结点（一般设为 self.bst）开始向下搜索插入位置
+            ptr = root               # 用 ptr 指针从 root 结点（一般设为 self.bst）开始向下搜索删除位置
             while isinstance(ptr, TreeNode) and ptr != self.nil:
                 if delete_key == ptr.key:
                     break            # 定位到了目标删除结点
@@ -425,14 +397,15 @@ class RedBlackTree:
                     ptr = ptr.right  # 大则往右
 
             # 若没找到目标结点
-            if not isinstance(ptr, TreeNode) or ptr == self.nil:
+            assert isinstance(ptr, TreeNode)
+            if ptr == self.nil:
                 print('提示：删除时，找不到 key 为', delete_key, '的元素')
-
             else:
                 if ptr == self.bst and ptr.key == delete_key and \
                         (not isinstance(ptr.left, TreeNode) or ptr.left == self.nil) and \
                         (not isinstance(ptr.right, TreeNode) or ptr.right == self.nil):
                     # 当前 BST 仅有一个根结点 ptr，且欲删除根结点，会导致树空
+                    self.bst = None
                     self.is_bst_empty = True
                     self.sorted_key_list = []
                 else:
@@ -444,11 +417,11 @@ class RedBlackTree:
                     if ptr.left == self.nil:
                         # 如果欲删除结点 ptr 的左孩子为空，则将 ptr 替换为其右孩子
                         x = ptr.right
-                        self.rb_transplant(ptr, ptr.right)
+                        self._rb_transplant(ptr, ptr.right)
                     elif ptr.right == self.nil:
                         # 如果欲删除结点 ptr 的右孩子为空，则将 ptr 替换为其左孩子
                         x = ptr.left
-                        self.rb_transplant(ptr, ptr.left)
+                        self._rb_transplant(ptr, ptr.left)
                     else:
                         # 欲删除结点 ptr 的左右孩子均不为空，则将 ptr 替换为其后继
                         y = self.successor(ptr)     # y 为 ptr 的后继，y 的左孩子为 nil
@@ -456,31 +429,27 @@ class RedBlackTree:
                         x = y.right
                         if y.parent == ptr:
                             # 如果 ptr 的后继 y 就是 ptr 的直接右孩子
-                            if isinstance(x, TreeNode):
-                                x.parent = y
-                            else:
-                                # ptr 的后继 y 的右孩子为非树结点，红黑树不应如此
-                                print('rb_delete: Error Path 1')
+                            # ptr 的后继 y 的右孩子必为树结点 (红黑树性质)
+                            assert isinstance(x, TreeNode)
+                            x.parent = y
                         else:
                             # 如果 ptr 的后继 y 不是 ptr 的直接右孩子
                             # 让 y 被其右孩子替换（因为之后 y 要用于替换 ptr）
                             # 所以真正需要被删除的结点就是 y.right，也就是 x
-                            if isinstance(y.right, TreeNode):
-                                self.rb_transplant(y, y.right)
-                                y.right = ptr.right
-                                y.right.parent = y
-                            else:
-                                # ptr 的后继 y 的右孩子为非树结点，红黑树不应如此
-                                print('rb_delete: Error Path 2')
+                            # ptr 的后继 y 的右孩子必为树结点 (红黑树性质)
+                            assert isinstance(y.right, TreeNode)
+                            self._rb_transplant(y, y.right)
+                            y.right = ptr.right
+                            y.right.parent = y
 
                         # 现在把 ptr 替换为其后继结点 y，并修改链接关系和 color（不修改 key、value）
-                        self.rb_transplant(ptr, y)
+                        self._rb_transplant(ptr, y)
                         y.left = ptr.left
                         y.left.parent = y
                         y.color = ptr.color  # y 继承 ptr 的颜色
                     # 最后，如果"真正"删除的结点颜色为黑色，则破坏了红黑性质，需要进行维护
                     if not y_original_color:
-                        self.rb_delete_fixup(x)  # 删除后维护红黑性质
+                        self._rb_delete_fixup(x)  # 删除后维护红黑性质
 
     # 找到一棵以 root 为根的 BST/RBT 中的最小值结点（一路向左）
     # 时间复杂度 O(log n) 与树高有关
