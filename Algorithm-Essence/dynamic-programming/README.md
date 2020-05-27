@@ -77,8 +77,21 @@ By [YuweiYin](https://github.com/YuweiYin)
 	- [连续子数组的最大和](./max-subarray-sum.py)
 	- [钢条切割](./cut-rod.py)
 	- [矩阵链乘法](./matrix-chain-order.py)
-	- 最长公共子序列
-	- 最优二叉搜索树
+	- [最长公共子序列](./longest-common-subsequence.py)
+	- [最优二叉搜索树](./optimal-binary-search-tree.py)
+- 《CLRS》 Chapter 15 思考题
+	- 有向无环图中的最长简单路径
+	- 最长回文子序列
+	- 双调欧几里得旅行商问题
+	- 整齐打印
+	- 编辑距离
+	- 公司聚会计划
+	- 译码算法
+	- 基于接缝裁剪的图像压缩
+	- 字符串拆分
+	- 投资策略规划
+	- 库存规划
+	- 签约棒球自由球员
 
 **动态规划** (Dynamic Programming, DP) 与分治法相似，都是通过组合子问题的解来求解原问题。注意，“Dynamic Programming”里的 Programming 指的是一种**表格法**，而非编写计算机程序。
 

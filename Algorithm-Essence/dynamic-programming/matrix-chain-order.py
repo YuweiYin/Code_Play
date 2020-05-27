@@ -36,6 +36,7 @@ class MatrixChainOrder:
         assert isinstance(p_arr, list) and len(p_arr) > 1
         self.p_arr = p_arr       # p 数组给出各矩阵的规模
         self.optimal_paren = ''  # 最优括号化方案 (字符串)
+        self.inf = 0x3f3f3f3f    # 目标是求代价最小值，所以备忘录各个位置初始化为 inf
 
     # 矩阵乘积运算 计算 A * B 的结果
     # 其中矩阵 A 的规模为 P*Q、矩阵 B 的规模为 Q*R
@@ -61,40 +62,87 @@ class MatrixChainOrder:
     # 如果返回最佳收益为 -1，则为异常
     def matrix_chain_order(self):
         assert isinstance(self.p_arr, list) and len(self.p_arr) > 1
-        # return self._matrix_chain_order_1()  # 自顶向下递归实现 (DFS 暴力搜索) O(2^n)
-        # return self._matrix_chain_order_2()  # 自顶向下递归实现 (带备忘录的动态规划) O(n^2)
-        return self._matrix_chain_order_3()  # 自底向上循环实现 (动态规划) O(n^2)
-
-    # TODO 自顶向下递归实现 (DFS 暴力搜索)
-    # 如果 i = j 则 m[i, j] = 0
-    # 如果 i < j 则 m[i, j] = min{m[i, k] + m[k+1, j] + p_{i-1} * p_k * pj}  \forall k \in [i, j)
-    # 时间复杂度 O(2^n)
-    def _matrix_chain_order_1(self):
-        pass
-
-    # TODO 自顶向下递归实现 (带备忘录的动态规划)
-    # 时间复杂度 \Theta(n^3)
-    # 空间复杂度 \Theta(n^2)
-    def _matrix_chain_order_2(self):
-        pass
-
-    # 自底向上循环实现 (动态规划)
-    # 时间复杂度 \Theta(n^3)
-    # 空间复杂度 \Theta(n^2)
-    def _matrix_chain_order_3(self):
-        assert isinstance(self.p_arr, list) and len(self.p_arr) > 1
         # 矩阵数量为 p 数组长度减一
         matrix_num = len(self.p_arr) - 1
         # 备忘录表格 m[i, j] 表示计算矩阵 A_{i..j} 所需标量乘法次数的最小值
         # 因此，原问题的最优解（计算 A_{1..n}）所需的最低代价就是 m[1, n] 的值
         # 备忘录 s[i, j] 保存链乘 Ai...Aj 最优括号化方案的各个分割点位置 k
         # 即：使得 m[i, j] = m[i, k] + m[k+1, j] + p_{i-1} * p_k * pj 成立的 k 值
-        inf = 0x3f3f3f3f  # 目标是求代价最小值，所以备忘录各个位置初始化为 inf
-        m_table = [[inf for j in range(matrix_num)] for i in range(matrix_num)]
-        s_table = [[inf for j in range(matrix_num)] for i in range(matrix_num)]
+        m_table = [[self.inf for j in range(matrix_num)] for i in range(matrix_num)]
+        s_table = [[self.inf for j in range(matrix_num)] for i in range(matrix_num)]
         # m_table 主对角线的值均置为 0
         for i in range(matrix_num):
             m_table[i][i] = 0
+        # s_table 主对角线 (i, i) 的值均置为 i
+        for i in range(matrix_num):
+            s_table[i][i] = i
+
+        # 自顶向下递归实现 (DFS 暴力搜索) O(2^n)
+        # m_table, s_table = self._matrix_chain_order_1(m_table, s_table, matrix_num)
+        # 自顶向下递归实现 (带备忘录的动态规划) O(n^2)
+        # m_table, s_table = self._matrix_chain_order_2(m_table, s_table, matrix_num)
+        # 自底向上循环实现 (动态规划) O(n^2)
+        m_table, s_table = self._matrix_chain_order_3(m_table, s_table, matrix_num)
+        return m_table, s_table
+
+    # 自顶向下递归实现 (DFS 暴力搜索)
+    # 如果 i = j 则 m[i, j] = 0
+    # 如果 i < j 则 m[i, j] = min{m[i, k] + m[k+1, j] + p_{i-1} * p_k * pj}  \forall k \in [i, j)
+    # 时间复杂度 O(2^n)
+    def _matrix_chain_order_1(self, m_table, s_table, matrix_num):
+        self._recursive_matrix_chain_order(m_table, s_table, 0, matrix_num - 1)
+        return m_table, s_table
+
+    def _recursive_matrix_chain_order(self, m_table, s_table, i, j):
+        # 基本情况：i j 相等表示仅有一个矩阵，无需标量运算
+        if i == j:
+            return 0
+        # 对于每个切分点 k 计算代价，i <= k < j
+        for k in range(i, j):
+            # 计算代价时仅依赖于已经求出的 m[i, k] 和 m[k+1, j]
+            # 注意这里 i 从下标 0 开始，于是原公式里的 p_{i-1} * p_k * pj 需改为 p_i * p_{k+1} * p_{j+1}
+            left_cost = self._recursive_matrix_chain_order(m_table, s_table, i, k)
+            right_cost = self._recursive_matrix_chain_order(m_table, s_table, k + 1, j)
+            merge_cost = self.p_arr[i] * self.p_arr[k + 1] * self.p_arr[j + 1]
+            cost = left_cost + right_cost + merge_cost
+            if cost < m_table[i][j]:
+                m_table[i][j] = cost
+                s_table[i][j] = k
+        return m_table[i][j]
+
+    # 自顶向下递归实现 (带备忘录的动态规划)
+    # 时间复杂度 \Theta(n^3)
+    # 空间复杂度 \Theta(n^2)
+    def _matrix_chain_order_2(self, m_table, s_table, matrix_num):
+        self._lookup_matrix_chain_order(m_table, s_table, 0, matrix_num - 1)
+        return m_table, s_table
+
+    def _lookup_matrix_chain_order(self, m_table, s_table, i, j):
+        # 先查表，如果当前子问题已有解，则直接返回之
+        if m_table[i][j] < self.inf:
+            return m_table[i][j]
+        # 基本情况：i j 相等表示仅有一个矩阵，无需标量运算
+        if i == j:
+            return 0
+        # 对于每个切分点 k 计算代价，i <= k < j
+        for k in range(i, j):
+            # 计算代价时仅依赖于已经求出的 m[i, k] 和 m[k+1, j]
+            # 注意这里 i 从下标 0 开始，于是原公式里的 p_{i-1} * p_k * pj 需改为 p_i * p_{k+1} * p_{j+1}
+            left_cost = self._lookup_matrix_chain_order(m_table, s_table, i, k)
+            right_cost = self._lookup_matrix_chain_order(m_table, s_table, k + 1, j)
+            merge_cost = self.p_arr[i] * self.p_arr[k + 1] * self.p_arr[j + 1]
+            cost = left_cost + right_cost + merge_cost
+            if cost < m_table[i][j]:
+                m_table[i][j] = cost
+                s_table[i][j] = k
+        return m_table[i][j]
+
+    # 自底向上循环实现 (动态规划)
+    # 时间复杂度 \Theta(n^3)
+    # 空间复杂度 \Theta(n^2)
+    def _matrix_chain_order_3(self, m_table, s_table, matrix_num):
+        assert isinstance(self.p_arr, list) and len(self.p_arr) > 1
+
         # 对于每种 chain_len 链长(子问题)求最优解/值，自底向上分别计算
         for chain_len in range(2, matrix_num + 1):
             # i 为当前链的起始位置
