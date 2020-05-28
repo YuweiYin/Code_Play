@@ -7,9 +7,9 @@ By [YuweiYin](https://yuweiyin.github.io/)
 ## 贪心算法
 
 - 贪心算法基础
-	- [活动选择问题](./activity-select)
-	- [哈夫曼编码 Huffman](./huffman)
-	- [拟阵及任务调度问题](./task-scheduling)
+	- [活动选择问题](./activity-select.py)
+	- [哈夫曼编码 Huffman](./huffman.py)
+	- [拟阵及任务调度问题](./task-scheduling.py)
 - 《CLRS》 Chapter 16 思考题
 	- 找零问题
 	- 最小平均完成时间调度问题
