@@ -303,9 +303,13 @@ class HeapSort(Sort):
     def extract_max(self):
         if self.max_heap_size < 1:
             print('Waning: 最大堆已空')
+        if self.max_heap_size == 1:
+            self.max_heap_size -= 1
+            return self.ele_list.pop(1)
         else:
             max_ele = self.ele_list[1]  # 取出最大元素后需要更换堆根
-            self.ele_list[1] = self.ele_list[self.max_heap_size]
+            # self.ele_list[1] = self.ele_list[self.max_heap_size]
+            self.ele_list[1] = self.ele_list.pop(self.max_heap_size)
             self.max_heap_size -= 1
             self._max_heapify(1)  # 维护最大堆性质 O(log n)
             return max_ele
@@ -354,9 +358,13 @@ class HeapSort(Sort):
     def extract_min(self):
         if self.min_heap_size < 1:
             print('Waning: 最小堆已空')
+        elif self.min_heap_size == 1:
+            self.min_heap_size -= 1
+            return self.min_ele_list.pop(1)
         else:
             min_ele = self.min_ele_list[1]  # 取出最小元素后需要更换堆根
-            self.min_ele_list[1] = self.min_ele_list[self.min_heap_size]
+            # self.min_ele_list[1] = self.min_ele_list[self.min_heap_size]
+            self.min_ele_list[1] = self.min_ele_list.pop(self.min_heap_size)
             self.min_heap_size -= 1
             self._min_heapify(1)  # 维护最小堆性质 O(log n)
             return min_ele

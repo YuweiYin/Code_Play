@@ -132,9 +132,13 @@ class Heap:
         if self.min_heap_size < 1:
             print('extract_min: 最小堆已空, 无法提取最小元素')
             return None
+        elif self.min_heap_size == 1:
+            self.min_heap_size -= 1
+            return self.min_ele_list.pop(1)
         else:
             min_ele = self.min_ele_list[1]  # 取出最小元素后需要更换堆根
-            self.min_ele_list[1] = self.min_ele_list[self.min_heap_size]
+            # self.min_ele_list[1] = self.min_ele_list[self.min_heap_size]
+            self.min_ele_list[1] = self.min_ele_list.pop(self.min_heap_size)
             self.min_heap_size -= 1
             self._min_heapify(1)  # 维护最小堆性质 O(log n)
             return min_ele
