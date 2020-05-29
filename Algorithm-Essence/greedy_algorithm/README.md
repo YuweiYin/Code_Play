@@ -1,8 +1,10 @@
-# Algorithm - Greedy Algorithm
+# Code_Play
 
-By [YuweiYin](https://yuweiyin.github.io/)
+Programming Practice - ACM Algorithm
 
-## 目录
+By [YuweiYin](https://github.com/YuweiYin)
+
+**Algorithm - Greedy Algorithm**
 
 ## 贪心算法
 

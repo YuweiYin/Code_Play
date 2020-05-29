@@ -1,6 +1,10 @@
-# Algorithm - Dynamic Programming
+# Code_Play
 
-By [YuweiYin](https://yuweiyin.github.io/)
+Programming Practice - ACM Algorithm
+
+By [YuweiYin](https://github.com/YuweiYin)
+
+**Algorithm - Dynamic Programming**
 
 ## 目录
 
