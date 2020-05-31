@@ -156,17 +156,20 @@ class AdjacencyList:
 # 深度优先搜索 (Depth First Search, BFS)
 class DFS:
     def __init__(self):
-        self.inf = 0x3f3f3f3f  # 初始化各个结点被发现和结束探索的时间均为 inf 无穷
-        self.timestamp = 0     # 时间戳
+        self.inf = 0x3f3f3f3f     # 初始化各个结点被发现和结束探索的时间均为 inf 无穷
+        self.timestamp = 0        # 时间戳
+        self.topo_sort_list = []  # 拓扑排序的顺序。在 DFS 某结点 finish 时(其关键字)加入此列表
 
     # 输入：graph 图结构，is_adj_link 为 True 表示图为邻接表结构，False 表示为邻接矩阵结构
     def do_dfs(self, graph, is_adj_link=True):
+        self.topo_sort_list = []  # 拓扑排序的顺序
         if is_adj_link:
             # 如果图是邻接表结构
             self._dfs_link(graph)
         else:
             # 如果图是邻接矩阵结构
             self._dfs_matrix(graph)
+        return self.topo_sort_list
 
     def _dfs_link(self, adj_l):
         assert isinstance(adj_l, AdjacencyList)
@@ -224,6 +227,8 @@ class DFS:
         # u.color = True
         self.timestamp += 1
         u.finish = self.timestamp
+        # 拓扑排序：在 DFS 某结点 finish 时(其关键字)加入此列表
+        self.topo_sort_list.append(u.key)  # 插入到后方 O(1) 但这样是拓扑排序的逆序
 
     # 对邻接矩阵结构的图 graph 进行 DFS
     def _dfs_matrix(self, adj_m):
@@ -267,12 +272,14 @@ def main():
     # 执行 DFS 过程
     start = time.process_time()
     dfs = DFS()
-    dfs.do_dfs(graph=adj_l, is_adj_link=True)
+    topo_sort_list = dfs.do_dfs(graph=adj_l, is_adj_link=True)
     end = time.process_time()
 
     # 查看 DFS 结果
-    print('DFS 结果 (各顶点关键字 及其 发现时间 与结束探索时间)')
+    print('\nDFS 结果 (各顶点关键字 及其 发现时间 与结束探索时间)')
     dfs.print_vertex_time(adj_l)
+    print('\n拓扑排序的逆序')
+    print(topo_sort_list)
 
     print('Running Time: %.5f ms' % ((end - start) * 1000))
 
