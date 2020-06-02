@@ -13,15 +13,21 @@ By [YuweiYin](https://github.com/YuweiYin)
 		- [有向无环图 DAG 的最短路径](./dag-shortest-path.py) - (利用 DFS & 拓扑排序)
 		- 非负权值加权图的最短路径 - [Dijkstra 算法](./dijkstra.py) (使用 [Fibonacci Heap](../../data_structure/fibonacci-heap.py) 优化)
 		- 含负权值加权图的最短路径 - [Bellman-Ford 算法](./bellman-ford.py) (也用于负权环的检测)
-		- 含负权值加权图的最短路径 - SPFA 算法 (在稠密图中 SPFA 效率不如 BF)
+		- Bellman-Ford 算法的应用之一：线性规划问题 - 差分约束系统
+		- 含负权值加权图的最短路径 - SPFA 算法 (在稠密图中 SPFA 效率不如 BF，不过 SPFA 算法实现复杂度低)
 	- 全源最短路径
-		- Floyd-Warshall 算法
-		- Johnson 算法
+		- [全源最短路径和矩阵乘法](./all-pairs-sp-mm.py)
+		- [Floyd-Warshall 算法](./floyd-warshall.py)
+		- [Johnson 算法](./johnson.py)
 	- 次短路径
 	- 第 k 短路径
-	- 线性规划 & 差分约束系统 (Bellman-Ford 算法的应用之一)
 	- 平面点对的最短路径
 	- 双标准限制最短路径
+	- 嵌套盒子
+	- 套利交易
+	- Gabow 的单源最短路径伸缩算法
+	- Karp 的最小平均权重环路算法
+	- 双调最短路径
 
 ## 单源最短路径
 
@@ -168,6 +174,44 @@ RELAX(u, v, w)
 
 ## 全源最短路径
 
+全源最短路径是考虑如何找到一个图中所有结点之间的(加权)最短路径。
+
+给定一个带(边)权重的有向图 G = (V, E)，其权重函数为 w: E -> R，该函数将边映射到实数值权重上。目标是找到对于所有的结点对 u, v \in V，一条从结点 u 到结点 v 的加权最短路径。
+
+计算结果通常以表格(二维数组)形式输出：第 u 行第 v 列给出的是结点 u 到结点 v 的最短路径权重值。
+
+可以对每个结点单独运行**单源最短路径算法**，例如 Dijkstra 算法或 Bellman-Ford 算法。
+
+- 对于 Dijkstra 算法
+	- 如果使用**线性数组**来实现**最小优先队列** Q，则 `|V|` 次运行的总时间是 `O(|V|^3 + |V|·|E|)`，即 `O(|V|^3)`。
+	- 如果使用**二叉堆**实现 Q，则 `|V|` 次运行的总时间是 `O(|V|·|E| log |V|)`，这在**稀疏图**的情况下是个较大的改进。
+	- 如果使用**斐波那契堆**实现 Q，则 `|V|` 次运行的总时间是 `O(|V|·|E| + |V|^2 log |V|)`。这对大型稀疏图来说是个很好的算法。
+
+但是如果图中含有权重为负值的边，就不能使用 Dijkstra 算法。此时如果运行 Bellman-Ford 算法，`|V|` 次运行的总时间是 `O(|V|^2·|E|)`，在稠密图（`|E|` 接近 `|V|^2`）的情况下，此运行时间为 `O(|V|^4)`。
+
+假定用邻接矩阵来表达图结构，将结点编号为 1, 2, ..., `|V|`，则算法的输入是一个 n x n 的矩阵 W，该矩阵代表的是一个有 n 个结点的有向图 G = (V, E) 的边的权重。即 W = (wij)，其中：
+
+- 若 i == j，则 wij = 0
+- 若 i != j 且 (i, j) \in E，则 wij 等于有向边 (i, j) 的权重值 w(i, j)
+- 若 i != j 且 (i, j) \notin E，则 wij = inf 无穷
+
+算法输出的表格是一个 n x n 的矩阵 D = (dij)，其中 dij 代表的是从结点 i 到结点 j 的一条最短路径的权重值。若用 d(i, j) 来代表从结点 i 到结点 j 的最短路径权重，则在算法结束时有 dij = d(i, j)。
+
+为了获取最优解，还需要计算出**前驱结点矩阵** P = (pij)，其中 pij 在 i == j 或 从 i 到 j 不存在路径时为 nil 空，在其他情况下给出的是从结点 i 到结点 j 的某条最短路径上 结点 j 的前驱结点。有矩阵 P 的第 i 行所诱导的**前驱子图** 是一棵根结点为 i 的**最短路径树**。
+
+如果 Gpi 是一棵以结点 i 为根结点的最短路径树，则下面的过程将打印出从结点 i 到结点 j 的一条最短路径。
+
+```
+PRINT_ALL_PAIRS_SHORTEST_PATH(P, i, j)
+1  if i == j
+2      print i
+3  elseif pij == nil
+4      print "no path from" i "to" j "exists"
+5  else
+6      PRINT_ALL_PAIRS_SHORTEST_PATH(P, i, pij)
+7      print j
+```
+
 ## 参考资料
 
-- Introduction to Algorithm (aka CLRS) Third Edition - Chapter 24
+- Introduction to Algorithm (aka CLRS) Third Edition - Chapter 24 & 25
