@@ -199,7 +199,7 @@ class FibonacciHeap:
         # d_arr 数组的长度为最大度数的上界 D(H.n)，可以证明 D(H.n) <= \floor(log_{phi} n) = O(log n)
         phi = (1 + math.sqrt(5)) / 2  # 黄金分割率 golden_ratio ~= 1.61803
         # phi = round(phi, 5)  # 四舍五入仅保留小数点后几位，可加速下面的对数运算
-        max_d = int(math.log(self.n, phi))  # 最大度数的上界
+        max_d = int(math.log(self.n, phi)) + 1  # 最大度数的上界
 
         # 创建长度为 max_d 的辅助数据 d_arr
         # 如果 d_arr 中某结点关键字 key 为 inf，则表示仅为占位结点
