@@ -11,7 +11,7 @@ By [YuweiYin](https://github.com/YuweiYin)
 - 最短路径
 	- 单源最短路径
 		- [有向无环图 DAG 的最短路径](./dag-shortest-path.py) - (利用 DFS & 拓扑排序)
-		- 非负权值加权图的最短路径 - [Dijkstra 算法](./dijkstra.py) (使用 [Fibonacci Heap](../../data_structure/fibonacci-heap.py) 优化)
+		- 非负权值加权图的最短路径 - [Dijkstra 算法](./dijkstra.py) (使用 [Fibonacci Heap](../../data-structure/fibonacci-heap.py) 优化)
 		- 含负权值加权图的最短路径 - [Bellman-Ford 算法](./bellman-ford.py) (也用于负权环的检测)
 		- Bellman-Ford 算法的应用之一：线性规划问题 - 差分约束系统
 		- 含负权值加权图的最短路径 - SPFA 算法 (在稠密图中 SPFA 效率不如 BF，不过 SPFA 算法实现复杂度低)
@@ -42,7 +42,7 @@ By [YuweiYin](https://github.com/YuweiYin)
 
 从结点 u 到 结点 v 的**最短路径**则定义为任何一条权重为 w(p) = d(u, v) 的从 u 到 v 的路径 p，可能不唯一。
 
-[广度优先搜索 BFS](../graph_basis/graph-basis.py) 就是一个可用于求取最短路径的算法，但是该算法只能用于无权重的图（即每条边的权重都相同）。
+[广度优先搜索 BFS](../graph-basis/graph-basis.py) 就是一个可用于求取最短路径的算法，但是该算法只能用于无权重的图（即每条边的权重都相同）。
 
 ### 最短路径的几个变体
 
@@ -86,7 +86,7 @@ By [YuweiYin](https://github.com/YuweiYin)
 
 通常情况下，不但希望计算出最短路径的总权重值(最优值)，也希望获得该最短路径上的所有结点序列(最优解)。
 
-对最短路径的表示与 [广度优先搜索 BFS](../graph_basis/graph-basis.py) 中的广度优先搜索树类似。给定图 G = (V, E)，对于每个结点 v，维护一个前驱结点 v.p。该前驱结点可能是另一个结点，或者是默认值 nil 空。在算法结束时，将从某个结点 v 开始的前驱结点链 反转过来，就是从源结点 s 到 v 的一条最短路径。
+对最短路径的表示与 [广度优先搜索 BFS](../graph-basis/graph-basis.py) 中的广度优先搜索树类似。给定图 G = (V, E)，对于每个结点 v，维护一个前驱结点 v.p。该前驱结点可能是另一个结点，或者是默认值 nil 空。在算法结束时，将从某个结点 v 开始的前驱结点链 反转过来，就是从源结点 s 到 v 的一条最短路径。
 
 因此，算法结束时，给定结点 v 且 v.p != nil，用广度优先搜索算法中打印广度优先树的 `PRINT_PATH(G, s, v)` 函数就可以打印出从结点 s 到结点 v 的一条最短路径。
 

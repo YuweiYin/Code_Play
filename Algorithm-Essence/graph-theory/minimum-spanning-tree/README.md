@@ -36,7 +36,7 @@ By [YuweiYin](https://github.com/YuweiYin)
 
 ![mst-1](./img/mst-1.png)
 
-解决最小生成树问题的两种常用算法为：Kruskal 算法和 Prim 算法。如果使用普通的[二叉堆](../../data_structure/heap-priority-queue.py)，那么可以将这两个算法的时间复杂度限制在 `O(|E| log |V|)` 的数量级内。如果使用[斐波那契堆](../../data_structure/fibonacci-heap.py)，Prim 算法的运行时间将改善为 `O(|E| + |V| log |V|)`，此运行时间在结点数 `|V|` 远远小于边数 `|E|` 的情况下较好（即稠密图）。
+解决最小生成树问题的两种常用算法为：Kruskal 算法和 Prim 算法。如果使用普通的[二叉堆](../../data-structure/heap-priority-queue.py)，那么可以将这两个算法的时间复杂度限制在 `O(|E| log |V|)` 的数量级内。如果使用[斐波那契堆](../../data-structure/fibonacci-heap.py)，Prim 算法的运行时间将改善为 `O(|E| + |V| log |V|)`，此运行时间在结点数 `|V|` 远远小于边数 `|E|` 的情况下较好（即稠密图）。
 
 这两种算法都是[贪心算法](../../greedy_algorithm/)。贪心算法的每一步都要在多个可能的选择中选择当前最优的一个，这种策略并不一定保证在所有问题中都能获得最优解，但是对于 MST 问题来说，可以证明：某些贪心策略确实能够找到一棵总权重 w(T) 最小的生成树。
 
