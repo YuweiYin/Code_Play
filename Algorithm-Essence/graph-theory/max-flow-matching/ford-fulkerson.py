@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """=================================================
-@Project : algorithm/graph_theory/max_flow
+@Project : algorithm/graph_theory/max_flow_matching
 @File    : ford-fulkerson.py
 @Author  : YuweiYin
 @Date    : 2020-06-03
@@ -15,8 +15,8 @@ import queue
 最大流 Max-Flow
 
 - Ford-Fulkerson 方法
-    - Ford-Fulkerson 算法
-    - Edmonds-Karp 算法
+    - Ford-Fulkerson 算法 O(V |f*|)
+    - Edmonds-Karp 算法 O(V E^2)
 
 参考资料：
 Introduction to Algorithm (aka CLRS) Third Edition - Chapter 26

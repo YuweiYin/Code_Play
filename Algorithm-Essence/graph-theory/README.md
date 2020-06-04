@@ -45,17 +45,22 @@ By [YuweiYin](https://github.com/YuweiYin)
 	- 差分约束系统
 	- 平面点对的最短路径(优化)
 	- 双标准限制最短路径
-- [最大流](./max-flow/)
-	- 增广路->Ford-Fulkerson 算法
-	- 预推流
+- [最大流 Max-Flow](./max-flow-matching/)
+	- Ford-Fulkerson 方法
+	- Push-Relabel 推送-重贴标签方法
+		- Relabel-To-Front 前置重贴标签算法
+	- 结点有容量限制的网络流
+	- 逃逸问题
+	- 最大流的更新
 	- Dinic 算法
 	- 有上下界限制的最大流
-	- 节点有限制的网络流
-	- 无向图最小割->Stoer-Wagner 算法
-	- 有向图和无向图的边不交路径
-	- Ford-Fulkerson 迭加算法
+	- 无向图最小切割 -> Stoer-Wagner 算法
+	- 有向图和无向图的 边不相交路径
 	- 含负费用的最小费用最大流
-- [匹配](./match/)
+- 匹配 Matching
+	- 最大二分匹配
+		- Ford-Fulkerson 最大流方法
+		- Hopcroft-Karp 最大二分匹配算法
 	- Hungary 算法
 	- 最小点覆盖
 	- 最小路径覆盖
@@ -65,6 +70,5 @@ By [YuweiYin](https://github.com/YuweiYin)
 	- 带权二分匹配：KM 算法
 	- 一般图的最大基数匹配
 	- 一般图的赋权匹配问题
-- 拓扑排序
 - 弦图
 - 稳定婚姻问题

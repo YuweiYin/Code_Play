@@ -4,20 +4,35 @@ Programming Practice - ACM Algorithm - Graph Theory
 
 By [YuweiYin](https://github.com/YuweiYin)
 
-**Max-Flow**
+**Max-Flow & Matching**
 
 ## 目录
 
-- 最大流
-	- [Ford-Fulkerson 方法](./ford-fulkerson)
-	- 预推流
+- 最大流 Max-Flow
+	- [Ford-Fulkerson 方法](./ford-fulkerson.py)
+	- [Push-Relabel](./push-relabel.py) 推送-重贴标签方法
+		- Relabel-To-Front 前置重贴标签算法
+	- 结点有容量限制的网络流
+	- 逃逸问题
+	- 最大流的更新
 	- Dinic 算法
 	- 有上下界限制的最大流
-	- 节点有限制的网络流
-	- 无向图最小割 -> Stoer-Wagner 算法
-	- 有向图和无向图的边不交路径
-	- Ford-Fulkerson 迭加算法
+	- 无向图最小切割 -> Stoer-Wagner 算法
+	- 有向图和无向图的 边不相交路径
 	- 含负费用的最小费用最大流
+- 匹配 Matching
+	- 最大二分匹配
+		- Ford-Fulkerson 最大流方法
+		- Hopcroft-Karp 最大二分匹配算法
+	- Hungary 算法
+	- 最小点覆盖
+	- 最小路径覆盖
+	- 最大独立集问题
+	- 二分图最优完备匹配 Kuhn-Munkras 算法
+	- 不带权二分匹配：匈牙利算法
+	- 带权二分匹配：KM 算法
+	- 一般图的最大基数匹配
+	- 一般图的赋权匹配问题
 
 ## 最大流 Max-Flow
 
@@ -110,14 +125,6 @@ $$ |f| = \sum_{v \in V} f(s, v) = \sum_{v \in V} f(v, s) $$
 ![max-flow-4](./img/max-flow-4.png)
 
 因此对于去掉了结点容量的流网络 G' = (V', E') 而言，有 `|V'| = 2 |V|` 且 `|E'| = |E| + |V|`。（这里假定原图的 V 中每个结点都具有结点容量，因此都需拆成两份）
-
-## Ford-Fulkerson 方法
-
-## 最大二分匹配
-
-## 推送-重贴标签算法
-
-## 前置重贴标签算法
 
 ## 参考资料
 
