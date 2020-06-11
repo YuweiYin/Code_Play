@@ -157,7 +157,7 @@ class NumberTheoreticAlgorithm:
         if n == 2:
             # 2 是素数
             return True
-        elif n < 2 or n % 2 == 0:
+        elif n < 2 or not (n & 0x1):
             # 除了 2 自身以外，2 的倍数是合数 (小于 2 的数不是素数，不考虑它们)
             return False
         else:
@@ -177,7 +177,7 @@ class NumberTheoreticAlgorithm:
         if n == 2:
             # 2 是素数
             return True
-        elif n < 2 or n % 2 == 0:
+        elif n < 2 or not (n & 0x1):
             # 除了 2 自身以外，2 的倍数是合数 (小于 2 的数不是素数，不考虑它们)
             return False
         else:
@@ -199,9 +199,11 @@ class NumberTheoreticAlgorithm:
     def witness(self, a, n):
         assert n >= 2
         if n == 2:
+            # 2 为素数
             return False
-        elif n % 2 == 0:
-            return True  # n 为大于 2 的偶数，则必为合数
+        elif not (n & 0x1):
+            # n 为大于 2 的偶数(即二进制末尾为 0)，则必为合数
+            return True
         else:
             # 此时 n 为大于 2 的奇数，故 n-1 是偶数，n-1 的二进制末尾必为 0
             # 构造 u 和 t，使得 t >= 1 且 u 为奇数，并且 n - 1 = u * 2^{t}
@@ -230,7 +232,18 @@ class NumberTheoreticAlgorithm:
             return False
 
     # 整数的(素)因子分解 - Pollard-Rho 启发式算法
+    # 对小于 R 的所有整数进行试除，保证完全获得小于 R^2 的任意数的因子分解
+    # Pollard-Rho 启发式算法用相同的工作量，就能对小于 R^4 的任意数进行因子分解（除非运气不佳，否则可以完成）
+    # 由于该过程仅仅是一种启发式方法，因此既不能保证其运行时间 也不能保证其运行成功，尽管该过程在实际应用中非常有效
+    # Pollard-Rho 启发式算法的另一个优点是：空间复杂度很低
+    # 输入整数 n，输出其素因子结果集合
     def pollard_rho(self, n):
+        res_set = set({})  # 结果集合
+        if n < 2:
+            return res_set
+        elif n == 2:
+            return set(2)
+
         # 初始化 i 为 1，并把 x_1 初始化为整数加群 Z_n 中一个随机值
         i = 1
         x = [0, random.randint(0, n - 1)]  # x[0] 仅作占位
@@ -245,13 +258,32 @@ class NumberTheoreticAlgorithm:
             # 尝试用当前 y 值和 x_i 值 来寻找 n 的素因子
             d = self.iterative_euclid(y - x[i], n)
             if d != 1 and d != n:
-                print(d)
+                # 找到了一个新的素因子，加入结果集合
+                if not (d in res_set):
+                    print(d)
+                    res_set.add(d)
+                    # 检查，如果当前集合中的素因子(的正整数次幂)的乘积恰等于 n，则结束搜索
+                    temp_n = n
+                    for prime in res_set:
+                        # 除以当前素因子 prime 的尽可能多次幂，之后再考虑下一个素因子
+                        while temp_n % prime == 0:
+                            temp_n /= prime
+                    # 如果最后 n 被除为 1，则表示找出了所有素因子
+                    if temp_n == 1:
+                        return res_set
+                    else:
+                        # 如果最后剩余的因子是素数，则将之加入到结果集合中，并返回 res_set
+                        temp_n = int(temp_n)
+                        if self.miller_rabin_prime_test(temp_n, 10):
+                            print(temp_n)
+                            res_set.add(temp_n)
+                            return res_set
             # k 的值保持为 2 的某个幂次，k 的序列为 2, 4, 8, 16, ...
             # 当 i 达到 k 值时，将 x_i 保存在 y 中
             if i == k:
                 # 本来 while 循环需要一直不停地迭代下去，但这里限制循环次数
                 if k >= 0x10000000:
-                    return x
+                    return res_set
                 y = x[i]
                 k <<= 1
 
@@ -364,8 +396,8 @@ def main():
     res_7 = nta.pollard_rho(n)
     end = time.process_time()
 
-    # 输出结果: [19, 73]
-    if isinstance(res_7, list):
+    # 输出结果: {73, 19}
+    if isinstance(res_7, set):
         print(res_7)
     else:
         print('整数的(素)因子分解无解')
