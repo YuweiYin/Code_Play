@@ -776,19 +776,39 @@ class RedBlackTree:
         else:
             return None
 
-    # 找到在 BST 中 node 结点的前驱结点，即：其左子树中的最大值
+    # 找到在 BST 中 node 结点的前驱结点
+    # 如果 node 的左孩子存在，则 node 的前驱就是其左子树中的最大值
+    # 如果 node 的左孩子不存在，则 node 的前驱是其某个祖先结点 a，满足此时 a.right == node
     # 时间复杂度 O(log n) 与树高有关
     def predecessor(self, node):
         if isinstance(node, TreeNode) and node != self.nil:
-            return self.max_bst(node.left)
+            if isinstance(node.left, TreeNode) and node.left != self.nil:
+                return self.max_bst(node.left)
+            else:
+                while node.parent != self.nil:
+                    if node.parent.right == node:
+                        return node.parent
+                    else:
+                        node = node.parent
+                return None
         else:
             return None
 
-    # 找到在 BST 中 node 结点的后继结点，即：其右子树中的最小值
+    # 找到在 BST 中 node 结点的后继结点
+    # 如果 node 的右孩子存在，则 node 的后继就是其右子树中的最小值
+    # 如果 node 的右孩子不存在，则 node 的前驱是其某个祖先结点 a，满足此时 a.left == node
     # 时间复杂度 O(log n) 与树高有关
     def successor(self, node):
         if isinstance(node, TreeNode) and node != self.nil:
-            return self.min_bst(node.right)
+            if isinstance(node.right, TreeNode) and node.right != self.nil:
+                return self.min_bst(node.right)
+            else:
+                while node.parent != self.nil:
+                    if node.parent.left == node:
+                        return node.parent
+                    else:
+                        node = node.parent
+                return None
         else:
             return None
 

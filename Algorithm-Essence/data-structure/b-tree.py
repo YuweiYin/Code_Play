@@ -587,6 +587,8 @@ class BTree:
         return ptr.keys[len(ptr.keys) - 1], ptr.vals[len(ptr.vals) - 1]  # 返回目标 key/val
 
     # 找到在 B-Tree 中结点 node 的关键字 key_index 的前驱结点
+    # 如果 node 的左孩子存在，则 node 的前驱就是其左子树中的最大值
+    # TODO 如果 node 的左孩子不存在，则 node 的前驱是其某个祖先结点 a，满足此时 a.right == node
     # 返回目标结点的 key/val
     # 时间复杂度 O(log n) 与树高有关
     def predecessor(self, node, key_index):
@@ -595,6 +597,8 @@ class BTree:
         return self.max_bst(node.kids[key_index])
 
     # 找到在 B-Tree 中结点 node 的关键字 key_index 的后继结点
+    # 如果 node 的右孩子存在，则 node 的后继就是其右子树中的最小值
+    # TODO 如果 node 的右孩子不存在，则 node 的前驱是其某个祖先结点 a，满足此时 a.left == node
     # 返回目标结点的 key/val
     # 时间复杂度 O(log n) 与树高有关
     def successor(self, node, key_index):
