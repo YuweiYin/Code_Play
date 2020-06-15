@@ -9,15 +9,21 @@
 
 import sys
 import time
+import math
 
 """
 - 计算几何学 Computational Geometry
     - (欧几里得空间)点和线段的构造
-    - 给定两条线段，判断二者是否相交
-    - 给定线段集合，判断其中是否存在相交线段
-    - 给定点集，寻找该点集的凸包 convex hull
-        - (可利用凸包求出该点集的最远点对)
-    - 给定点集，寻找最近点对
+    - 基本几何运算: 对位四则运算、内积、叉积、距离、夹角
+    - 判断线段相交
+        - 给定两条线段，判断二者是否相交
+        - 给定线段集合，判断其中是否存在相交线段
+    - 凸包问题: 给定点集，寻找该点集的凸包 (convex hull)
+        - Graham 扫描法
+        - Jarvis 步进法
+    - 最远/最近点对问题
+        - 给定凸多边形的顶点集合，求出该点集的最远点对: 旋转卡壳算法 (Rotating Calipers)
+        - 给定点集，求出该点集的最近点对
 
 参考资料：
 Introduction to Algorithm (aka CLRS) Third Edition - Chapter 33
@@ -116,6 +122,31 @@ class ComputationalGeometry:
         else:
             print('cross_product: 维度不为 2 或者 3')
             return None
+
+    # 利用叉积公式计算两向量(列表)夹角的正弦值
+    def sin_angle(self, vec_1, vec_2):
+        assert isinstance(vec_1, list) and isinstance(vec_2, list) and len(vec_1) == len(vec_2)
+        cross = self.cross_product(vec_1, vec_2)
+        square_1 = self.inner_product(vec_1, vec_1)
+        square_2 = self.inner_product(vec_2, vec_2)
+        assert square_1 > 0 and square_2 > 0
+        return cross / math.sqrt(square_1 * square_2)
+
+    # 利用内积公式计算两向量(列表)夹角的余弦值
+    def cos_angle(self, vec_1, vec_2):
+        assert isinstance(vec_1, list) and isinstance(vec_2, list) and len(vec_1) == len(vec_2)
+        inner = self.inner_product(vec_1, vec_2)
+        square_1 = self.inner_product(vec_1, vec_1)
+        square_2 = self.inner_product(vec_2, vec_2)
+        assert square_1 > 0 and square_2 > 0
+        return inner / math.sqrt(square_1 * square_2)
+
+    # 在二维欧氏空间中，计算两点距离的平方
+    @staticmethod
+    def point_distance_square_2d(point_1, point_2):
+        assert isinstance(point_1, Point) and isinstance(point_2, Point)
+        assert point_1.dim == point_2.dim == 2
+        return (point_1.vec[0] - point_2.vec[0]) ** 2 + (point_1.vec[1] - point_2.vec[1]) ** 2
 
     # (二维欧氏空间中)给定线段 Segment 结构体 seg，以及 x 坐标，获得该点的 y 坐标
     # 如果 x 坐标越出 seg 范围，则返回 None
@@ -259,7 +290,8 @@ class ComputationalGeometry:
                     above_seg = above_node.seg
                     if self.segments_intersect(ep.seg, above_seg):
                         print('Type-1:')
-                        print('插入端点', ep.point.key, '时，线段', ep.seg.key, '与其上方的线段', above_seg.key, '相交')
+                        print('插入端点', ep.point.key, '时，发现线段', ep.seg.key,
+                              '与其上方的线段', above_seg.key, '相交')
                         return True
                 # 如果后继结点存在，判断两线段是否相交
                 below_node = seg_rbt.below(cur_node)
@@ -267,7 +299,8 @@ class ComputationalGeometry:
                     below_seg = below_node.seg
                     if self.segments_intersect(ep.seg, below_seg):
                         print('Type-2:')
-                        print('插入端点', ep.point.key, '时，线段', ep.seg.key, '与其下方的线段', below_seg.key, '相交')
+                        print('插入端点', ep.point.key, '时，发现线段', ep.seg.key,
+                              '与其下方的线段', below_seg.key, '相交')
                         return True
             # 如果事件点 p 是某线段 s 的右端点，那么会将 s 从完全前序 T 中删除
             #   考虑经过 p 的扫除线所定义的完全前序，如果 s 旁边(ABOVE 或者 BELOW)的线段有相交，则返回 True
@@ -287,7 +320,8 @@ class ComputationalGeometry:
                     below_seg = below_node.seg
                     if self.segments_intersect(above_seg, below_seg):
                         print('Type-3:')
-                        print('删除端点', ep.point.key, '时，线段', above_seg.key, '与其下方的线段', below_seg.key, '相交')
+                        print('删除端点', ep.point.key, '时，发现线段', above_seg.key,
+                              '与其下方的线段', below_seg.key, '相交')
                         return True
                 # 将当前(线段)端点从(红黑树)完全前序 T 中删除
                 seg_rbt.rb_delete(seg_rbt.bst, delete_ep=ep)
@@ -295,26 +329,26 @@ class ComputationalGeometry:
         # 4. 最后，如果在处理完全部 2n 个事件点后没发现存在线段相交，则返回 False
         return False
 
-    # 对端点集合进行二路归并排序
+    # 对端点集合进行二路归并排序(升序)
     def sort_endpoints(self, endpoint_list):
-        self._merge_sort(endpoint_list, 0, len(endpoint_list) - 1)
+        self._endpoints_merge_sort(endpoint_list, 0, len(endpoint_list) - 1)
 
-    # 归并排序
-    def _merge_sort(self, endpoint_list, l, r):
+    # 二路归并排序
+    def _endpoints_merge_sort(self, endpoint_list, l, r):
         # 当待排序数组的左下标等于右下标时为基本情况：
         # 该数组只有一个元素。这自然是已排好序的，无需处理
         if l < r:
             m = int((l + r) >> 1)  # 二路归并
-            self._merge_sort(endpoint_list, l, m)
-            self._merge_sort(endpoint_list, m + 1, r)
-            self._merge(endpoint_list, l, m, r)
+            self._endpoints_merge_sort(endpoint_list, l, m)
+            self._endpoints_merge_sort(endpoint_list, m + 1, r)
+            self._endpoints_merge(endpoint_list, l, m, r)
 
     # 合并
     # 该过程假设子数组 endpoint_list[l..m] 和 endpoint_list[m+1..r] 都已排好序
-    # 合并上述两个子数组为一个排好序的较大数组 seg_list[l..r]
+    # 合并上述两个子数组为一个排好序的较大数组
     # 参数范围 l <= m < r
     @staticmethod
-    def _merge(endpoint_list, l, m, r):
+    def _endpoints_merge(endpoint_list, l, m, r):
         len_sub1 = m - l + 1  # 左子数组的长度
         len_sub2 = r - m      # 右子数组的长度
 
@@ -325,7 +359,7 @@ class ComputationalGeometry:
         aux_right = endpoint_list[m + 1: m + 1 + len_sub2]
 
         # 升序排序(默认)，辅助数组末尾放置哨兵 inf 正无穷
-        inf = 0x3f3f3f3f  # 哨兵数字 inf，用于升序排序。需要比 seg_list 中的所有坐标值都大
+        inf = 0x3f3f3f3f  # 哨兵数字 inf，用于升序排序。需要比所有坐标值都大
         inf_endpoint = Endpoint(key=(inf, inf, inf), point=None, seg=None)
         aux_left.append(inf_endpoint)
         aux_right.append(inf_endpoint)
@@ -363,6 +397,533 @@ class ComputationalGeometry:
                     else:
                         endpoint_list[k] = right_ep
                         j += 1
+
+    # Graham 扫描法 - 给定点集，寻找该点集的凸包 convex hull
+    # (可利用凸包求出该点集的最远点对 - O(n))
+    # 时间复杂度：O(n log n) 其中 n 为点集中的点数目
+    def convex_hull_graham_scan(self, point_list):
+        # 点集 Q 的要求：点数目 >= 3，且至少存在不共线的 3 个点
+        assert isinstance(point_list, list)
+        if len(point_list) < 3:
+            print('输入的点集至少应有 3 个点')
+            return None
+
+        # 1. 选取点 p_0，它是 y 坐标最小的点 (如果有多个极小 y 坐标的点，则选取其中 x 坐标最小的点)
+        #    点 p_0 一定是凸包的一个顶点
+        p_0_index = 0
+        for index, point in enumerate(point_list):
+            assert isinstance(point, Point)
+            if (point.vec[1] < point_list[p_0_index].vec[1]) or \
+                    (point.vec[1] == point_list[p_0_index].vec[1] and point.vec[0] < point_list[p_0_index].vec[0]):
+                p_0_index = index
+        p_0 = point_list.pop(p_0_index)
+        assert isinstance(p_0, Point)
+
+        # 2. 利用叉积方法，求取其它各点相对于 p_0 的极角，并按极角升序(逆时针)排列这些点
+        #    如果存在多个点 相对 p_0 的极角相同，则只保留(欧式)距离 p_0 最远的那一个点
+        n_points = len(point_list)
+        remain_list = [True for _ in range(n_points)]
+        self.sort_polar_angle(p_0, remain_list, point_list)
+        # remain_list[i] == True 表示需保留 point_list[i] 点，否则不保留 (因为存在共线且更远的点)
+        # 此时进行线性扫描，只选 remain_list[i] == True 的那些点
+        ordered_points = []
+        for i in range(n_points):
+            if remain_list[i]:
+                ordered_points.append(point_list[i])
+
+        # 3. 检查剩余的点数目，应至少有 2 个
+        if len(ordered_points) < 2:
+            print('convex hull is empty!')
+            return None
+
+        # 4. 按极角序逐个处理每个点
+        else:
+            # 用 list 模拟栈，先让 p_0、p_1、p_2 入栈
+            stack_list = [p_0, ordered_points[0], ordered_points[1]]
+
+            # 循环处理剩余的每个点
+            for i in range(2, len(ordered_points)):
+                # 按逆时针方向遍历凸包时，理应在每个顶点处向左转
+                # 因此，如果 while 发现在一个顶点处没有左转，就该把此顶点从栈中弹出
+                cur_point = ordered_points[i]
+                while len(stack_list) >= 2:
+                    s_len = len(stack_list)
+                    d = self.direction(stack_list[s_len - 2], stack_list[s_len - 1], cur_point)
+                    # 左转
+                    if d < 0:
+                        break
+                    # 非左转
+                    else:
+                        stack_list.pop()
+                        s_len -= 1
+                stack_list.append(cur_point)
+
+            # 此时 stack_list 是从 p_0 开始按逆时针方向排列的各个凸包顶点
+            return stack_list
+
+    # 对点集 point_list，以 compare_point 为参照点进行极角(升序)排序-二路归并排序
+    def sort_polar_angle(self, compare_point, remain_list, point_list):
+        assert isinstance(compare_point, Point) and isinstance(remain_list, list) and isinstance(point_list, list)
+        self._polar_angle_merge_sort(compare_point, remain_list, point_list, 0, len(point_list) - 1)
+
+    # 二路归并排序
+    def _polar_angle_merge_sort(self, compare_point, remain_list, point_list, l, r):
+        # 当待排序数组的左下标等于右下标时为基本情况：
+        # 该数组只有一个元素。这自然是已排好序的，无需处理
+        if l < r:
+            m = int((l + r) >> 1)  # 二路归并
+            self._polar_angle_merge_sort(compare_point, remain_list, point_list, l, m)
+            self._polar_angle_merge_sort(compare_point, remain_list, point_list, m + 1, r)
+            self._polar_angle_merge(compare_point, remain_list, point_list, l, m, r)
+
+    # 合并 (以 compare_point 为基点，按极角(升序)排序)
+    # remain_list[i] == True 表示需保留 point_list[i] 点，否则不保留 (因为存在共线且更远的点)
+    # 该过程假设子数组 point_list[l..m] 和 point_list[m+1..r] 都已排好序
+    # 合并上述两个子数组为一个排好序的较长数组
+    # 参数范围 l <= m < r
+    def _polar_angle_merge(self, compare_point, remain_list, point_list, l, m, r):
+        len_sub1 = m - l + 1  # 左子数组的长度
+        len_sub2 = r - m  # 右子数组的长度
+
+        # 设置左辅助数组的前 len_sub1 项值为左子数组的值
+        aux_left = point_list[l: l + len_sub1]
+        aux_left_remain = remain_list[l: l + len_sub1]
+
+        # 设置右辅助数组的前 len_sub2 项值为右子数组的值
+        aux_right = point_list[m + 1: m + 1 + len_sub2]
+        aux_right_remain = remain_list[m + 1: m + 1 + len_sub2]
+
+        # 升序排序(默认)，辅助数组末尾放置哨兵 inf 正无穷
+        inf = 0x3f3f3f3f  # 哨兵数字 inf，用于升序排序。需要比所有坐标值都大
+        inf_point = Point(key=inf, vec=[inf, inf])
+        aux_left.append(inf_point)
+        aux_right.append(inf_point)
+
+        # 两个有序数组的合并
+        i = 0
+        j = 0
+        for k in range(l, r + 1):
+            # 获取当前端点
+            left_p = aux_left[i]
+            right_p = aux_right[j]
+            assert isinstance(left_p, Point) and isinstance(right_p, Point)
+            # 某个辅助列表达到末尾
+            if left_p == inf_point:
+                while aux_right[j] != inf_point:
+                    point_list[k] = aux_right[j]
+                    remain_list[k] = aux_right_remain[j]
+                    k += 1
+                    j += 1
+                break
+            if right_p == inf_point:
+                while aux_left[i] != inf_point:
+                    point_list[k] = aux_left[i]
+                    remain_list[k] = aux_left_remain[i]
+                    k += 1
+                    i += 1
+                break
+            # 判断转向，d < 0 表示(相对于 compare_point) right_p 在 left_p 的逆时针方法，所以 left_p 在极角序中更靠前
+            # d > 0 反之。而 d == 0 表示三点共线
+            d = self.direction(compare_point, left_p, right_p)
+            if d < 0:
+                point_list[k] = left_p
+                remain_list[k] = aux_left_remain[i]
+                i += 1
+            elif d > 0:
+                point_list[k] = right_p
+                remain_list[k] = aux_right_remain[j]
+                j += 1
+            # d == 0 表示三点共线，则只按与 compare_point 的距离排序，越远越靠前
+            # 由于此时 left_p 与 right_p 共线，所以判断距离很容易，不用计算平方
+            else:
+                # 计算 x 坐标差距以及 y 坐标差距
+                left_dis_x = abs(left_p.vec[0] - compare_point.vec[0])
+                left_dis_y = abs(left_p.vec[1] - compare_point.vec[1])
+                right_dis_x = abs(right_p.vec[0] - compare_point.vec[0])
+                right_dis_y = abs(right_p.vec[1] - compare_point.vec[1])
+                # 此时选取差距较小的点，并把其 remain 标志位置为 False (排序之后的线性扫描会扔弃这些点)
+                remain_list[k] = False
+                if left_dis_x < right_dis_x:
+                    point_list[k] = left_p
+                    i += 1
+                elif left_dis_x > right_dis_x:
+                    point_list[k] = right_p
+                    j += 1
+                # 如果 x 坐标差距相同，则比较 y 坐标差距
+                else:
+                    if left_dis_y <= right_dis_y:
+                        point_list[k] = left_p
+                        i += 1
+                    else:
+                        point_list[k] = right_p
+                        j += 1
+
+    # Jarvis 步进法 - 给定点集，寻找该点集的凸包 convex hull
+    # 点集 Q 的要求：点数目 >= 3，且至少存在不共线的 3 个点
+    # (可利用凸包求出该点集的最远点对 - O(n))
+    # 时间复杂度：O(nh) 其中 h 为凸包的顶点数目
+    def convex_hull_jarvis_march(self, point_list):
+        # 点集 Q 的要求：点数目 >= 3，且至少存在不共线的 3 个点
+        assert isinstance(point_list, list)
+        if len(point_list) < 3:
+            print('输入的点集至少应有 3 个点')
+            return None
+
+        # 1. 选取点 p_0，它是 y 坐标最小的点 (如果有多个极小 y 坐标的点，则选取其中 x 坐标最小的点)
+        #    点 p_0 一定是凸包的一个顶点
+        p_0_index = 0
+        for index, point in enumerate(point_list):
+            assert isinstance(point, Point)
+            if (point.vec[1] < point_list[p_0_index].vec[1]) or \
+                    (point.vec[1] == point_list[p_0_index].vec[1] and point.vec[0] < point_list[p_0_index].vec[0]):
+                p_0_index = index
+        p_0 = point_list[p_0_index]
+        assert isinstance(p_0, Point)
+
+        # 2. 循环过程中，每次选取一个点作为凸包的顶点，该点相对于前一个选出的点 具有最小的极角
+        #    循环从 p_0 开始，直至回到 p_0 为止。用极角的余弦值来比较极角的大小，余弦值越大、极角越小
+        #    由于对于凸包的每条边来说，凸包的点都仅位于此边的一侧，所以极角取值范围为 [0, \pi]，因此余弦值从 1 降至 -1
+        vertex_list = [p_0]  # p_0 必选
+        first_flag = True    # 初次选取标志
+        while True:
+            # 2.1.1 首次选取需与向量 [0, 1] 夹角最小
+            if first_flag:
+                first_flag = False  # 去除首次循环标志
+                p_i = p_0
+                p_j = Point(key='first', vec=[p_0.vec[0] + 1, p_0.vec[1]])
+                vec_x = [1, 0]
+            # 2.1.2. 之后的每次选取点，需与 vertex_list 中最末两点形成的向量 pi pj 的夹角最小
+            else:
+                p_i = vertex_list[len(vertex_list) - 2]
+                p_j = vertex_list[len(vertex_list) - 1]
+                vec_x = [p_j.vec[0] - p_i.vec[0], p_j.vec[1] - p_i.vec[1]]
+
+            # 2.2. min_point: 当前选择的最小极角的点 (不能选取 p_i 或 p_j)
+            first_index = 0
+            while point_list[first_index] == p_i or point_list[first_index] == p_j:
+                first_index += 1
+            min_point = point_list[first_index]
+
+            # 2.3. min_angle: 当前选择的最小极角(余弦值的平方)
+            # 由于对于凸包的每条边来说，凸包的点都仅位于此边的一侧，所以极角取值范围为 [0, \pi]，因此余弦值从 1 降至 -1
+            cur_vec = [min_point.vec[0] - p_j.vec[0], min_point.vec[1] - p_j.vec[1]]
+            min_cos_angle = self.cos_angle(vec_x, cur_vec)
+
+            # 2.4. 进行选取
+            for i in range(len(point_list)):
+                cur_point = point_list[i]
+                # 每次选取不考虑 p_i 和 p_j 和 min_point
+                if cur_point == p_i or cur_point == p_j or cur_point == min_point:
+                    continue
+
+                # 利用内积公式求夹角的余弦值
+                cur_vec = [cur_point.vec[0] - p_j.vec[0], cur_point.vec[1] - p_j.vec[1]]
+                cur_cos = self.cos_angle(vec_x, cur_vec)  # 余弦值
+                assert -1 <= cur_cos <= 1
+                if cur_cos > min_cos_angle:
+                    min_cos_angle = cur_cos
+                    min_point = cur_point
+
+            # 2.5. 如果当前选出的点是 p_0，则结束凸包选取，否则把新选出的顶点加入 vertex_list 列表
+            assert isinstance(min_point, Point)
+            if min_point == p_0:
+                break
+            else:
+                vertex_list.append(min_point)
+
+        # 3. 此时 vertex_list 是从 p_0 开始按逆时针方向排列的各个凸包顶点
+        return vertex_list
+
+    # 旋转卡壳 (Rotating Calipers) 算法 - 给定凸多边形，求其最远点对
+    # 输入：凸包的顶点集 vertex_list
+    # 输出：最远点对
+    # 时间复杂度：O(n)
+    def rotating_calipers(self, vertex_list):
+        assert isinstance(vertex_list, list)
+        n_vertex = len(vertex_list)
+        # 0. 边界情况
+        if n_vertex < 2:
+            print('输入的顶点不足 2 个')
+            return None, None
+        if n_vertex == 2:
+            print('输入的顶点仅有 2 个')
+            return vertex_list[0], vertex_list[1]
+
+        # 1. 记录 Point 对象到 vertex_list 下标的映射
+        point2index = dict({})
+        for index, point in enumerate(vertex_list):
+            point2index[point] = index
+
+        # 2.1. 初次选取：默认 vertex_list 是从某点开始 按逆时针方向排列的各个凸包顶点
+        p_i, p_next_i, p_j = vertex_list[0], vertex_list[1], vertex_list[2]
+        assert isinstance(p_i, Point) and isinstance(p_next_i, Point) and isinstance(p_j, Point)
+
+        # 2.2. 初次选取：找出离 p0 pi 最远的顶点 (最远，即形成的平行四边形面积最大，也即叉积值最大)
+        max_pair = (p_i, p_j)
+        max_cross = self.cross_product(
+            self.vector_operation_by_ele(p_next_i.vec, p_i.vec, func=lambda x, y: x - y),
+            self.vector_operation_by_ele(p_j.vec, p_next_i.vec, func=lambda x, y: x - y))
+        max_cross = abs(max_cross)
+
+        # 2.3. 初次选取：考察除了 p_0, p_i, p_j 外的各个点
+        for i in range(n_vertex):
+            cur_v = vertex_list[i]
+            assert isinstance(cur_v, Point)
+            if cur_v == p_i or cur_v == p_next_i or cur_v == p_j:
+                continue
+
+            cur_cross = self.cross_product(
+                self.vector_operation_by_ele(p_next_i.vec, p_i.vec, func=lambda x, y: x - y),
+                self.vector_operation_by_ele(cur_v.vec, p_next_i.vec, func=lambda x, y: x - y))
+            cur_cross = abs(cur_cross)
+            if cur_cross > max_cross:
+                max_cross = cur_cross
+                max_pair = (p_i, cur_v)
+
+        # 3. 如果所有点均共线
+        if max_cross == 0:
+            print('凸多边形所有点共线，形成的面积为 0')
+            return max_pair
+
+        # 4. 旋转卡壳 - 循环 n 次，n 为顶点数(也为边数)
+        # 用平行于 p0 pi 的两条边 (包含 p0 pi) "夹住"凸包，初始在边 p0 pi 处 "卡壳"
+        # 随后逆时针旋转平行边 (因为默认 vertex_list 是凸包顶点的逆时针序)，想象循转过程中保持夹紧凸包
+        # 每次旋转结束后，其中(至少)一条平行边会与凸包的某条边平行，然后考察此边的两端点与对点的距离
+        # 当前卡壳的边的两个端点 (也是凸包的两个顶点) 是 p_i 和 p_next_i
+        # 当前卡壳边的对点为 p_j, 而 p_i 和 p_j 形成转动的主轴
+        # 总共循转 n 次，每次循环会计算 2 次余弦值、2 次点对距离(的平方)
+        p_i, p_j = max_pair[0], max_pair[1]
+        max_dis = self.point_distance_square_2d(p_i, p_j)
+        cur_calipers = True  # True 表示当前卡壳的边是 p_i p_next_i, 否则为 p_j p_next_j
+        for i in range(n_vertex):
+            # next_i 是 p_i 逆时针的下一个顶点下标
+            next_i = (point2index[p_i] + 1) % n_vertex
+            p_next_i = vertex_list[next_i]
+            # next_i 是 p_j 逆时针的下一个顶点下标
+            next_j = (point2index[p_j] + 1) % n_vertex
+            p_next_j = vertex_list[next_j]
+            assert isinstance(p_next_i, Point) and isinstance(p_next_j, Point)
+
+            # 4.1. 如果当前卡壳的边是 p_i p_next_i
+            if cur_calipers:
+                # vec_x 是卡壳边的正向向量, vec_x_reverse 是卡壳边的反向向量
+                vec_x = [p_next_i.vec[0] - p_i.vec[0], p_next_i.vec[1] - p_i.vec[1]]
+                vec_x_reverse = [p_i.vec[0] - p_next_i.vec[0], p_i.vec[1] - p_next_i.vec[1]]
+                # 根据夹角大小，判断下一次旋转卡壳时的边，是 p_next_i p_next_next_i 还是 p_j p_next_j
+                next_next_i = (next_i + 1) % n_vertex
+                p_next_next_i = vertex_list[next_next_i]
+                assert isinstance(p_next_next_i, Point)
+
+                # 计算夹角的余弦值，值越大、夹角越小、对应的边越快卡壳
+                # 由于对于凸包的每条边来说，凸包的点都仅位于此边的一侧，所以极角取值范围为 [0, \pi]，因此余弦值从 1 降至 -1
+                cos_angle_i = self.cos_angle(
+                    vec_x, [p_next_next_i.vec[0] - p_next_i.vec[0], p_next_next_i.vec[1] - p_next_i.vec[1]])
+                cos_angle_j = self.cos_angle(
+                    vec_x_reverse, [p_next_j.vec[0] - p_j.vec[0], p_next_j.vec[1] - p_j.vec[1]])
+
+                # case 1: 如果下次 p_next_i p_next_next_i 卡壳 (还是 i 卡壳)
+                if cos_angle_i > cos_angle_j:
+                    cur_calipers = True
+                    # 以 p_next_i p_next_next_i 为卡壳边，以 p_j 为对点，计算距离
+                    cur_dis_1 = self.point_distance_square_2d(p_j, p_next_i)
+                    cur_dis_2 = self.point_distance_square_2d(p_j, p_next_next_i)
+                    if cur_dis_1 > max_dis:
+                        max_dis = cur_dis_1
+                        max_pair = (p_next_i, p_j)
+                    if cur_dis_2 > max_dis:
+                        max_dis = cur_dis_2
+                        max_pair = (p_next_next_i, p_j)
+
+                # case 2: 如果下次 p_j p_next_j 卡壳 (改成了 j 卡壳)
+                else:
+                    cur_calipers = False
+                    # 以 p_j p_next_j 为卡壳边，以 p_next_i 为对点，计算距离
+                    cur_dis_1 = self.point_distance_square_2d(p_next_i, p_j)
+                    cur_dis_2 = self.point_distance_square_2d(p_next_i, p_next_j)
+                    if cur_dis_1 > max_dis:
+                        max_dis = cur_dis_1
+                        max_pair = (p_next_i, p_j)
+                    if cur_dis_2 > max_dis:
+                        max_dis = cur_dis_2
+                        max_pair = (p_next_i, p_next_j)
+
+                # 更新移动(旋转)，原来的卡壳必然不会再卡壳，所以卡壳边的起点 p_i 要移动至下一个
+                p_i = p_next_i
+            # 4.2. 如果当前卡壳的边是 p_j p_next_j
+            else:
+                # vec_x 是卡壳边的正向向量, vec_x_reverse 是卡壳边的反向向量
+                vec_x = [p_next_j.vec[0] - p_j.vec[0], p_next_j.vec[1] - p_j.vec[1]]
+                vec_x_reverse = [p_j.vec[0] - p_next_j.vec[0], p_j.vec[1] - p_next_j.vec[1]]
+                # 根据夹角大小，判断下一次旋转卡壳时的边，是 p_i p_next_i 还是 p_next_j p_next_next_j
+                next_next_j = (next_j + 1) % n_vertex
+                p_next_next_j = vertex_list[next_next_j]
+
+                # 计算夹角的余弦值，值越大、夹角越小、对应的边越快卡壳
+                # 由于对于凸包的每条边来说，凸包的点都仅位于此边的一侧，所以极角取值范围为 [0, \pi]，因此余弦值从 1 降至 -1
+                cos_angle_i = self.cos_angle(
+                    vec_x, [p_next_i.vec[0] - p_i.vec[0], p_next_i.vec[1] - p_i.vec[1]])
+                cos_angle_j = self.cos_angle(
+                    vec_x_reverse, [p_next_next_j.vec[0] - p_next_j.vec[0], p_next_next_j.vec[1] - p_next_j.vec[1]])
+
+                # case 3: 如果下次 p_i p_next_i 卡壳 (改成了 i 卡壳)
+                if cos_angle_i > cos_angle_j:
+                    cur_calipers = True
+                    # 以 p_i p_next_i 为卡壳边，以 p_next_j 为对点，计算距离
+                    cur_dis_1 = self.point_distance_square_2d(p_next_j, p_i)
+                    cur_dis_2 = self.point_distance_square_2d(p_next_j, p_next_i)
+                    if cur_dis_1 > max_dis:
+                        max_dis = cur_dis_1
+                        max_pair = (p_i, p_next_j)
+                    if cur_dis_2 > max_dis:
+                        max_dis = cur_dis_2
+                        max_pair = (p_next_i, p_next_j)
+
+                # case 4: 如果下次 p_next_j p_next_next_j 卡壳 (还是 j 卡壳)
+                else:
+                    cur_calipers = False
+                    # 以 p_next_j p_next_next_j 为卡壳边，以 p_i 为对点，计算距离
+                    cur_dis_1 = self.point_distance_square_2d(p_i, p_next_j)
+                    cur_dis_2 = self.point_distance_square_2d(p_i, p_next_next_j)
+                    if cur_dis_1 > max_dis:
+                        max_dis = cur_dis_1
+                        max_pair = (p_i, p_next_j)
+                    if cur_dis_2 > max_dis:
+                        max_dis = cur_dis_2
+                        max_pair = (p_i, p_next_next_j)
+
+                # 更新移动(旋转)，原来的卡壳必然不会再卡壳，所以卡壳边的起点 p_i 要移动至下一个
+                p_j = p_next_j
+
+        # 5. 返回最大距离的点对 (tuple)
+        return max_pair
+
+    # 给定点集，求出该点集的最近点对 (二维欧氏空间 - 平面)
+    # 输入：点集 point_list
+    # 输出：最近点对 及其距离
+    # 时间复杂度：O(n log n)
+    def nearest_point_pair(self, point_list):
+        assert isinstance(point_list, list)
+        n_points = len(point_list)
+        # 边界情况
+        if n_points < 2:
+            print('输入的点不足 2 个')
+            return None, None
+        if n_points == 2:
+            print('输入的点仅有 2 个')
+            return point_list[0], point_list[1]
+        if n_points == 3:
+            print('输入的点仅有 3 个')
+            dis_1 = self.point_distance_square_2d(point_list[0], point_list[1])
+            dis_2 = self.point_distance_square_2d(point_list[0], point_list[2])
+            dis_3 = self.point_distance_square_2d(point_list[1], point_list[2])
+            min_dis = min(dis_1, dis_2, dis_3)
+            if dis_1 == min_dis:
+                return point_list[0], point_list[1]
+            if dis_2 == min_dis:
+                return point_list[0], point_list[2]
+            if dis_3 == min_dis:
+                return point_list[1], point_list[2]
+
+        # 预排序
+        x_sorted_list = sorted(point_list, key=lambda x: x.vec[0])  # point_list 中的所有点按 x 坐标排序
+        y_sorted_list = sorted(point_list, key=lambda x: x.vec[1])  # point_list 中的所有点按 y 坐标排序
+
+        # 分治法初始调用
+        p_1, p_2, dis = self.nearest_point_pair_split(point_list, x_sorted_list, y_sorted_list)
+        return p_1, p_2, dis
+
+    # 分治法
+    # 输入：point_list 点集、x_sorted_list 按 x 坐标升序排列的点集、y_sorted_list 按 y 坐标升序排列的点集
+    # 输出：当前子问题下的最近点对 及其距离
+    def nearest_point_pair_split(self, point_list, x_sorted_list, y_sorted_list):
+        assert isinstance(point_list, list) and isinstance(x_sorted_list, list) and isinstance(y_sorted_list, list)
+        n_points = len(point_list)
+        assert len(x_sorted_list) == len(y_sorted_list) == n_points
+        assert n_points >= 2
+        # 1. 基本情况
+        if n_points == 2:
+            dis = self.point_distance_square_2d(point_list[0], point_list[1])
+            return point_list[0], point_list[1], dis
+        if n_points == 3:
+            dis_1 = self.point_distance_square_2d(point_list[0], point_list[1])
+            dis_2 = self.point_distance_square_2d(point_list[0], point_list[2])
+            dis_3 = self.point_distance_square_2d(point_list[1], point_list[2])
+            min_dis = min(dis_1, dis_2, dis_3)
+            if dis_1 == min_dis:
+                return point_list[0], point_list[1], min_dis
+            if dis_2 == min_dis:
+                return point_list[0], point_list[2], min_dis
+            if dis_3 == min_dis:
+                return point_list[1], point_list[2], min_dis
+
+        # 2. 分解子问题：选取一个垂直线 l: x = x_0，将 point_list 分为两个集合 Pl 和 Pr
+        #    Pl 中的所有点的 x 坐标小于等于 x_0，而 Pr 中的所有点的 x 坐标大于等于 x_0
+        #    并且集合 Pl 的秩是 len(point_list) / 2 上取整，而 Pr 的秩是 len(point_list) / 2 下取整
+        #    首先切分 x_sorted_list
+        right_len = len(x_sorted_list) >> 1
+        left_len = len(x_sorted_list) - right_len
+        left_x_sorted_list = x_sorted_list[:left_len]
+        right_x_sorted_list = x_sorted_list[left_len:]
+        mid_point = left_x_sorted_list[left_len - 1]
+        # 用字典记录属于左侧的点
+        is_left = dict({})
+        for point in left_x_sorted_list:
+            is_left[point] = True
+        # 然后根据 is_left 切分 point_list 和 y_sorted_list
+        left_point_list = []
+        right_point_list = []
+        left_y_sorted_list = []
+        right_y_sorted_list = []
+        for point in y_sorted_list:
+            if point in is_left:
+                left_y_sorted_list.append(point)
+                left_point_list.append(point)
+            else:
+                right_y_sorted_list.append(point)
+                right_point_list.append(point)
+
+        # 3. 递归调用、解决子问题
+        left_p_1, left_p_2, left_dis = self.nearest_point_pair_split(
+            left_point_list, left_x_sorted_list, left_y_sorted_list)
+        right_p_1, right_p_2, right_dis = self.nearest_point_pair_split(
+            right_point_list, right_x_sorted_list, right_y_sorted_list)
+
+        if left_dis <= right_dis:
+            min_dis = left_dis
+            min_points = (left_p_1, left_p_2)
+        else:
+            min_dis = right_dis
+            min_points = (right_p_1, right_p_2)
+
+        # 4. 合并结果
+        #    检查最短点对是否为跨越 left 和 right 区域的点对
+        #    先创建新 list，仅保留 y_sorted_list 在中心线左右 min_dis 区域内的点
+        assert isinstance(mid_point, Point)
+        mid_x = mid_point.vec[0]
+        l_bound = mid_x - min_dis
+        r_bound = mid_x + min_dis
+        new_y_sorted_list = []  # 这个 list 也是按 y 坐标的升序排列的
+        for point in y_sorted_list:
+            if l_bound <= point.vec[0] <= r_bound:
+                new_y_sorted_list.append(point)
+
+        # 如果在区域内的点不足 2 个，则无需考虑跨越的情况
+        new_y_len = len(new_y_sorted_list)
+        if new_y_len < 2:
+            return min_points[0], min_points[1], min_dis
+
+        # 然后对于 new_y_sorted_list 中的每个点 p 进行处理
+        for i, point in enumerate(new_y_sorted_list):
+            # 计算 p 与紧随其后的(至多) 7 个点的距离，记录最近点对及其距离
+            for j in range(i + 1, min(new_y_len, i + 8)):
+                next_p = new_y_sorted_list[j]
+                cur_dis = self.point_distance_square_2d(point, next_p)
+                if cur_dis < min_dis:
+                    min_dis = cur_dis
+                    min_points = (point, next_p)
+
+        # 5. 返回合并结果
+        return min_points[0], min_points[1], min_dis
 
 
 # 红黑树的树结点
@@ -1252,6 +1813,96 @@ def main():
         print('Yes! 线段集合中存在两线段相交')
     else:
         print('No! 线段集合中不存在两线段相交')
+    print('Running Time: %.5f ms' % ((end - start) * 1000))
+
+    # Graham 扫描法 - 给定点集，寻找该点集的凸包 convex hull
+    print('\nGraham 扫描法 - 给定点集，寻找该点集的凸包:')
+    # 仿照《CLRS》Chapter 33 的图 33-7
+    p_0 = Point(vec=[1, 1], key='p_0', val=0)  # p_0 起始扫描点
+    p_1 = Point(vec=[10, 1], key='p_1', val=100)
+    p_2 = Point(vec=[9, 2], key='p_2', val=200)
+    p_3 = Point(vec=[12, 3], key='p_3', val=300)
+    p_4 = Point(vec=[8, 3], key='p_4', val=400)
+    p_5 = Point(vec=[8, 4], key='p_5', val=500)
+    p_6 = Point(vec=[6, 5], key='p_6', val=600)
+    p_7 = Point(vec=[5, 5], key='p_7', val=700)
+    p_8 = Point(vec=[3, 4], key='p_8', val=800)
+    p_9 = Point(vec=[3, 5], key='p_9', val=900)
+    p_10 = Point(vec=[2, 9], key='p_10', val=1000)
+    p_11 = Point(vec=[1, 5], key='p_11', val=1100)
+    p_12 = Point(vec=[0, 4], key='p_12', val=1200)
+    p_13 = Point(vec=[1, 3], key='p_13', val=1300)  # 相对于 p_0，与 p_11 共线，但 p_11 更远，所以不选 p_13
+    # point_list = [p_0, p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10, p_11, p_12, p_13]
+    # 刻意打乱顺序
+    point_list = [p_8, p_3, p_12, p_0, p_4, p_2, p_5, p_10, p_13, p_11, p_1, p_6, p_9, p_7]
+
+    start = time.process_time()
+    res_3 = cg.convex_hull_graham_scan(point_list)
+    end = time.process_time()
+
+    # 输出结果: [p_0, p_1, p_3, p_10, p_12]
+    if isinstance(res_3, list):
+        print('Yes! Graham 扫描法 找到了点集的凸包')
+        for point in res_3:
+            print(point)
+    else:
+        print('No! Graham 扫描法 找不到点集的凸包')
+    print('Running Time: %.5f ms' % ((end - start) * 1000))
+
+    # Jarvis 步进法 - 给定点集，寻找该点集的凸包 convex hull
+    print('\nJarvis 步进法 - 给定点集，寻找该点集的凸包:')
+    # point_list = [p_0, p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10, p_11, p_12, p_13]
+    # 刻意打乱顺序
+    point_list = [p_8, p_3, p_12, p_0, p_4, p_2, p_5, p_10, p_13, p_11, p_1, p_6, p_9, p_7]
+
+    start = time.process_time()
+    res_4 = cg.convex_hull_jarvis_march(point_list)
+    end = time.process_time()
+
+    # 输出结果: [p_0, p_1, p_3, p_10, p_12]
+    if isinstance(res_4, list):
+        print('Yes! Jarvis 步进法 找到了点集的凸包')
+        for point in res_4:
+            print(point)
+    else:
+        print('No! Jarvis 步进法 找不到点集的凸包')
+    print('Running Time: %.5f ms' % ((end - start) * 1000))
+
+    # 旋转卡壳 (Rotating Calipers) 算法 - 给定凸多边形，求其最远点对
+    print('\n旋转卡壳 (Rotating Calipers) 算法 - 给定凸多边形，求其最远点对:')
+    vertex_list = res_4
+
+    start = time.process_time()
+    res_5 = cg.rotating_calipers(vertex_list)
+    end = time.process_time()
+
+    # 输出结果: (p_3, p_12)
+    if isinstance(res_5, tuple):
+        print('Yes! 旋转卡壳算法 找到了最远点对')
+        for point in res_5:
+            print(point)
+        print('两点的距离平方为:', cg.point_distance_square_2d(res_5[0], res_5[1]))
+    else:
+        print('No! 旋转卡壳算法 找不到最远点对')
+    print('Running Time: %.5f ms' % ((end - start) * 1000))
+
+    # 给定点集，求出该点集的最近点对
+    print('\n给定点集，求出该点集的最近点对:')
+    p_14 = Point(vec=[8.5, 3], key='p_14', val=1400)  # 该点与 p_4 的距离为 0.5 最近
+    point_list = [p_8, p_3, p_12, p_0, p_4, p_2, p_5, p_10, p_13, p_11, p_1, p_6, p_9, p_7, p_14]
+
+    start = time.process_time()
+    res_p_1, res_p_2, res_dis = cg.nearest_point_pair(point_list)
+    end = time.process_time()
+
+    # 输出结果: p_4, p_14, 0.25
+    if isinstance(res_p_1, Point) and isinstance(res_p_2, Point):
+        print('Yes! 找到了最近点对')
+        print(res_p_1)
+        print(res_p_2)
+        print('最短距离的平方:', res_dis)
+    else:
+        print('No! 找不到最近点对')
     print('Running Time: %.5f ms' % ((end - start) * 1000))
 
 
