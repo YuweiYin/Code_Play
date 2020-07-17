@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : binary-indexed-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-02
 =================================================="""
 
 import sys

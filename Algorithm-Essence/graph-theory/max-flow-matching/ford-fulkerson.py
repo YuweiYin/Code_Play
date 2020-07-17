@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/max_flow_matching
 @File    : ford-fulkerson.py
 @Author  : YuweiYin
-@Date    : 2020-06-03
 =================================================="""
 
 import sys

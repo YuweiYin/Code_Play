@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : bucket-sort.py
 @Author  : YuweiYin
-@Date    : 2020-05-11
 =================================================="""
 
 import sys

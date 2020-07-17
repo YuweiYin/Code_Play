@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : segment-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-01
 =================================================="""
 
 import sys

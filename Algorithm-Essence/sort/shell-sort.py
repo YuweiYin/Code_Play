@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : shell-sort.py
 @Author  : YuweiYin
-@Date    : 2020-05-16
 =================================================="""
 
 import sys

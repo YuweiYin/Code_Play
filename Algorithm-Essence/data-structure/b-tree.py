@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : b-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-16
 =================================================="""
 
 # import gc

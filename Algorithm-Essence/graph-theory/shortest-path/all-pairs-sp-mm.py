@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/shortest_path
 @File    : all-pairs-sp-mm.py
 @Author  : YuweiYin
-@Date    : 2020-06-01
 =================================================="""
 
 import sys

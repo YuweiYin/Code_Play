@@ -4,7 +4,6 @@
 @Project : algorithm/other-topics/string-matching
 @File    : string-algorithm.py
 @Author  : YuweiYin
-@Date    : 2020-06-11
 =================================================="""
 
 import sys

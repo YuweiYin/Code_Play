@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : red-black-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-06
 =================================================="""
 
 # import gc

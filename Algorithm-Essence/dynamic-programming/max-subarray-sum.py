@@ -4,7 +4,6 @@
 @Project : algorithm/dynamic_programming
 @File    : max-subarray-sum.py
 @Author  : YuweiYin
-@Date    : 2020-05-20
 =================================================="""
 
 import sys

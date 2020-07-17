@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : order-statistic-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-24
 =================================================="""
 
 # import gc

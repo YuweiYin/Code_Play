@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : van-emde-boas-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-19
 =================================================="""
 
 # import gc

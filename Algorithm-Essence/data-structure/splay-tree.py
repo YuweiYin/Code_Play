@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : splay-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-09
 =================================================="""
 
 # import gc

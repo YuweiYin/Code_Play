@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : avl-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-05
 =================================================="""
 
 # import gc

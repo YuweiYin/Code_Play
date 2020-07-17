@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : counting-sort.py
 @Author  : YuweiYin
-@Date    : 2020-05-10
 =================================================="""
 
 import sys

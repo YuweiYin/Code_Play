@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : skip-list.py
 @Author  : YuweiYin
-@Date    : 2020-05-09
 =================================================="""
 
 # import gc

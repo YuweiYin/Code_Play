@@ -4,7 +4,6 @@
 @Project : algorithm/mathematics/probability_statistics
 @File    : hiring.py
 @Author  : YuweiYin
-@Date    : 2020-05-23
 =================================================="""
 
 import sys

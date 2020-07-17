@@ -13,7 +13,7 @@ By [YuweiYin](https://github.com/YuweiYin)
 - [动态规划 Dynamic Programming](./dynamic_programming/)
 - [图论 Graph Theory](./graph_theory/)
 - [数学 Mathematics](./mathematics/)
-
+- [其它主题 Other Topics](./other-topics/)
 
 ## 1. 算法
 
@@ -81,13 +81,13 @@ By [YuweiYin](https://github.com/YuweiYin)
 
 由于数据的输入规模 n 往往是一个自然数，因此用来描述算法渐近运行时间的记号是根据定义域为自然数集 N = {0, 1, 2, ...} 的函数来定义的。渐近记号除去了算法运行时间函数的某些细节（低阶项、最高阶项的系数）。
 
-$ \Theta $ 、O、o、$ \Omega $、$ \omega $ 记号，分别表达**渐近紧确界** (Asymptotically Tight Bound)、渐近上界、非紧确渐近上界、渐近下界、非紧确渐近下界。
+$\Theta$ 、O、o、$\Omega$、$\omega$ 记号，分别表达**渐近紧确界** (Asymptotically Tight Bound)、渐近上界、非紧确渐近上界、渐近下界、非紧确渐近下界。
 
-- $ \Theta(g(n)) $ = {f(n): 存在某正常数 c1, c2 和 n0，使得对所有的 n >= n0，有 0 <= c1 g(n) <= f(n) <= c2 g(n)}
+- $\Theta(g(n))$ = {f(n): 存在某正常数 c1, c2 和 n0，使得对所有的 n >= n0，有 0 <= c1 g(n) <= f(n) <= c2 g(n)}
 - O(g(n)) = {f(n): 存在某正常数 c 和 n0，使得对所有的 n >= n0，有 0 <= f(n) <= c g(n)}
 - o(g(n)) = {f(n): 存在某正常数 c 和 n0，使得对所有的 n >= n0，有 0 <= f(n) < c g(n)}
-- $ \Omega(g(n)) $ = {f(n): 存在某正常数 c1 和 n0，使得对所有的 n >= n0，有 0 <= c g(n) <= f(n)}
-- $ \omega(g(n)) $ = {f(n): 存在某正常数 c1 和 n0，使得对所有的 n >= n0，有 0 <= c g(n) < f(n)}
+- $\Omega(g(n))$ = {f(n): 存在某正常数 c1 和 n0，使得对所有的 n >= n0，有 0 <= c g(n) <= f(n)}
+- $\omega(g(n))$ = {f(n): 存在某正常数 c1 和 n0，使得对所有的 n >= n0，有 0 <= c g(n) < f(n)}
 
 ![alg-0](./img/alg-0.png)
 
@@ -95,44 +95,44 @@ $ \Theta $ 、O、o、$ \Omega $、$ \omega $ 记号，分别表达**渐近紧�
 
 **传递性**
 
-- f(n) = $ \Theta(g(n)) $ 且 g(n) = $ \Theta(h(n)) $ 蕴含 f(n) = $ \Theta(h(n)) $
+- f(n) = $\Theta(g(n))$ 且 g(n) = $\Theta(h(n))$ 蕴含 f(n) = $\Theta(h(n))$
 - f(n) = O(g(n)) 且 g(n) = O(h(n)) 蕴含 f(n) = O(h(n))
 - f(n) = o(g(n)) 且 g(n) = o(h(n)) 蕴含 f(n) = o(h(n))
-- f(n) = $ \Omega(g(n)) $ 且 g(n) = $ \Omega(h(n)) $ 蕴含 f(n) = $ \Omega(h(n)) $
-- f(n) = $ \omega(g(n)) $ 且 g(n) = $ \omega(h(n)) $ 蕴含 f(n) = $ \omega(h(n)) $
+- f(n) = $\Omega(g(n))$ 且 g(n) = $\Omega(h(n))$ 蕴含 f(n) = $\Omega(h(n))$
+- f(n) = $\omega(g(n))$ 且 g(n) = $\omega(h(n))$ 蕴含 f(n) = $\omega(h(n))$
 
 **自反性**
 
-- f(n) = $ \Theta(f(n)) $
+- f(n) = $\Theta(f(n))$
 - f(n) = O(f(n))
-- f(n) = $ \Omega(f(n)) $
+- f(n) = $\Omega(f(n))$
 
 **对称性**
 
-- f(n) = $ \Theta(g(n)) $ 当且仅当 g(n) = $ \Theta(f(n)) $
+- f(n) = $\Theta(g(n))$ 当且仅当 g(n) = $\Theta(f(n))$
 
 **转置对称性**
 
-- f(n) = O(g(n)) 当且仅当 g(n) = $ \Omega(f(n)) $
-- f(n) = o(g(n)) 当且仅当 g(n) = $ \omega(f(n)) $
+- f(n) = O(g(n)) 当且仅当 g(n) = $\Omega(f(n))$
+- f(n) = o(g(n)) 当且仅当 g(n) = $\omega(f(n))$
 
 **三歧性**
 
 对任意两个实数 a 和 b，下列三种情况**恰有** (有且仅有) 一种成立：a < b; a = b; a > b。
 
-虽然任意两个实数都可以进行比较（实数上的序关系是全序关系），但不是所有函数都可以渐近比较。即：对两个函数 f(n) 和 g(n) 而言，可能 f(n) = O(g(n)) 和 f(n) = $ \Omega(g(n)) $ 均不成立。
+虽然任意两个实数都可以进行比较（实数上的序关系是全序关系），但不是所有函数都可以渐近比较。即：对两个函数 f(n) 和 g(n) 而言，可能 f(n) = O(g(n)) 和 f(n) = $\Omega(g(n))$ 均不成立。
 
-例如，不能用渐近记号来比较函数 f(n) = n 和 g(n) = n^(1 + sin(n))，因为 g(n) 中的幂值在 0 与 2 之间摆动、取介于两者之间的所有值。不过，好在一般很少遇到这种特殊的运行时间表达式。T(n) 一般都是多项式函数与对数函数的组合，偶尔会出现指数函数和阶乘函数（此二者往往导致算法运行时间随输入规模的增长而剧烈增长，应尽量避免）。
+例如，不能用渐近记号来比较函数 $f(n) = n$ 和 $g(n) = n^(1 + \sin(n))$，因为 g(n) 中的幂值在 0 与 2 之间摆动、取介于两者之间的所有值。不过，好在一般很少遇到这种特殊的运行时间表达式。T(n) 一般都是多项式函数与对数函数的组合，偶尔会出现指数函数和阶乘函数（此二者往往导致算法运行时间随输入规模的增长而剧烈增长，应尽量避免）。
 
 正整数 n 的阶乘可以根据 斯特林公式 (Stirling's Approximation) 来近似：
 
-$$ n! = \sqrt(2n \pi) (n/e)^{n} (1 + 1/O(n)) $$
+$$n! = \sqrt{2n \pi} (n/e)^{n} (1 + 1/O(n))$$
 
 ## 3. 递归式
 
 对含有递归结构的算法进行运行时间分析时，常使用**递归式**来表达问题。
 
-例如，归并排序的每次将当前数据规模 k 的问题分解为 2 个数据规模为 k/2 的子问题，并耗费 $ \Theta(k) $ 的时候将子问题的结果合并起来。因此归并排序的递归式为 $ T(k) = 2 T(k/2) + \Theta(k) $。顶层调用为输入规模 k=n。
+例如，归并排序的每次将当前数据规模 k 的问题分解为 2 个数据规模为 k/2 的子问题，并耗费 $ \Theta(k) $ 的时候将子问题的结果合并起来。因此归并排序的递归式为 $T(k) = 2 T(k/2) + \Theta(k)$。顶层调用为输入规模 k=n。
 
 求解递归式一般有三种方式：代入法、递归树、主方法。
 
@@ -160,19 +160,19 @@ $$ n! = \sqrt(2n \pi) (n/e)^{n} (1 + 1/O(n)) $$
 
 **主定理**：令 a >= 1 和 b > 1 是常数，f(n) 是一个渐近为正的函数，T(n) 是定义域为自然数集的递归式：
 
-$$ T(n) = a T(n/b) + f(n) $$
+$$T(n) = a T(n/b) + f(n)$$
 
-这里将 n/b 解释为上取整 `\ceil(n/b)` 或下取整 `\floor(n/b)`。则 T(n) 有如下渐近界：
+这里将 n/b 解释为上取整 $\lceil n/b \rceil$ 或下取整 $\lfloor n/b \rfloor$。则 T(n) 有如下渐近界：
 
-1. 若对某个常数 $ \epsilon > 0 $，有 $ f(n) = O(n^{(log_{b} a) - \epsilon}) $，则 $ T(n) = \Theta(n^{log_{b} a}) $
-2. 若 $ f(n) = \Theta(n^{log_{b} a}) $，则 $ T(n) = \Theta(n^{log_{b} a} log n) $
-3. 若对某个常数 $ \epsilon > 0 $，有 $ f(n) = \Omega(n^{(log_{b} a) + \epsilon}) $，且对某个常数 c < 1 和所有足够大的 n 有 $ a f(n/b) <= c f(n) $，则 $ T(n) = \Theta(f(n)) $
+1. 若对某个常数 $\epsilon > 0$，有 $f(n) = O(n^{(log_{b} a) - \epsilon})$，则 $T(n) = \Theta(n^{log_{b} a})$
+2. 若 $f(n) = \Theta(n^{log_{b} a})$，则 $T(n) = \Theta(n^{log_{b} a} log n)$
+3. 若对某个常数 $ \epsilon > 0 $，有 $f(n) = \Omega(n^{(log_{b} a) + \epsilon})$，且对某个常数 c < 1 和所有足够大的 n 有 $a f(n/b) \leq c f(n)$，则 $T(n) = \Theta(f(n))$
 
-**解释**：对于三种情况的每一种，将函数 f(n) 与函数 $ g(n) = n^{log_{b} a} $ 进行比较，两大函数的较大者决定了递归式的解。
+**解释**：对于三种情况的每一种，将函数 f(n) 与函数 $g(n) = n^{log_{b} a}$ 进行比较，两大函数的较大者决定了递归式的解。
 
-- 对于情况 1，g(n) 渐近较大，则解为 $ T(n) = \Theta(g(n)) $
-- 对于情况 2，两者渐近相等，则在 g(n) 的基础上乘以一个对数因子，解为 $ T(n) = \Theta(g(n) log n) $
-- 对于情况 3，f(n) 渐近较大，则解为 $ T(n) = \Theta(f(n)) $
+- 对于情况 1，g(n) 渐近较大，则解为 $T(n) = \Theta(g(n))$
+- 对于情况 2，两者渐近相等，则在 g(n) 的基础上乘以一个对数因子，解为 $T(n) = \Theta(g(n) log n)$
+- 对于情况 3，f(n) 渐近较大，则解为 $T(n) = \Theta(f(n))$
 
 **注意**：这三种情况并没有把所有可能出现的 case 都覆盖，存在一些“间隙”，使得主定理无法适用。
 
@@ -182,7 +182,7 @@ $$ T(n) = a T(n/b) + f(n) $$
 
 **应用举例**
 
-对归并排序的递归式 $ T(n) = 2 T(n/2) + \Theta(n) $ 应用主定理。a = 2、b = 2、$ f(n) = \Theta(n) $，因此 $ g(n) = n^{log_{b} a} = n^{log_{2} 2} = n $。所以 f(n) 渐近等于 g(n)，属于情况 2，得到递归式的解为 $ T(n) = \Theta(g(n) log n) = \Theta(n log n) $。
+对归并排序的递归式 $T(n) = 2 T(n/2) + \Theta(n)$ 应用主定理。a = 2、b = 2、$f(n) = \Theta(n)$，因此 $g(n) = n^{log_{b} a} = n^{log_{2} 2} = n$。所以 f(n) 渐近等于 g(n)，属于情况 2，得到递归式的解为 $T(n) = \Theta(g(n) log n) = \Theta(n log n)$。
 
 ## 4. 数据结构
 

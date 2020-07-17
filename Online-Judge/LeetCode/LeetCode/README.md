@@ -10,8 +10,8 @@ By [YuweiYin](https://github.com/YuweiYin)
 
 ## 代码环境
 
-CPP
+CPP, Python
 
 ## IDE
 
-XCode
+XCode, PyCharm

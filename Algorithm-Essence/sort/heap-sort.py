@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : heap-sort.py
 @Author  : YuweiYin
-@Date    : 2020-05-07
 =================================================="""
 
 import sys

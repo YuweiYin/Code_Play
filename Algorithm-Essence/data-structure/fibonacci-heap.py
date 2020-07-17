@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : fibonacci-heap.py
 @Author  : YuweiYin
-@Date    : 2020-05-22
 =================================================="""
 
 import sys

@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/graph_basis
 @File    : graph-basis.py
 @Author  : YuweiYin
-@Date    : 2020-05-29
 =================================================="""
 
 import sys

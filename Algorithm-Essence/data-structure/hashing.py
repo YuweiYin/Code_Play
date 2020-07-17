@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : hashing.py
 @Author  : YuweiYin
-@Date    : 2020-05-13
 =================================================="""
 
 import sys

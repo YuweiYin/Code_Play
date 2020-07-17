@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/shortest_path
 @File    : dag-shortest-path.py
 @Author  : YuweiYin
-@Date    : 2020-05-31
 =================================================="""
 
 import sys

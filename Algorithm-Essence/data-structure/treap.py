@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : treap.py
 @Author  : YuweiYin
-@Date    : 2020-05-08
 =================================================="""
 
 # import gc

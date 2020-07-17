@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : union-find.py
 @Author  : YuweiYin
-@Date    : 2020-05-04
 =================================================="""
 
 import sys

@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : string-trie.py
 @Author  : YuweiYin
-@Date    : 2020-06-17
 =================================================="""
 
 import sys

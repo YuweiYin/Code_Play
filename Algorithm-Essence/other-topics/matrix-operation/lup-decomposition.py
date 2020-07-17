@@ -4,7 +4,6 @@
 @Project : algorithm/other-topics/matrix-operation
 @File    : lup-decomposition.py
 @Author  : YuweiYin
-@Date    : 2020-06-05
 =================================================="""
 
 import sys

@@ -4,7 +4,6 @@
 @Project : algorithm/other-topics/number-theoretic-algorithm
 @File    : number-theory.py
 @Author  : YuweiYin
-@Date    : 2020-06-09
 =================================================="""
 
 import sys

@@ -4,7 +4,6 @@
 @Project : algorithm/other-topics/polynomial-fft
 @File    : fast-fourier-transform.py
 @Author  : YuweiYin
-@Date    : 2020-06-08
 =================================================="""
 
 import sys

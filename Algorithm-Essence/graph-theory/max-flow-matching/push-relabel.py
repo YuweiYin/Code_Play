@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/max_flow_matching
 @File    : push-relabel.py
 @Author  : YuweiYin
-@Date    : 2020-06-04
 =================================================="""
 
 import sys

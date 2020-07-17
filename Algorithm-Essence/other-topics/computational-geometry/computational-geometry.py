@@ -4,7 +4,6 @@
 @Project : algorithm/other-topics/computational-geometry
 @File    : computational-geometry.py
 @Author  : YuweiYin
-@Date    : 2020-06-13
 =================================================="""
 
 import sys

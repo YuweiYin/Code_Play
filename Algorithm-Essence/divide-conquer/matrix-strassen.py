@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """=================================================
-@Project : algorithm/divide_conquer
+@Project : algorithm/divide-conquer
 @File    : matrix-strassen.py
 @Author  : YuweiYin
-@Date    : 2020-05-21
 =================================================="""
 
 import sys

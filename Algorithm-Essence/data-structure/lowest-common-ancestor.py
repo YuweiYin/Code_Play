@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : lowest-common-ancestor.py
 @Author  : YuweiYin
-@Date    : 2020-05-03
 =================================================="""
 
 import sys

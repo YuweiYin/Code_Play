@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/graph_basis
 @File    : bfs.py
 @Author  : YuweiYin
-@Date    : 2020-05-30
 =================================================="""
 
 import sys

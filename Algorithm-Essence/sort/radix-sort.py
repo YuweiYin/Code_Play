@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : radix-sort.py
 @Author  : YuweiYin
-@Date    : 2020-05-10
 =================================================="""
 
 import sys

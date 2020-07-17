@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : median-order-statistic.py
 @Author  : YuweiYin
-@Date    : 2020-05-24
 =================================================="""
 
 import sys

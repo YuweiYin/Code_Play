@@ -4,7 +4,6 @@
 @Project : algorithm/dynamic_programming
 @File    : optimal-binary-search-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-27
 =================================================="""
 
 import sys

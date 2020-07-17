@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/shortest_path
 @File    : bellman-ford.py
 @Author  : YuweiYin
-@Date    : 2020-05-31
 =================================================="""
 
 import sys

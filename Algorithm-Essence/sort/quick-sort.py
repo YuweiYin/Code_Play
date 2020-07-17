@@ -4,7 +4,6 @@
 @Project : algorithm/sort
 @File    : quick-sort.py
 @Author  : YuweiYin
-@Date    : 2020-05-09
 =================================================="""
 
 import sys

@@ -4,7 +4,6 @@
 @Project : algorithm/greedy_algorithm
 @File    : huffman.py
 @Author  : YuweiYin
-@Date    : 2020-05-28
 =================================================="""
 
 import sys

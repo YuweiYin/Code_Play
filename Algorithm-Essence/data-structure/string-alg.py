@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : string-alg.py
 @Author  : YuweiYin
-@Date    : 2020-05-12
 =================================================="""
 
 import sys

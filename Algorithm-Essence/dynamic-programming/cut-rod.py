@@ -4,7 +4,6 @@
 @Project : algorithm/dynamic_programming
 @File    : cut-rod.py
 @Author  : YuweiYin
-@Date    : 2020-05-26
 =================================================="""
 
 import sys

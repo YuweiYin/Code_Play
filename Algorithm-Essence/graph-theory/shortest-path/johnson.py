@@ -4,7 +4,6 @@
 @Project : algorithm/graph_theory/shortest_path
 @File    : johnson.py
 @Author  : YuweiYin
-@Date    : 2020-06-02
 =================================================="""
 
 import sys

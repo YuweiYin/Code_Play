@@ -4,7 +4,6 @@
 @Project : algorithm/other-topics/linear-programming
 @File    : simplex.py
 @Author  : YuweiYin
-@Date    : 2020-06-06
 =================================================="""
 
 import sys

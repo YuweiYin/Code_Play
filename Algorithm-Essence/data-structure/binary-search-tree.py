@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : binary-search-tree.py
 @Author  : YuweiYin
-@Date    : 2020-05-04
 =================================================="""
 
 # import gc

@@ -4,7 +4,6 @@
 @Project : algorithm/data_structure
 @File    : string-suffix.py
 @Author  : YuweiYin
-@Date    : 2020-06-19
 =================================================="""
 
 import sys
