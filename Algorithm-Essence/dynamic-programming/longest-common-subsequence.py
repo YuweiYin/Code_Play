@@ -43,8 +43,8 @@ class LongestCommonSubsequence:
         # b[i, j] 表格（二维数组 c[1..m, 1..n]）保存计算 c[i, j] 时所选择的子问题最优解，方便构造原问题的最优解
         # b[i, j] 等于 0 仅作占位、等于 1 表示当前最优解是 c[i, j] = c[i-1, j-1] + 1
         # 等于 2 表示当前最优解是 c[i, j] = c[i-1, j]、等于 3 则表示 c[i, j] =  c[i, j-1]
-        c_table = [[self.neg_inf for j in range(n + 1)] for i in range(m + 1)]
-        b_table = [[0 for j in range(n)] for i in range(m)]
+        c_table = [[self.neg_inf for _ in range(n + 1)] for _ in range(m + 1)]
+        b_table = [[0 for _ in range(n)] for _ in range(m)]
         # c_table 首行与首列的值均置为 0
         for i in range(m + 1):
             c_table[i][0] = 0

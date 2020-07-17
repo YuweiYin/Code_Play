@@ -42,16 +42,16 @@ class OptimalBinarySearchTree:
         # 表格 e[1..n+1, 0..n] 来保存 e[i, j] 值
         # 第一维下标上界为 n+1 而不是 n，是因为对于只包含伪关键字 dn 的子树，需要计算并保存 e[n+1, n]
         # 第二维下标下界为 0，是因为对于只包含伪关键字 d0 的子树，需要计算并保存 e[1, 0]。只是用表中满足 i < j 的表项 e[i, j]
-        e_table = [[0 for j in range(n + 1)] for i in range(n + 2)]
+        e_table = [[0 for _ in range(n + 1)] for _ in range(n + 2)]
 
         # 为了避免每次计算 e[i, j] 都要重新计算 w(i, j)，可以将此值保存在表格 w 中
         # 这样每次可以节省 $ \Theta(j-i) $ 次加法运算。
-        w_table = [[0 for j in range(n + 1)] for i in range(n + 2)]
+        w_table = [[0 for _ in range(n + 1)] for _ in range(n + 2)]
 
         # 表格 root[i, j] 记录 包含了关键字 k1, ..., kj 的子树 的根
         # 利用 root 表格可以构建出最优解。只使用此表中满足 1 <= i <= j <= n 的表项 root[i, j]
         # r_table = [[0 for j in range(n)] for i in range(n)]
-        r_table = [[0 for j in range(n + 1)] for i in range(n + 2)]
+        r_table = [[0 for _ in range(n + 1)] for _ in range(n + 2)]
 
         # e[i, i-1] 和 w[i, i-1] 均置为 q_{i-1}
         for i in range(1, n + 2):

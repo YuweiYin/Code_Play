@@ -49,7 +49,7 @@ class MatrixChainOrder:
         if matrix_a.col_num != matrix_b.row_num:
             print('matrix_multiply: incompatible dimensions')
             return None
-        res_matrix = [[0 for j in range(matrix_b.col_num)] for i in range(matrix_a.row_num)]
+        res_matrix = [[0 for _ in range(matrix_b.col_num)] for _ in range(matrix_a.row_num)]
         for i in range(matrix_a.row_num):
             for j in range(matrix_b.col_num):
                 for k in range(matrix_a.col_num):
@@ -67,8 +67,8 @@ class MatrixChainOrder:
         # 因此，原问题的最优解（计算 A_{1..n}）所需的最低代价就是 m[1, n] 的值
         # 备忘录 s[i, j] 保存链乘 Ai...Aj 最优括号化方案的各个分割点位置 k
         # 即：使得 m[i, j] = m[i, k] + m[k+1, j] + p_{i-1} * p_k * pj 成立的 k 值
-        m_table = [[self.inf for j in range(matrix_num)] for i in range(matrix_num)]
-        s_table = [[self.inf for j in range(matrix_num)] for i in range(matrix_num)]
+        m_table = [[self.inf for _ in range(matrix_num)] for _ in range(matrix_num)]
+        s_table = [[self.inf for _ in range(matrix_num)] for _ in range(matrix_num)]
         # m_table 主对角线的值均置为 0
         for i in range(matrix_num):
             m_table[i][i] = 0
