@@ -4,7 +4,6 @@
 @Project : LeetCode/Prob0001_Two_Sum
 @File    : leetcode_0001_two_sum.py
 @Author  : YuweiYin
-@Date    : 2020-07-15
 =================================================="""
 
 # import gc
